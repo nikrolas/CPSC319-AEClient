@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import RecordSearchInput from './search/RecordSearchInput';
+import CreateRecord from './record/CreateRecord';
 import LayoutBanner from './banner/LayoutBanner'
 
 
@@ -11,6 +12,7 @@ class App extends Component {
           <LayoutBanner/>
         <br/>
       <RecordSearchInput/>
+          <CreateRecord/>
       </div>
     );
   }
