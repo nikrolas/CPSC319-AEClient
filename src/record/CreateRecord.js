@@ -1,4 +1,5 @@
 import React from 'react';
+import {Button, FormGroup, ControlLabel, FormControl} from 'react-bootstrap'
 
 class CreateRecord extends React.Component{
 
@@ -36,21 +37,24 @@ class CreateRecord extends React.Component{
     render() {
         return (
             <form>
-                <label>
-                    Record Type*:
-                    <br/>
-                    <input type="select" onChange={this.onDropdownSelected} label="Multiple Select" multiple>
+                <FormGroup controlId="formControlsSelect " onChange ={this.onDropdownSelected}>
+                    <ControlLabel>Record Type*</ControlLabel>
+                    <FormControl componentClass="select" placeholder="select">
                         {this.createRecordType()}
-                    </input>
-                </label>
+                    </FormControl>
+                </FormGroup>
                 <br/>
-                <label>
-                    Location*:
-                    This will take location and be read only
-                    <br/>
-                    <input type="text" value={this.state.location} disabled />
-                </label>
-                <input type="submit" value="Submit" />
+                <FormGroup>
+                    <ControlLabel>Location*</ControlLabel>
+                    <FormControl
+                        disabled
+                        type="text"
+                        value={this.state.location}
+                        placeholder="Enter text"
+                        onChange={this.handleChange}
+                    />
+                </FormGroup>
+                <Button type="submit">Submit</Button>
             </form>
         )
     }
