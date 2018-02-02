@@ -5,45 +5,55 @@ class CreateRecord extends React.Component{
 
     constructor(props) {
         super(props);
-        this.state = {value: '',
-                      location: "Burnaby"};
+        this.state =
+            {
+                recordType:"",
+                recordNumber: "",
+                title:"",
+                location: "Burnaby",
+                recordJson:{"Subject":"KKK-yyyy/ggg","AE CORP - CEO - BOARD MINUTES":"KKK-XXXXXXXXXXXXXXXXXXXXXX"},
+                checked: false
+            };
+
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        this.setState({value: event.target.value});
+    handleChange(e) {
+        this.setState({[e.target.name]: e.target.value});
+        //Obtain record number from dropdown and set state recordNumber
+        if(e.target.name === "recordType") {
+            for(var k in this.state.recordJson) {
+                if(k === e.target.value) {
+                    this.setState({recordNumber:this.state.recordJson[k]});
+                    break;
+                }
+            }
+        }
     }
 
     handleSubmit(event) {
-        alert('Your favorite flavor is: ' + this.state.value);
+        alert('Form has been submitted');
         event.preventDefault();
     }
-    createRecordType() {
-        let items = ["Cat", "Dog", "Hamster"];
-        //TODO populate with proper values
-        for (let i = 0; i <= this.props.maxValue; i++) {
-            items.push(<option key={i} value={i}>{i}</option>);
-            //here I will be creating my options dynamically based on
-            //what props are currently passed to the parent component
+    dropdownRecordType() {
+        let keys = [];
+        for (var k in this.state.recordJson) {
+            keys.push(<option key={k} value={k}>{k}</option>);
         }
-        return items;
+        return keys;
     }
 
-    onDropdownSelected(e) {
-        console.log("THE VAL", e.target.value);
-    }
     render() {
         return (
-            <form>
-                <FormGroup controlId="formControlsSelect " onChange ={this.onDropdownSelected}>
+            <form onSubmit={this.handleSubmit}>
+                <FormGroup controlId="formControlsSelect " onChange ={this.handleChange}>
                     <ControlLabel>Record Type*</ControlLabel>
-                    <FormControl componentClass="select" placeholder="select">
-                        {this.createRecordType()}
+                    <FormControl name="recordType" componentClass="select" placeholder="select">
+                        {this.dropdownRecordType()}
                     </FormControl>
                 </FormGroup>
-                <br/>
                 <FormGroup>
                     <ControlLabel>Location*</ControlLabel>
                     <FormControl
@@ -54,6 +64,16 @@ class CreateRecord extends React.Component{
                         onChange={this.handleChange}
                     />
                 </FormGroup>
+                <FormGroup>
+                    <ControlLabel>Record Number</ControlLabel>
+                    <FormControl
+                        name="recordNumber"
+                        type="text"
+                        value={this.state.recordNumber}
+                        placeholder="Enter text"
+                        onChange={this.handleChange}
+                    />
+                </FormGroup>;
                 <Button type="submit">Submit</Button>
             </form>
         )
