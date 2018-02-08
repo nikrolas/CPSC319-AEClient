@@ -13,7 +13,7 @@ const chance = new Chance();
 function getData() {
     //TODO
     const testData = [
-        {RecordNum: 'EDM-2003/001',
+        {'Record #': 'EDM-2003/001',
             Title: 'Laboriosam at sapiente temporibus',
             Type: 'Subject',
             State: 'Destroyed',
@@ -21,7 +21,7 @@ function getData() {
             Location: 'Edmonton',
             Updated: '2003-12-31'
         },
-        {RecordNum: 'EDM-2003/017:1',
+        {'Record #': 'EDM-2003/017:1',
             Title: 'Consequatur culpa aute',
             Type: 'Subject',
             State: 'Archived - Interim',
@@ -38,17 +38,36 @@ function getData() {
     });
 }
 
+function View(key, val) {
+    //TODO
+    console.log("key: ", key, " val: ",val);
+}
+
 function getColumns(data) {
     const columns = [];
     const sample = data[0];
     Object.keys(sample).forEach((key)=>{
         if(key!=='_id')
         {
-            columns.push({
-                accessor: key,
-                Header: key,
-            })
+            if(key === 'Record #' || key === 'Container') {
+                columns.push({
+                    accessor: key,
+                    Header: key,
+                    Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                })
+            }
+            else {
+                columns.push({
+                    accessor: key,
+                    Header: key,
+                })
+            }
         }
+    });
+    columns.push({
+        Header: '',
+        id: 'xbutton',
+        Cell: e => <button className="btn btn-danger btn-xs"><i className="fa fa-trash-o"></i></button>
     });
     return columns;
 }
@@ -100,21 +119,20 @@ class SelectTable extends Component {
     };
 
     isSelected = (key) => {
-        /*
-          Instead of passing our external selection state we provide an 'isSelected'
-          callback and detect the selection state ourselves. This allows any implementation
-          for selection (either an array, object keys, or even a Javascript Set object).
-        */
         return this.state.selection.includes(key);
     };
 
-    updateSelection = () => {
-        console.log('selection:', this.state.selection);
+    updateTray = () => {
         //TODO
+        let filtered = this.state.data.filter((item) => {
+            return this.isSelected(item._id);
+        });
+        console.log('selection: ', this.state.selection);
+        console.log(JSON.stringify(filtered));
     };
 
     render() {
-        const { toggleSelection, toggleAll, isSelected, updateSelection } = this;
+        const { toggleSelection, toggleAll, isSelected, updateTray } = this;
         const { data, columns, selectAll, } = this.state;
         const checkboxProps = {
             selectAll,
@@ -123,18 +141,33 @@ class SelectTable extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
+        let divstyle = {
+            padding: '50px'
+        };
+        let tablestyle = {
+            'margin-top': '30px',
+        };
+        let btnstyle = {
+            float: 'left',
+        };
         return (
-            <div>
-                <button onClick={updateSelection}>Add to Tray</button>
-                <CheckboxTable
-                    ref={(r)=>this.checkboxTable=r}
-                    data={data}
-                    columns={columns}
-                    defaultPageSize={10}
-                    className="-striped -highlight"
+            <div style={divstyle}>
+                <div style={btnstyle}>
+                    <button style={btnstyle} onClick={updateTray}>Add to Tray</button>
+                </div>
+                <div style={tablestyle}>
+                    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+                    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+                    <CheckboxTable
+                        ref={(r)=>this.checkboxTable=r}
+                        data={data}
+                        columns={columns}
+                        defaultPageSize={10}
+                        className="-striped -highlight"
 
-                    {...checkboxProps}
-                />
+                        {...checkboxProps}
+                    />
+                </div>
             </div>
         );
     }
