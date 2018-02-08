@@ -64,10 +64,15 @@ function getColumns(data) {
             }
         }
     });
+    let delbtn = {
+        'background-color': '#ff6c60',
+        'border-color': '#ff6c60',
+        color: '#FFFFFF'
+    };
     columns.push({
         Header: '',
         id: 'xbutton',
-        Cell: e => <button className="btn btn-del btn-xs"><i className="fa fa-trash-o"></i></button>
+        Cell: e => <button className="btn btn-xs" style={delbtn}><i className="fa fa-trash-o"></i></button>
     });
     return columns;
 }
@@ -145,16 +150,16 @@ class SelectTable extends Component {
             padding: '50px'
         };
         let tablestyle = {
-            'margin-top': '30px',
+            'margin-top': '35px',
         };
-        let btnstyle = {
+        let addbtnstyle = {
             float: 'left',
+            'background-color': '#b5ff87',
+            'border-color': '#FFFFFF',
         };
         return (
             <div style={divstyle}>
-                <div style={btnstyle}>
-                    <button style={btnstyle} onClick={updateTray}>Add to Tray</button>
-                </div>
+                <button style={addbtnstyle} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
                 <div style={tablestyle}>
                     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
                     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />

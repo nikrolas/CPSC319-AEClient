@@ -64,10 +64,15 @@ function getColumns(data) {
             }
         }
     });
+    let delbtn = {
+        'background-color': '#ff6c60',
+        'border-color': '#ff6c60',
+        color: '#FFFFFF'
+    };
     columns.push({
         Header: '',
         id: 'xbutton',
-        Cell: e => <button className="btn btn-del btn-xs"><i className="fa fa-trash-o"></i></button>
+        Cell: e => <button className="btn btn-xs" style={delbtn}><i className="fa fa-trash-o"></i></button>
     });
     return columns;
 }
