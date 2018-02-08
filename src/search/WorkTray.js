@@ -72,7 +72,7 @@ function getColumns(data) {
     return columns;
 }
 
-class SelectTable extends Component {
+class WorkTray extends Component {
     constructor() {
         super();
         const data = getData();
@@ -122,17 +122,8 @@ class SelectTable extends Component {
         return this.state.selection.includes(key);
     };
 
-    updateTray = () => {
-        //TODO
-        let filtered = this.state.data.filter((item) => {
-            return this.isSelected(item._id);
-        });
-        console.log('selection: ', this.state.selection);
-        console.log(JSON.stringify(filtered));
-    };
-
     render() {
-        const { toggleSelection, toggleAll, isSelected, updateTray } = this;
+        const { toggleSelection, toggleAll, isSelected } = this;
         const { data, columns, selectAll, } = this.state;
         const checkboxProps = {
             selectAll,
@@ -142,35 +133,22 @@ class SelectTable extends Component {
             selectType: 'checkbox',
         };
         let divstyle = {
-            padding: '50px'
-        };
-        let tablestyle = {
-            'margin-top': '30px',
-        };
-        let btnstyle = {
-            float: 'left',
+            margin: '50px'
         };
         return (
             <div style={divstyle}>
-                <div style={btnstyle}>
-                    <button style={btnstyle} onClick={updateTray}>Add to Tray</button>
-                </div>
-                <div style={tablestyle}>
-                    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
-                    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
-                    <CheckboxTable
-                        ref={(r)=>this.checkboxTable=r}
-                        data={data}
-                        columns={columns}
-                        defaultPageSize={10}
-                        className="-striped -highlight"
+                <CheckboxTable
+                    ref={(r)=>this.checkboxTable=r}
+                    data={data}
+                    columns={columns}
+                    defaultPageSize={10}
+                    className="-striped -highlight"
 
-                        {...checkboxProps}
-                    />
-                </div>
+                    {...checkboxProps}
+                />
             </div>
         );
     }
 }
 
-export default SelectTable;
+export default WorkTray;
