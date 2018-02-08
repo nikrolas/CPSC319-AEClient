@@ -67,7 +67,7 @@ function getColumns(data) {
     columns.push({
         Header: '',
         id: 'xbutton',
-        Cell: e => <button><i className="fa fa-trash-o"></i></button>
+        Cell: e => <button className="btn btn-del btn-xs"><i className="fa fa-trash-o"></i></button>
     });
     return columns;
 }
