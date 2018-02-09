@@ -11,7 +11,7 @@ class LayoutBanner extends Component {
                     logo= {<img src={banner_logo} className="App-logo" alt="logo" />}
                     url={ window.location.pathname }
                     links={[
-                        { "title": "Example Link", "url": "/example" },
+                        { "title": "New Record", "url": "/createRecord" },
                         { "title": "Another", "url": "/another" },
                         { "title": "Link w/ Children", "url": "/children", "children": [
                                 { "title": "John", "url": "/children/john" },

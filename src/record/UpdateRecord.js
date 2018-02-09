@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, Checkbox} from 'react-bootstrap'
 
-class CreateRecord extends Component {
+class UpdateRecord extends Component {
 
     constructor(props, context) {
         super(props, context);
@@ -10,6 +10,7 @@ class CreateRecord extends Component {
                 recordType: "",
                 recordNumber: "",
                 title: "",
+                state:"",
                 containerNumber: "",
                 consignmentCode: "",
                 location: "Burnaby",
@@ -60,7 +61,10 @@ class CreateRecord extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-
+    componentWillMount() {
+    }
+    componentDidMount(){
+    }
     //TODO - Validationstate is working but will have to likely create many for different validations
     getValidationState() {
         const length = this.state.recordNumber.length;
@@ -72,6 +76,8 @@ class CreateRecord extends Component {
 
     handleChange(e) {
         this.setState({[e.target.name]: e.target.value});
+        console.log(this.props.match.params)
+
         //When RecordType is changed, adjust record number
         if (e.target.name === "recordType") {
             for (var k in this.state.recordJson) {
@@ -121,7 +127,7 @@ class CreateRecord extends Component {
 
         return (
             <div>
-                <h1>Create a New Record</h1>
+                <h1>Update Record</h1>
                 <form onSubmit={this.handleSubmit}>
                     <FormGroup
                         controlId="formControlsSelect "
@@ -137,7 +143,7 @@ class CreateRecord extends Component {
                     <FormGroup>
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
                         <FormControl
-                            disabled
+                            name="location"
                             type="text"
                             value={this.state.location}
                             placeholder="Enter text"
@@ -190,6 +196,21 @@ class CreateRecord extends Component {
                             {listRetentionScheduleJson}
                         </FormControl>
                     </FormGroup>
+                    <FormGroup
+                        controlId="formControlsSelect "
+                        onChange={this.handleChange}
+                    >
+                        <ControlLabel>State {requiredLabel}</ControlLabel>
+                        <FormControl name="state"
+                                     componentClass="select"
+                                     placeholder="select">
+                            <option>Active</option>
+                            <option>Inactive</option>
+                            <option>Archived - Local</option>
+                            <option>Archived - Interim</option>
+                            <option>Destroyed</option>
+                        </FormControl>
+                    </FormGroup>
                     <FormGroup>
                         <ControlLabel>Container Number</ControlLabel>
                         <FormControl
@@ -217,4 +238,4 @@ class CreateRecord extends Component {
     }
 }
 
-export default CreateRecord;
+export default UpdateRecord;
