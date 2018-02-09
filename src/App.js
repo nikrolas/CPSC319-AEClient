@@ -3,6 +3,7 @@ import './App.css';
 import RecordSearchInput from './search/RecordSearchInput';
 import LayoutBanner from './banner/LayoutBanner'
 import SelectTable from "./search/Results";
+import WorkTray from "./search/WorkTray";
 
 
 class App extends Component {
@@ -13,6 +14,7 @@ class App extends Component {
         <br/>
       <RecordSearchInput/>
           <SelectTable/>
+          <WorkTray/>
       </div>
     );
   }

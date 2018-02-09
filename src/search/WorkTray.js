@@ -2,18 +2,14 @@ import React, { Component } from 'react';
 import ReactTable from 'react-table'
 import "react-table/react-table.css";
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
-import Chance from 'chance';
-
 const CheckboxTable = checkboxHOC(ReactTable);
-const chance = new Chance();
-
 
 //https://react-table.js.org/#/story/select-table-hoc
 
 function getData() {
     //TODO
     const testData = [
-        {'Record #': 'EDM-2003/001',
+        {RecordNum: 'EDM-2003/001',
             Title: 'Laboriosam at sapiente temporibus',
             Type: 'Subject',
             State: 'Destroyed',
@@ -21,7 +17,7 @@ function getData() {
             Location: 'Edmonton',
             Updated: '2003-12-31'
         },
-        {'Record #': 'EDM-2003/017:1',
+        {RecordNum: 'EDM-2003/017:1',
             Title: 'Consequatur culpa aute',
             Type: 'Subject',
             State: 'Archived - Interim',
@@ -30,7 +26,7 @@ function getData() {
             Updated: '2015-12-31'
         }];
     return testData.map((item)=>{
-        const _id = chance.guid();
+        const _id = item.RecordNum;
         return {
             _id,
             ...item,
@@ -49,18 +45,29 @@ function getColumns(data) {
     Object.keys(sample).forEach((key)=>{
         if(key!=='_id')
         {
-            if(key === 'Record #' || key === 'Container') {
-                columns.push({
-                    accessor: key,
-                    Header: key,
-                    Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
-                })
-            }
-            else {
-                columns.push({
-                    accessor: key,
-                    Header: key,
-                })
+            switch(key) {
+                case 'RecordNum': {
+                    columns.push({
+                        accessor: key,
+                        Header: 'Record #',
+                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                    });
+                    break;
+                }
+                case 'Container': {
+                    columns.push({
+                        accessor: key,
+                        Header: key,
+                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                    });
+                    break;
+                }
+                default: {
+                    columns.push({
+                        accessor: key,
+                        Header: key,
+                    })
+                }
             }
         }
     });
@@ -138,19 +145,37 @@ class WorkTray extends Component {
             selectType: 'checkbox',
         };
         let divstyle = {
-            margin: '50px'
+            padding: '50px',
+        };
+        let tablestyle = {
+            //'margin-top': '35px',
+            paddingTop: '20px',
+            //border: '5px solid gray'
+        };
+        let addbtnstyle = {
+            float: 'left',
+            display: 'block',
+            'background-color': '#b5ff87',
+            'border-color': '#FFFFFF',
+        };
+        let h1style = {
+            //display: 'inline',
         };
         return (
             <div style={divstyle}>
-                <CheckboxTable
-                    ref={(r)=>this.checkboxTable=r}
-                    data={data}
-                    columns={columns}
-                    defaultPageSize={10}
-                    className="-striped -highlight"
+                <h1 style={h1style}>Work Tray</h1>
+                <div style={tablestyle}>
+                    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+                    <CheckboxTable
+                        ref={(r)=>this.checkboxTable=r}
+                        data={data}
+                        columns={columns}
+                        defaultPageSize={10}
+                        className="-striped -highlight"
 
-                    {...checkboxProps}
-                />
+                        {...checkboxProps}
+                    />
+                </div>
             </div>
         );
     }
