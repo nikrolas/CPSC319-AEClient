@@ -71,7 +71,7 @@ function getColumns(data) {
             }
         }
     });
-    let delbtn = {
+/*    let delbtn = {
         'background-color': '#ff6c60',
         'border-color': '#ff6c60',
         color: '#FFFFFF'
@@ -80,7 +80,7 @@ function getColumns(data) {
         Header: '',
         id: 'xbutton',
         Cell: e => <button className="btn btn-xs" style={delbtn}><i className="fa fa-trash-o"></i></button>
-    });
+    });*/
     return columns;
 }
 
