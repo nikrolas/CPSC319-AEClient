@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
-import ReactTable from 'react-table'
+import ReactTable from 'react-table';
+import {Link} from 'react-router-dom';
 import "react-table/react-table.css";
+import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
+import WorkTray from "./WorkTray";
+import Search from "./Search";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 //https://react-table.js.org/#/story/select-table-hoc
+
 
 function getData() {
     //TODO
@@ -173,9 +178,10 @@ class SelectTable extends Component {
         return (
             <div style={divstyle}>
                 <h1 style={h1style}>Results</h1>
-                <button style={addbtnstyle} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
+                <Link to="/worktray">
+                    <button style={addbtnstyle} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
+                </Link>
                 <div style={tablestyle}>
-                    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}
                         data={data}
@@ -186,6 +192,7 @@ class SelectTable extends Component {
                         {...checkboxProps}
                     />
                 </div>
+                {this.props.children}
             </div>
         );
     }

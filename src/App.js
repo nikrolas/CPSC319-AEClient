@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
+import {Route, BrowserRouter} from 'react-router-dom';
 import './App.css';
-import RecordSearchInput from './search/RecordSearchInput';
 import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
 import UpdateRecord from './record/UpdateRecord';
 import LayoutBanner from './banner/LayoutBanner';
-import {
-    Route,
-} from 'react-router-dom';
+import Search from './search/Search';
+import SelectTable from "./search/Results";
+import WorkTray from "./search/WorkTray";
 
 class App extends Component {
     render() {
@@ -17,6 +17,17 @@ class App extends Component {
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
+{/*                <BrowserRouter>
+                    <Route exact path='/' component={Search}>
+                        <Route path="result" component={SelectTable}>
+                            <Route path="worktray" component={WorkTray}/>
+                        </Route>
+                    </Route>
+                </BrowserRouter>
+                {this.props.children}*/}
+                <Route exact path='/' component={Search}/>
+                <Route path="/result" component={SelectTable}/>
+                <Route path="/worktray" component={WorkTray}/>
             </div>
         );
     }
