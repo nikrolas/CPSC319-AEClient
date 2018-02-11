@@ -1,0 +1,17 @@
+image: node:latest
+
+cache:
+  paths:
+  - node_modules/
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+  - yarn install
+  - yarn run build
+  - apt-get update
+  - apt-get install lftp
+  - lftp -u $FTP_USER,$FTP_PASSWORD $FTP_URL -e "mirror -R -p -x=node_modules build/. ./"
