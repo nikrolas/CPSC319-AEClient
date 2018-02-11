@@ -4,6 +4,7 @@ import './App.css';
 import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
 import UpdateRecord from './record/UpdateRecord';
+import CreateContainer from "./container/CreateContainer";
 import LayoutBanner from './banner/LayoutBanner';
 import SelectTable from "./search/Results";
 import WorkTray from "./search/WorkTray";
@@ -20,6 +21,7 @@ class App extends Component {
                 <Route exact path='/' component={Home}/>
                 <Route path="/results/:searchString?" component={SelectTable}/>
                 <Route path="/worktray" component={WorkTray}/>
+                <Route path='/createContainer/' component={CreateContainer}/>
             </div>
         );
     }
