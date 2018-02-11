@@ -42,7 +42,7 @@ class ViewRecord extends Component {
     }
 
     render() {
-        const { navigate } = this.state.navigate;
+        const { navigate } = this.state;
 
         // here is the important part
         if (navigate) {
