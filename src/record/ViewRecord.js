@@ -37,7 +37,7 @@ class ViewRecord extends Component {
     }
 
     handleSubmit(event) {
-        alert('Form has been submitted');
+        alert('Form has been submitted - for rollback');
         event.preventDefault();
     }
 
