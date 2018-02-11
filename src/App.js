@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './App.css';
-import RecordSearchInput from './search/RecordSearchInput';
 import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
 import UpdateRecord from './record/UpdateRecord';
