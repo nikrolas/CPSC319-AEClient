@@ -4,14 +4,12 @@ import {Link} from 'react-router-dom';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
-import WorkTray from "./WorkTray";
-import Search from "./Search";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 //https://react-table.js.org/#/story/select-table-hoc
 
 
-function getData() {
+function getData(resp) {
     //TODO
     const testData = [
         {RecordNum: 'EDM-2003/001',
@@ -29,14 +27,35 @@ function getData() {
             Container: '2016/181-EDM',
             Location: 'AE Corporate Office - Burnaby - Accounting',
             Updated: '2015-12-31'
-        }];
-    return testData.map((item)=>{
-        const _id = item.RecordNum;
+        },
+        {
+            NewColumn: "test",
+            Title: '',
+            Type: 'Subject',
+            State: 'Archived - Interim',
+            Container: '2016/181-EDM',
+            Updated: '2015-12-31'
+        }
+        ];
+    return testData.map((item, index)=>{
+        const _id = index;
         return {
             _id,
             ...item,
         }
     });
+
+
+    //Actual data
+/*    let keys = Object.keys(resp);
+    let data = resp[keys[0]].concat(resp[keys[1]]);
+    return data.map((item, index)=>{
+        const _id = index;
+        return {
+            _id,
+            ...item,
+        }
+    });*/
 }
 
 function View(key, val) {
@@ -45,9 +64,14 @@ function View(key, val) {
 }
 
 function getColumns(data) {
-    const columns = [];
-    const sample = data[0];
-    Object.keys(sample).forEach((key)=>{
+    let columns = [];
+    if (!data || data.length === 0) {
+        return columns;
+    }
+    let first = data[0];
+    let last = data.slice(-1)[0];
+    let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
+    Array.from(keyset).forEach((key)=>{
         if(key!=='_id')
         {
             switch(key) {
@@ -99,8 +123,12 @@ class SelectTable extends Component {
             columns,
             selection: [],
             selectAll: false,
+            tray: []
         };
     }
+
+    componentWillMount() {}
+    componentDidMount() {}
 
     toggleSelection = (key) => {
         // start off with the existing state
@@ -141,11 +169,13 @@ class SelectTable extends Component {
 
     updateTray = () => {
         //TODO
-        let filtered = this.state.data.filter((item) => {
-            return this.isSelected(item._id);
+        this.state.selection.forEach((id) => {
+            if (!this.state.tray.includes(this.state.data[id])) {
+                this.state.tray.push(this.state.data[id]);
+            }
         });
         console.log('selection: ', this.state.selection);
-        console.log(JSON.stringify(filtered));
+        console.log(JSON.stringify(this.state.tray));
     };
 
     render() {
@@ -178,9 +208,8 @@ class SelectTable extends Component {
         return (
             <div style={divstyle}>
                 <h1 style={h1style}>Results</h1>
-                <Link to="/worktray">
                     <button style={addbtnstyle} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
-                </Link>
+                <Link to={{ pathname: '/worktray', state: {traydata: this.state.tray} }}>Work Tray</Link>
                 <div style={tablestyle}>
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}

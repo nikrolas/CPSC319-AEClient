@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
-import ReactTable from 'react-table'
+import ReactTable from 'react-table';
+import {Link} from 'react-router-dom';
 import "react-table/react-table.css";
+import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 const CheckboxTable = checkboxHOC(ReactTable);
 
 //https://react-table.js.org/#/story/select-table-hoc
 
-function getData() {
+function getData(data) {
     //TODO
-    const testData = [
+/*    const testData = [
         {RecordNum: 'EDM-2003/001',
             Title: 'Laboriosam at sapiente temporibus',
             Type: 'Subject',
@@ -24,12 +26,13 @@ function getData() {
             Container: '2016/181-EDM',
             Location: 'AE Corporate Office - Burnaby - Accounting',
             Updated: '2015-12-31'
-        }];
-    return testData.map((item)=>{
-        const _id = item.RecordNum;
+        }];*/
+    return data.map((item, index)=>{
+        const _id = index;
         return {
             _id,
             ...item,
+            _id
         }
     });
 }
@@ -39,10 +42,16 @@ function View(key, val) {
     console.log("key: ", key, " val: ",val);
 }
 
-function getColumns(data) {
-    const columns = [];
-    const sample = data[0];
-    Object.keys(sample).forEach((key)=>{
+/*function getColumns(data) {
+    console.log(JSON.stringify(data));
+    let columns = [];
+    if (!data || data.length === 0) {
+        return columns;
+    }
+    let first = data[0];
+    let last = data.slice(-1)[0];
+    let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
+    Array.from(keyset).forEach((key)=>{
         if(key!=='_id')
         {
             switch(key) {
@@ -79,16 +88,17 @@ function getColumns(data) {
     columns.push({
         Header: '',
         id: 'xbutton',
-        Cell: e => <button className="btn btn-xs" style={delbtn}><i className="fa fa-trash-o"></i></button>
+        Cell: e => <button className="btn btn-xs" onClick={} style={delbtn}><i className="fa fa-trash-o"/></button>
     });
     return columns;
-}
+}*/
 
 class WorkTray extends Component {
-    constructor() {
-        super();
-        const data = getData();
-        const columns = getColumns(data);
+    constructor(props) {
+        super(props);
+        //console.log(JSON.stringify(this.props.location.state.traydata));
+        const data = getData(this.props.location.state.traydata);
+        const columns = this.getColumns(this.props.location.state.traydata);
         this.state = {
             data,
             columns,
@@ -96,6 +106,68 @@ class WorkTray extends Component {
             selectAll: false,
         };
     }
+
+    componentWillMount() {}
+    componentDidMount() {}
+
+    getColumns = (data) => {
+        console.log(JSON.stringify(data));
+        let columns = [];
+        if (!data || data.length === 0) {
+            return columns;
+        }
+        let first = data[0];
+        let last = data.slice(-1)[0];
+        let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
+        Array.from(keyset).forEach((key)=>{
+            if(key!=='_id')
+            {
+                switch(key) {
+                    case 'RecordNum': {
+                        columns.push({
+                            accessor: key,
+                            Header: 'Record #',
+                            Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                        });
+                        break;
+                    }
+                    case 'Container': {
+                        columns.push({
+                            accessor: key,
+                            Header: key,
+                            Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                        });
+                        break;
+                    }
+                    default: {
+                        columns.push({
+                            accessor: key,
+                            Header: key,
+                        })
+                    }
+                }
+            }
+        });
+        let delbtn = {
+            'background-color': '#ff6c60',
+            'border-color': '#ff6c60',
+            color: '#FFFFFF'
+        };
+        columns.push({
+            Header: '',
+            id: 'xbutton',
+            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={delbtn}><i className="fa fa-trash-o"/></button>
+        });
+        return columns;
+    };
+
+    deleteRow = (e) => {
+        let index = e.row._index;
+        console.log(e.row);
+        let data = this.state.data;
+        data.splice(index, 1);
+        this.setState({data});
+    };
 
     toggleSelection = (key) => {
         // start off with the existing state
@@ -165,7 +237,6 @@ class WorkTray extends Component {
             <div style={divstyle}>
                 <h1 style={h1style}>Work Tray</h1>
                 <div style={tablestyle}>
-                    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}
                         data={data}

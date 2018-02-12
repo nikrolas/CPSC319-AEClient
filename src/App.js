@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Route, BrowserRouter} from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import './App.css';
 import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
@@ -17,14 +17,6 @@ class App extends Component {
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
-{/*                <BrowserRouter>
-                    <Route exact path='/' component={Search}>
-                        <Route path="result" component={SelectTable}>
-                            <Route path="worktray" component={WorkTray}/>
-                        </Route>
-                    </Route>
-                </BrowserRouter>
-                {this.props.children}*/}
                 <Route exact path='/' component={Search}/>
                 <Route path="/result" component={SelectTable}/>
                 <Route path="/worktray" component={WorkTray}/>

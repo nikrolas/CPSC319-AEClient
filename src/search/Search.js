@@ -99,7 +99,7 @@ class Search extends Component{
         };
         return (
             <div style={container}>
-                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
                 <form>
                     <div style={s1}>
                         <select value={this.state.value} onChange={this.handleSelectChange} style={sel}>
@@ -111,7 +111,7 @@ class Search extends Component{
                     </div>
 
                     <div style={searchwrap}>
-                        <i class="fa fa-search" style={searchicon}></i>
+                        <i class="fa fa-search" style={searchicon}/>
                         <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search.." style={searchbox}></input>
                         <Link to="/result">
                             <button type="submit" className='btn btn-default' onSubmit={this.handleSubmit} style={submitbtn}>
