@@ -5,7 +5,17 @@ cache:
   - node_modules/
 
 stages:
+  - build
   - deploy
+
+build:
+  stage: build
+  script:
+  - yarn install
+  - yarn run build
+  - cp web.config build
+  except:
+  - master
 
 deploy_staging:
   stage: deploy
