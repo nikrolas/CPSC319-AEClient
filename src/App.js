@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Route, BrowserRouter} from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import './App.css';
 import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
@@ -26,7 +26,7 @@ class App extends Component {
                 </BrowserRouter>
                 {this.props.children}*/}
                 <Route exact path='/' component={Search}/>
-                <Route path="/result" component={SelectTable}/>
+                <Route path="/results/:searchString" component={SelectTable}/>
                 <Route path="/worktray" component={WorkTray}/>
             </div>
         );

@@ -4,14 +4,13 @@ import {Link} from 'react-router-dom';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
-import WorkTray from "./WorkTray";
-import Search from "./Search";
+import {getRecordsByNumber} from "../APIs/RecordsApi";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 //https://react-table.js.org/#/story/select-table-hoc
 
 
-function getData() {
+function getMockData() {
     //TODO
     const testData = [
         {RecordNum: 'EDM-2003/001',
@@ -92,7 +91,7 @@ function getColumns(data) {
 class SelectTable extends Component {
     constructor() {
         super();
-        const data = getData();
+        const data = getMockData();
         const columns = getColumns(data);
         this.state = {
             data,
@@ -100,6 +99,27 @@ class SelectTable extends Component {
             selection: [],
             selectAll: false,
         };
+    }
+
+    componentDidMount() {
+        let setData = this.setData;
+        getRecordsByNumber(this.props.match.params.searchString, 5)
+            .then(result => {
+                setData(result);
+            })
+            .catch(err => {
+           console.error("Error loading search results: " + err.message);
+        });
+    }
+
+    setData = (data) => {
+        const columns = getColumns(data);
+        this.state = {
+            data,
+            columns,
+            selection: [],
+            selectAll: false
+        }
     }
 
     toggleSelection = (key) => {

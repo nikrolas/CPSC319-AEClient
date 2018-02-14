@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
-import {Route, Link} from 'react-router-dom';
-import WorkTray from "./WorkTray";
-import SelectTable from "./Results";
-
+import {Link} from 'react-router-dom';
 /*const routes = (
     <Route exact path='/' component={Search}>
         <Route path="result" component={SelectTable}>
@@ -18,11 +15,15 @@ class Search extends Component{
         this.state = {
             searchvalue: '',
             selectvalue: 'all',
-        }
+            searchPath: ''
+        };
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleInputChange = (e) => {
         this.setState({
-            'searchvalue': e.target.value
+            'searchvalue': e.target.value,
+            'searchPath': '/results/' + e.target.value
         });
     };
     handleSelectChange = (e) => {
@@ -30,8 +31,8 @@ class Search extends Component{
             'selectvalue': e.target.value
         });
     };
-    handleSubmit = () => {
-        //TODO router?
+
+    handleSubmit = (e) => {
     };
 
     render() {
@@ -100,21 +101,21 @@ class Search extends Component{
         return (
             <div style={container}>
                 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
-                <form>
+                <form onSubmit={this.handleSubmit}>
                     <div style={s1}>
-                        <select value={this.state.value} onChange={this.handleSelectChange} style={sel}>
-                            <option value='all' selected="selected">All</option>
-                            <option value='records'>Records</option>
-                            <option value='containers'>Containers</option>
-                            <option value='users'>Users</option>
-                        </select>
+                        {/*<select value={this.state.value} onChange={this.handleSelectChange} style={sel}>*/}
+                            {/*<option value='all' selected="selected">All</option>*/}
+                            {/*<option value='records'>Records</option>*/}
+                            {/*<option value='containers'>Containers</option>*/}
+                            {/*<option value='users'>Users</option>*/}
+                        {/*</select>*/}
                     </div>
 
                     <div style={searchwrap}>
                         <i class="fa fa-search" style={searchicon}></i>
-                        <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search.." style={searchbox}></input>
-                        <Link to="/result">
-                            <button type="submit" className='btn btn-default' onSubmit={this.handleSubmit} style={submitbtn}>
+                        <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search..." style={searchbox}></input>
+                        <Link to={this.state.searchPath}>
+                            <button type="submit" value="Submit" className='btn btn-default' style={submitbtn}>
                                 {/*<i class="fa fa-arrow-right" style={submiticon}></i>*/}
                                 <i class="material-icons" style={submiticon}>keyboard_arrow_right</i>
                             </button>
