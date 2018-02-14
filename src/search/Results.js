@@ -77,7 +77,7 @@ class SelectTable extends Component {
                         columns.push({
                             accessor: key,
                             Header: 'Record #',
-                            Cell: e => <a href="#" onClick={()=>{this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
+                            Cell: e => <a onClick={()=>{this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
                         });
                         break;
                     }
@@ -85,7 +85,7 @@ class SelectTable extends Component {
                         columns.push({
                             accessor: key,
                             Header: 'Record #',
-                            Cell: e => <a href="#" onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
+                            Cell: e => <a onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
                         });
                         break;
                     }
@@ -93,7 +93,7 @@ class SelectTable extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                            Cell: e => <a href="#" onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
+                            Cell: e => <a onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
                         });
                         break;
                     }
