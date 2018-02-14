@@ -29,6 +29,8 @@ deploy_staging:
   environment:
    name: Staging
    url: https://staging-aeclient.azurewebsites.net
+  only:
+  - master
 
 deploy_production:
   stage: deploy
