@@ -1,0 +1,49 @@
+image: node:latest
+
+cache:
+  paths:
+  - node_modules/
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+  - yarn install
+  - yarn run build
+  - cp web.config build
+  except:
+  - master
+
+deploy_staging:
+  stage: deploy
+  script:
+  - yarn install
+  - yarn run build
+  - cp web.config build
+  - apt-get update
+  - apt-get install lftp
+  - lftp -u $FTP_USER_STAGING,$FTP_PASSWORD_STAGING $FTP_URL_STAGING -e "mirror -R -p -x=node_modules build/. ./"
+  environment:
+   name: Staging
+   url: https://staging-aeclient.azurewebsites.net
+  only:
+  - master
+
+deploy_production:
+  stage: deploy
+  script:
+  - yarn install
+  - yarn run build
+  - cp web.config build
+  - apt-get update
+  - apt-get install lftp
+  - lftp -u $FTP_USER,$FTP_PASSWORD $FTP_URL -e "mirror -R -p -x=node_modules build/. ./"
+  environment:
+     name: Production
+     url: https://aeclient.azurewebsites.net
+  when: manual
+  only:
+  - master

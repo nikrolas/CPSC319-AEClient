@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Row, Col, Grid} from 'react-bootstrap'
-import {Link} from 'react-router-dom';
 import {getRecordById} from "../APIs/RecordsApi";
+import {Row, Col, Grid, Button} from 'react-bootstrap'
+import {Link,Redirect} from 'react-router-dom';
+import {Confirm} from 'react-confirm-bootstrap'
 
 
 class ViewRecord extends Component {
@@ -25,8 +26,8 @@ class ViewRecord extends Component {
                     ClosedAt: "2003-12-31 14:48:45.000000",
                     ClassificationIds: [3, 4, 5, 6],
                     Notes: "This is a note!"
-                }
-
+                },
+                navigate:false
             };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -61,16 +62,30 @@ class ViewRecord extends Component {
     }
 
     handleSubmit(event) {
-        alert('Form has been submitted');
+        alert('Form has been submitted - for rollback');
         event.preventDefault();
     }
 
-
     render() {
+        const { navigate } = this.state;
+
+        // here is the important part
+        if (navigate) {
+            return <Redirect to="/" push={true} />
+        }
         return (
             <div>
                 <h1>{this.state.recordJson["number"]}</h1>
-                <Link to="/createRecord">Edit Record</Link>
+                <Link to="/updateRecord">
+                    <Button> Edit Record </Button>
+                </Link>
+                    <Confirm
+                        onConfirm={() => this.setState({ navigate: true })}
+                        body="Are you sure you want to delete this?"
+                        confirmText="Confirm Delete"
+                        title="Deleting Record">
+                        <Button>Delete </Button>
+                    </Confirm>
                 <br/><br/>
                 <Grid>
                     <Row>
