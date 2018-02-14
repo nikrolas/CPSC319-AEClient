@@ -47,9 +47,17 @@ function getColumns(data) {
     const columns = [];
     const sample = data[0];
     Object.keys(sample).forEach((key)=>{
-        if(key!=='_id')
+        if(key!=='id' && !key.endsWith("Id"))
         {
             switch(key) {
+                case 'number': {
+                    columns.push({
+                        accessor: key,
+                        Header: 'Record #',
+                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                    });
+                    break;
+                }
                 case 'RecordNum': {
                     columns.push({
                         accessor: key,
@@ -101,25 +109,39 @@ class SelectTable extends Component {
         };
     }
 
-    componentDidMount() {
+    componentWillMount() {
         let setData = this.setData;
+        let that = this;
         getRecordsByNumber(this.props.match.params.searchString, 5)
-            .then(result => {
-                setData(result);
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    setData(that, data);
+                }
             })
             .catch(err => {
            console.error("Error loading search results: " + err.message);
         });
     }
 
-    setData = (data) => {
+    setData = (context, data) => {
+
+        data.forEach(result => {
+            let keys = Object.keys(result);
+            keys.forEach(key => {
+                if (key.endsWith("At")) {
+                    result[key] = new Date(result[key]).toTimeString();
+                }
+            })
+        });
+
         const columns = getColumns(data);
-        this.state = {
+        context.setState({
             data,
             columns,
             selection: [],
             selectAll: false
-        }
+        });
     }
 
     toggleSelection = (key) => {
