@@ -50,7 +50,7 @@ function getColumns(data) {
                     columns.push({
                         accessor: key,
                         Header: 'Record #',
-                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                        Cell: e => <a onClick={()=>{View(key, e.value)}}> {e.value} </a>
                     });
                     break;
                 }
@@ -58,7 +58,7 @@ function getColumns(data) {
                     columns.push({
                         accessor: key,
                         Header: key,
-                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                        Cell: e => <a onClick={()=>{View(key, e.value)}}> {e.value} </a>
                     });
                     break;
                 }
@@ -152,12 +152,12 @@ class WorkTray extends Component {
             paddingTop: '20px',
             //border: '5px solid gray'
         };
-        let addbtnstyle = {
-            float: 'left',
-            display: 'block',
-            'background-color': '#b5ff87',
-            'border-color': '#FFFFFF',
-        };
+        // let addbtnstyle = {
+        //     float: 'left',
+        //     display: 'block',
+        //     'background-color': '#b5ff87',
+        //     'border-color': '#FFFFFF',
+        // };
         let h1style = {
             //display: 'inline',
         };

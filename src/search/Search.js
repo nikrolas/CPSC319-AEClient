@@ -27,11 +27,11 @@ class Search extends Component{
             'searchPath': '/results/' + encodedSearchString
         });
     };
-    handleSelectChange = (e) => {
-        this.setState({
-            'selectvalue': e.target.value
-        });
-    };
+    // handleSelectChange = (e) => {
+    //     this.setState({
+    //         'selectvalue': e.target.value
+    //     });
+    // };
 
     handleSubmit = (e) => {
     };
@@ -54,9 +54,9 @@ class Search extends Component{
             display: 'inline-flex',
             height: '1cm',
         };
-        let sel = {
-            height: '1cm'
-        };
+        // let sel = {
+        //     height: '1cm'
+        // };
         let searchwrap = {
             //border: '2px solid blue',
             display: 'inline-flex',
