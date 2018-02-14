@@ -32,7 +32,6 @@ function getData(data) {
         return {
             _id,
             ...item,
-            _id
         }
     });
 }
@@ -116,22 +115,33 @@ class WorkTray extends Component {
         if (!data || data.length === 0) {
             return columns;
         }
+        let delbtn = {
+            'background-color': '#ff6c60',
+            'border-color': '#ff6c60',
+            color: '#FFFFFF'
+        };
+        columns.push({
+            Header: '',
+            id: 'xbutton',
+            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={delbtn}><i className="fa fa-trash-o"/></button>
+        });
         let first = data[0];
         let last = data.slice(-1)[0];
         let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
+
         Array.from(keyset).forEach((key)=>{
             if(key!=='_id')
             {
                 switch(key) {
-                    case 'RecordNum': {
+                    case 'number': {
                         columns.push({
                             accessor: key,
-                            Header: 'Record #',
+                            Header: key,
                             Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
                         });
                         break;
                     }
-                    case 'Container': {
+                    case 'container': {
                         columns.push({
                             accessor: key,
                             Header: key,
@@ -147,16 +157,6 @@ class WorkTray extends Component {
                     }
                 }
             }
-        });
-        let delbtn = {
-            'background-color': '#ff6c60',
-            'border-color': '#ff6c60',
-            color: '#FFFFFF'
-        };
-        columns.push({
-            Header: '',
-            id: 'xbutton',
-            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={delbtn}><i className="fa fa-trash-o"/></button>
         });
         return columns;
     };

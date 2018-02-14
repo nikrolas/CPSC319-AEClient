@@ -1,28 +1,18 @@
 import React, { Component } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
-import {Route, Link} from 'react-router-dom';
-import WorkTray from "./WorkTray";
-import SelectTable from "./Results";
-
-/*const routes = (
-    <Route exact path='/' component={Search}>
-        <Route path="result" component={SelectTable}>
-            <Route path="worktray" component={WorkTray}/>
-        </Route>
-    </Route>
-);*/
+import {Link} from 'react-router-dom';
 
 class Search extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            searchvalue: '',
+            searchinput: '',
             selectvalue: 'all',
         }
     }
     handleInputChange = (e) => {
         this.setState({
-            'searchvalue': e.target.value
+            'searchinput': e.target.value
         });
     };
     handleSelectChange = (e) => {
@@ -112,16 +102,16 @@ class Search extends Component{
 
                     <div style={searchwrap}>
                         <i class="fa fa-search" style={searchicon}/>
-                        <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search.." style={searchbox}></input>
-                        <Link to="/result">
-                            <button type="submit" className='btn btn-default' onSubmit={this.handleSubmit} style={submitbtn}>
+                        <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search.." style={searchbox}/>
+                        <Link to={{ pathname: '/result/', state: {searchinput: this.state.searchinput, selectvalue: this.state.selectvalue} }}>
+                            {/*<button type="submit" className='btn btn-default' onSubmit={this.handleSubmit} style={submitbtn}>*/}
+                            <button type="submit" className='btn btn-default' style={submitbtn}>
                                 {/*<i class="fa fa-arrow-right" style={submiticon}></i>*/}
                                 <i class="material-icons" style={submiticon}>keyboard_arrow_right</i>
                             </button>
                         </Link>
                     </div>
                 </form>
-                {/*{this.props.children}*/}
             </div>
         )
     }

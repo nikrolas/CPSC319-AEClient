@@ -9,9 +9,8 @@ const CheckboxTable = checkboxHOC(ReactTable);
 //https://react-table.js.org/#/story/select-table-hoc
 
 
-function getData(resp) {
-    //TODO
-    const testData = [
+function getData(data) {
+/*    const testData = [
         {RecordNum: 'EDM-2003/001',
             Title: 'Laboriosam at sapiente temporibus',
             Type: 'Subject',
@@ -43,10 +42,16 @@ function getData(resp) {
             _id,
             ...item,
         }
-    });
-
+    });*/
 
     //Actual data
+    return data.map((item, index)=>{
+        const _id = index;
+        return {
+            _id,
+            ...item,
+        }
+    });
 /*    let keys = Object.keys(resp);
     let data = resp[keys[0]].concat(resp[keys[1]]);
     return data.map((item, index)=>{
@@ -75,15 +80,15 @@ function getColumns(data) {
         if(key!=='_id')
         {
             switch(key) {
-                case 'RecordNum': {
+                case 'number': {
                     columns.push({
                         accessor: key,
-                        Header: 'Record #',
+                        Header:  key, //'Record #',
                         Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
                     });
                     break;
                 }
-                case 'Container': {
+                case 'container': {
                     columns.push({
                         accessor: key,
                         Header: key,
@@ -114,21 +119,34 @@ function getColumns(data) {
 }
 
 class SelectTable extends Component {
-    constructor() {
-        super();
-        const data = getData();
-        const columns = getColumns(data);
+    constructor(props) {
+        super(props);
+        //const data = getData();
+        //const columns = getColumns(data);
         this.state = {
-            data,
-            columns,
+            data: [],
+            columns: [],
             selection: [],
             selectAll: false,
-            tray: []
+            tray: [],
+            userId: '5'
         };
     }
 
-    componentWillMount() {}
-    componentDidMount() {}
+    componentDidMount() {
+        let {data, columns} = this.state;
+        let endpoint = "http://ec2-18-220-64-10.us-east-2.compute.amazonaws.com:8080/DiscoveryChannel-1.0-SNAPSHOT/" + this.props.location.state.selectvalue + "?num=" + this.props.location.state.searchinput + "&userId=" + this.state.userId;
+        console.log(endpoint);
+        fetch(endpoint)
+            .then(response => response.json())
+            .then((jsondata) =>
+            {
+                //console.log(jsondata);
+                data = getData(jsondata);
+                columns = getColumns(data);
+                this.setState({ data, columns });
+            });
+    }
 
     toggleSelection = (key) => {
         // start off with the existing state
@@ -168,7 +186,6 @@ class SelectTable extends Component {
     };
 
     updateTray = () => {
-        //TODO
         this.state.selection.forEach((id) => {
             if (!this.state.tray.includes(this.state.data[id])) {
                 this.state.tray.push(this.state.data[id]);
@@ -180,7 +197,7 @@ class SelectTable extends Component {
 
     render() {
         const { toggleSelection, toggleAll, isSelected, updateTray } = this;
-        const { data, columns, selectAll, } = this.state;
+        const { data, columns, selectAll, tray} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -202,14 +219,13 @@ class SelectTable extends Component {
             'background-color': '#b5ff87',
             'border-color': '#FFFFFF',
         };
-        let h1style = {
-            //display: 'inline',
-        };
         return (
             <div style={divstyle}>
-                <h1 style={h1style}>Results</h1>
+                <h1>Results</h1>
                     <button style={addbtnstyle} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
-                <Link to={{ pathname: '/worktray', state: {traydata: this.state.tray} }}>Work Tray</Link>
+                <div style={{float: 'left', marginLeft: '1cm'}}>
+                    <Link to={{ pathname: '/worktray/', state: {traydata: tray} }}>Work Tray</Link>
+                </div>
                 <div style={tablestyle}>
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}
@@ -221,7 +237,6 @@ class SelectTable extends Component {
                         {...checkboxProps}
                     />
                 </div>
-                {this.props.children}
             </div>
         );
     }
