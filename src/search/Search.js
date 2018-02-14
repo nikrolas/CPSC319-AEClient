@@ -21,9 +21,10 @@ class Search extends Component{
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleInputChange = (e) => {
+        let encodedSearchString = encodeURIComponent(e.target.value);
         this.setState({
             'searchvalue': e.target.value,
-            'searchPath': '/results/' + e.target.value
+            'searchPath': '/results/' + encodedSearchString
         });
     };
     handleSelectChange = (e) => {
