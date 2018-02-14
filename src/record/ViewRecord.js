@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Grid} from 'react-bootstrap'
-import {Route, Link} from 'react-router-dom';
-import CreateRecord from '../record/CreateRecord';
+import {Link} from 'react-router-dom';
+import {getRecordById} from "../APIs/RecordsApi";
 
 
 class ViewRecord extends Component {
@@ -32,6 +32,30 @@ class ViewRecord extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    componentWillMount() {
+        let setData = this.setData;
+        let that = this;
+        getRecordById(this.props.match.params.recordId, 5)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    setData(that, data);
+                }
+            })
+            .catch(err => {
+                console.error("Error loading search results: " + err.message);
+            });
+    }
+
+    setData = (context, data) => {
+        let keys = Object.keys(data);
+        keys.forEach( key => {
+            if (key.endsWith("At")) {
+                data[key] = new Date(data[key]).toTimeString();
+            }
+        });
+        context.setState({"recordJson": data});
+    };
     handleChange(e) {
 
     }
@@ -45,7 +69,7 @@ class ViewRecord extends Component {
     render() {
         return (
             <div>
-                <h1>{this.state.recordJson["Number"]}</h1>
+                <h1>{this.state.recordJson["number"]}</h1>
                 <Link to="/createRecord">Edit Record</Link>
                 <br/><br/>
                 <Grid>
@@ -53,19 +77,19 @@ class ViewRecord extends Component {
                         <Col sm={4} smOffset={2}>
                             <b>Title</b>
                             <br/>
-                            {this.state.recordJson["Title"]}
+                            {this.state.recordJson["title"]}
                             <br/>
                             <b>State</b>
                             <br/>
-                            {this.state.recordJson["StateId"]}
+                            {this.state.recordJson["state"]}
                             <br/>
                             <b>Location</b>
                             <br/>
-                            {this.state.recordJson["LocationId"]}
+                            {this.state.recordJson["location"]}
                             <br/>
                             <b>Record Type</b>
                             <br/>
-                            {this.state.recordJson["TypeId"]}
+                            {this.state.recordJson["type"]}
                             <br/>
                             <b>Classification</b>
                             <br/>
@@ -74,26 +98,26 @@ class ViewRecord extends Component {
                             <br/>
                             <b>Consignment Code</b>
                             <br/>
-                            {this.state.recordJson["ConsignmentCode"]}
+                            {this.state.recordJson["consignmentCode"]}
                             <br/>
 
                         </Col>
                         <Col sm={3}>
                             <b>Created At</b>
                             <br/>
-                            {this.state.recordJson["CreatedAt"]}
+                            {this.state.recordJson["createdAt"]}
                             <br/>
                             <b>Updated At</b>
                             <br/>
-                            {this.state.recordJson["UpdatedAt"]}
+                            {this.state.recordJson["updatedAt"]}
                             <br/>
                             <b>Closed At</b>
                             <br/>
-                            {this.state.recordJson["ClosedAt"]}
+                            {this.state.recordJson["closedAt"]}
                             <br/>
                             <b>Retention Schedule</b>
                             <br/>
-                            {this.state.recordJson["ScheduleId"]}
+                            {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
                             <br/>
                         </Col>
                     </Row>

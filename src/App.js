@@ -26,7 +26,7 @@ class App extends Component {
                 </BrowserRouter>
                 {this.props.children}*/}
                 <Route exact path='/' component={Search}/>
-                <Route path="/results/:searchString" component={SelectTable}/>
+                <Route path="/results/:searchString?" component={SelectTable}/>
                 <Route path="/worktray" component={WorkTray}/>
             </div>
         );

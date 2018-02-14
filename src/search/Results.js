@@ -11,7 +11,6 @@ const CheckboxTable = checkboxHOC(ReactTable);
 
 
 function getMockData() {
-    //TODO
     const testData = [
         {RecordNum: 'EDM-2003/001',
             Title: 'Laboriosam at sapiente temporibus',
@@ -38,69 +37,11 @@ function getMockData() {
     });
 }
 
-function View(key, val) {
-    //TODO
-    console.log("key: ", key, " val: ",val);
-}
-
-function getColumns(data) {
-    const columns = [];
-    const sample = data[0];
-    Object.keys(sample).forEach((key)=>{
-        if(key!=='id' && !key.endsWith("Id"))
-        {
-            switch(key) {
-                case 'number': {
-                    columns.push({
-                        accessor: key,
-                        Header: 'Record #',
-                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
-                    });
-                    break;
-                }
-                case 'RecordNum': {
-                    columns.push({
-                        accessor: key,
-                        Header: 'Record #',
-                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
-                    });
-                    break;
-                }
-                case 'Container': {
-                    columns.push({
-                        accessor: key,
-                        Header: key,
-                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
-                    });
-                    break;
-                }
-                default: {
-                    columns.push({
-                        accessor: key,
-                        Header: key,
-                    })
-                }
-            }
-        }
-    });
-/*    let delbtn = {
-        'background-color': '#ff6c60',
-        'border-color': '#ff6c60',
-        color: '#FFFFFF'
-    };
-    columns.push({
-        Header: '',
-        id: 'xbutton',
-        Cell: e => <button className="btn btn-xs" style={delbtn}><i className="fa fa-trash-o"></i></button>
-    });*/
-    return columns;
-}
-
 class SelectTable extends Component {
     constructor() {
         super();
         const data = getMockData();
-        const columns = getColumns(data);
+        const columns = this.getColumns(data);
         this.state = {
             data,
             columns,
@@ -124,6 +65,66 @@ class SelectTable extends Component {
         });
     }
 
+
+    getColumns = (data) => {
+        const columns = [];
+        const sample = data[0];
+        Object.keys(sample).forEach((key)=>{
+            if(key!=='id' && !key.endsWith("Id"))
+            {
+                switch(key) {
+                    case 'number': {
+                        columns.push({
+                            accessor: key,
+                            Header: 'Record #',
+                            Cell: e => <a href="#" onClick={()=>{this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
+                        });
+                        break;
+                    }
+                    case 'RecordNum': {
+                        columns.push({
+                            accessor: key,
+                            Header: 'Record #',
+                            Cell: e => <a href="#" onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
+                        });
+                        break;
+                    }
+                    case 'Container': {
+                        columns.push({
+                            accessor: key,
+                            Header: key,
+                            Cell: e => <a href="#" onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
+                        });
+                        break;
+                    }
+                    default: {
+                        columns.push({
+                            accessor: key,
+                            Header: key,
+                        })
+                    }
+                }
+            }
+        });
+        /*    let delbtn = {
+                'background-color': '#ff6c60',
+                'border-color': '#ff6c60',
+                color: '#FFFFFF'
+            };
+            columns.push({
+                Header: '',
+                id: 'xbutton',
+                Cell: e => <button className="btn btn-xs" style={delbtn}><i className="fa fa-trash-o"></i></button>
+            });*/
+        return columns;
+    };
+
+    handleClick = (key, val, id) => {
+        let routePath = "/viewRecord/" + id;
+        this.props.history.push(routePath);
+        console.log("key: ", key, " val: ", val, " id: ", id);
+    };
+
     setData = (context, data) => {
 
         data.forEach(result => {
@@ -135,14 +136,14 @@ class SelectTable extends Component {
             })
         });
 
-        const columns = getColumns(data);
+        const columns = this.getColumns(data);
         context.setState({
             data,
             columns,
             selection: [],
             selectAll: false
         });
-    }
+    };
 
     toggleSelection = (key) => {
         // start off with the existing state
