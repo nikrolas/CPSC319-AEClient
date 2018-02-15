@@ -9,22 +9,29 @@ class ViewRecord extends Component {
 
     constructor(props, context) {
         super(props, context);
+        let mockDate = new Date(1127779200000).toTimeString();
         this.state =
             {
                 recordJson: {
                     Id: 51,
                     Number: "EDM-2003/001",
-                    Title: "Sample Record",
+                    title: "Sample Record",
                     ScheduleId: 26,
                     TypeId: 3,
                     ConsignmentCode: "DESTRUCTION CERTIFICATE 2009-01",
                     StateId: 6,
                     ContainerId: 24365,
                     LocationId: 5,
-                    CreatedAt: "2003-09-15 18:52:36.000000",
-                    UpdatedAt: "2009-03-26 20:44:09.000000",
-                    ClosedAt: "2003-12-31 14:48:45.000000",
+                    createdAt: mockDate,
+                    updatedAt: mockDate,
+                    closedAt: mockDate,
                     ClassificationIds: [3, 4, 5, 6],
+                    state: "Active",
+                    location: "AE Corporate Office - Edmonton - Accounting",
+                    type: "AE CORP - ACCOUNTING - EDM - PROJECT BILLINGS",
+                    consignmentCode: null,
+                    schedule: "FINANCIAL MANAGEMENT - ACCOUNTING",
+                    scheduleYear: 6,
                     Notes: "This is a note!"
                 },
                 navigate:false
@@ -39,12 +46,12 @@ class ViewRecord extends Component {
         getRecordById(this.props.match.params.recordId, 5)
             .then(response => response.json())
             .then(data => {
-                if (data) {
+                if (data && !data.exception) {
                     setData(that, data);
                 }
             })
             .catch(err => {
-                console.error("Error loading search results: " + err.message);
+                console.error("Error loading record: " + err.message);
             });
     }
 
