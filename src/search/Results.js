@@ -11,23 +11,7 @@ const CheckboxTable = checkboxHOC(ReactTable);
 
 
 function getMockData() {
-    const testData = [
-        {RecordNum: 'EDM-2003/001',
-            Title: 'Laboriosam at sapiente temporibus',
-            Type: 'Subject',
-            State: 'Destroyed',
-            Container: '2007/014-EDM',
-            Location: 'Edmonton',
-            Updated: '2003-12-31'
-        },
-        {RecordNum: 'EDM-2003/017:1',
-            Title: 'Consequatur culpa aute',
-            Type: 'Subject',
-            State: 'Archived - Interim',
-            Container: '2016/181-EDM',
-            Location: 'AE Corporate Office - Burnaby - Accounting',
-            Updated: '2015-12-31'
-        }];
+    const testData = [];
     return testData.map((item)=>{
         const _id = item.RecordNum;
         return {
@@ -69,43 +53,46 @@ class SelectTable extends Component {
     getColumns = (data) => {
         const columns = [];
         const sample = data[0];
-        Object.keys(sample).forEach((key)=>{
-            if(key!=='id' && !key.endsWith("Id"))
-            {
-                switch(key) {
-                    case 'number': {
-                        columns.push({
-                            accessor: key,
-                            Header: 'Record #',
-                            Cell: e => <a onClick={()=>{this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'RecordNum': {
-                        columns.push({
-                            accessor: key,
-                            Header: 'Record #',
-                            Cell: e => <a onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'Container': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    default: {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                        })
+        if (sample!==undefined) {
+            Object.keys(sample).forEach((key)=>{
+                if(key!=='id' && !key.endsWith("Id"))
+                {
+                    switch(key) {
+                        case 'number': {
+                            columns.push({
+                                accessor: key,
+                                Header: 'Record #',
+                                Cell: e => <a onClick={()=>{this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
+                            });
+                            break;
+                        }
+                        case 'RecordNum': {
+                            columns.push({
+                                accessor: key,
+                                Header: 'Record #',
+                                Cell: e => <a onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
+                            });
+                            break;
+                        }
+                        case 'Container': {
+                            columns.push({
+                                accessor: key,
+                                Header: key,
+                                Cell: e => <a onClick={()=>{this.handleClick(key, e.value)}}> {e.value} </a>
+                            });
+                            break;
+                        }
+                        default: {
+                            columns.push({
+                                accessor: key,
+                                Header: key,
+                            })
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+
         /*    let delbtn = {
                 'background-color': '#ff6c60',
                 'border-color': '#ff6c60',

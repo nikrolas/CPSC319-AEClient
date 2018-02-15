@@ -75,15 +75,17 @@ class ViewRecord extends Component {
 
     render() {
         const { navigate } = this.state;
+        const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         // here is the important part
         if (navigate) {
             return <Redirect to="/" push={true} />
         }
+
         return (
             <div>
                 <h1>{this.state.recordJson["number"]}</h1>
-                <Link to="/updateRecord">
+                <Link to={updateRecordLink}>
                     <Button> Edit Record </Button>
                 </Link>
                     <Confirm
