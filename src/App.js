@@ -10,11 +10,12 @@ import SelectTable from "./search/Results";
 import WorkTray from "./search/WorkTray";
 
 class App extends Component {
+
     render() {
         return (
             <div className="App">
                 <LayoutBanner/>
-                <Route path='/createRecord/' component={CreateRecord} />
+                <Route path='/createRecord' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
 {/*                <BrowserRouter>
