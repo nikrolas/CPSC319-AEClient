@@ -8,16 +8,11 @@ class LayoutBanner extends Component {
         return (
             <div>
                 <Banner
+                    search = {false}
                     logo= {<img src={banner_logo} className="App-logo" alt="logo" />}
                     url={ window.location.pathname }
                     links={[
-                        { "title": "New Record", "url": "/createRecord" },
-                        { "title": "Another", "url": "/another" },
-                        { "title": "Link w/ Children", "url": "/children", "children": [
-                                { "title": "John", "url": "/children/john" },
-                                { "title": "Jill", "url": "/children/jill" },
-                                { "title": "Jack", "url": "/children/jack" }
-                            ]}
+                        { "title": "New Record", "url": "/createRecord" }
                     ]} />
             </div>
         );

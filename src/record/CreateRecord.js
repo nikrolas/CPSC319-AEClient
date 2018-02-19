@@ -63,7 +63,7 @@ class CreateRecord extends Component {
 
     //TODO - Validationstate is working but will have to likely create many for different validations
     getValidationState() {
-        const length = this.state.recordNumber.length;
+        const length = this.state.title.length;
         if (length > 10) return 'success';
         else if (length > 5) return 'warning';
         else if (length > 0) return 'error';
@@ -146,7 +146,6 @@ class CreateRecord extends Component {
                     </FormGroup>
                     <FormGroup
                         controlId="formBasicText"
-                        validationState={this.getValidationState()}
                     >
                         <ControlLabel>Record Number {requiredLabel}</ControlLabel>
                         <FormControl

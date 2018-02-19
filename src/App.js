@@ -18,7 +18,7 @@ class App extends Component {
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                 <Route exact path='/' component={Search}/>
-                <Route path="/result" component={SelectTable}/>
+                <Route path="/results/:searchString?" component={SelectTable}/>
                 <Route path="/worktray" component={WorkTray}/>
             </div>
         );

@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, Checkbox} from 'react-bootstrap'
+import {getRecordById} from "../APIs/RecordsApi";
 
 class UpdateRecord extends Component {
 
     constructor(props, context) {
         super(props, context);
+        let mockDate = new Date(1127779200000).toTimeString();
         this.state =
             {
                 recordType: "",
@@ -15,6 +17,28 @@ class UpdateRecord extends Component {
                 consignmentCode: "",
                 location: "Burnaby",
                 classificationChildren: [],
+                responseJson:{
+                    Id: 51,
+                    Number: "EDM-2003/001",
+                    title: "Sample Record",
+                    ScheduleId: 26,
+                    TypeId: 3,
+                    ConsignmentCode: "DESTRUCTION CERTIFICATE 2009-01",
+                    StateId: 6,
+                    ContainerId: 24365,
+                    LocationId: 5,
+                    createdAt: mockDate,
+                    updatedAt: mockDate,
+                    closedAt: mockDate,
+                    ClassificationIds: [3, 4, 5, 6],
+                    state: "Active",
+                    location: "AE Corporate Office - Edmonton - Accounting",
+                    type: "AE CORP - ACCOUNTING - EDM - PROJECT BILLINGS",
+                    consignmentCode: null,
+                    schedule: "FINANCIAL MANAGEMENT - ACCOUNTING",
+                    scheduleYear: 6,
+                    Notes: "This is a note!"
+                },
                 recordJson: [{
                     "id": "10",
                     "name": "CASE RECORDS",
@@ -62,22 +86,43 @@ class UpdateRecord extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     componentWillMount() {
+        let setData = this.setData;
+        let that = this;
+        getRecordById(this.props.match.params.recordId, 5)
+            .then(response => response.json())
+            .then(data => {
+                if (data && !data.exception) {
+                    setData(that, data);
+                }
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+            });
     }
+    setData = (context, data) => {
+        let keys = Object.keys(data);
+        keys.forEach( key => {
+            if (key.endsWith("At")) {
+                data[key] = new Date(data[key]).toTimeString();
+            }
+        });
+        context.setState({"responseJson": data});
+    };
     componentDidMount(){
     }
     //TODO - Validationstate is working but will have to likely create many for different validations
     getValidationState() {
-        const length = this.state.recordNumber.length;
+/*        const length = this.state.recordNumber.length;
         if (length > 10) return 'success';
         else if (length > 5) return 'warning';
         else if (length > 0) return 'error';
-        return null;
+        return null;*/
     }
 
     handleChange(e) {
-        this.setState({[e.target.name]: e.target.value});
-        console.log(this.props.match.params)
-
+        let responseCopy = JSON.parse(JSON.stringify(this.state.responseJson));
+        responseCopy[e.target.name] = e.target.value;
+        this.setState({responseJson:responseCopy});
         //When RecordType is changed, adjust record number
         if (e.target.name === "recordType") {
             for (var k in this.state.recordJson) {
@@ -117,8 +162,6 @@ class UpdateRecord extends Component {
     }
 
     render() {
-        const listRecordTypeJson = this.state.recordJson.map((item, i) => <option key={i}
-                                                                                  value={i}>{item.name}</option>);
         const listClassificationJson = this.state.classificationJson.map((item, i) =>
             <option key={i} value={i}>{item.name}</option>);
         const listRetentionScheduleJson = this.state.retentionScheduleJson.map((item, i) =>
@@ -128,37 +171,18 @@ class UpdateRecord extends Component {
         return (
             <div>
                 <h1>Update Record</h1>
+                <h2>{this.state.responseJson["number"]}</h2>
                 <form onSubmit={this.handleSubmit}>
-                    <FormGroup
-                        controlId="formControlsSelect "
-                        onChange={this.handleChange}
-                    >
-                        <ControlLabel>Record Type {requiredLabel}</ControlLabel>
-                        <FormControl name="recordType"
-                                     componentClass="select"
-                                     placeholder="select">
-                            {listRecordTypeJson}
-                        </FormControl>
-                    </FormGroup>
-                    <FormGroup>
-                        <ControlLabel>Location {requiredLabel}</ControlLabel>
-                        <FormControl
-                            name="location"
-                            type="text"
-                            value={this.state.location}
-                            placeholder="Enter text"
-                            onChange={this.handleChange}
-                        />
-                    </FormGroup>
                     <FormGroup
                         controlId="formBasicText"
                         validationState={this.getValidationState()}
                     >
                         <ControlLabel>Record Number {requiredLabel}</ControlLabel>
                         <FormControl
-                            name="recordNumber"
+                            disabled
+                            name="number"
                             type="text"
-                            value={this.state.recordNumber}
+                            value={this.state.responseJson["number"]}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
@@ -171,11 +195,21 @@ class UpdateRecord extends Component {
                         <FormControl
                             name="title"
                             type="text"
-                            value={this.state.title}
+                            value={this.state.responseJson["title"]}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
                         <FormControl.Feedback/>
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Location {requiredLabel}</ControlLabel>
+                        <FormControl
+                            name="location"
+                            type="text"
+                            value={this.state.responseJson["location"]}
+                            placeholder="Enter text"
+                            onChange={this.handleChange}
+                        />
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect " onChange={this.handleChange}>
                         <ControlLabel>Classification {requiredLabel}</ControlLabel>
@@ -226,7 +260,7 @@ class UpdateRecord extends Component {
                         <FormControl
                             name="consignmentCode"
                             type="text"
-                            value={this.state.consignmentCode}
+                            value={this.state.responseJson["consignmentCode"]}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
