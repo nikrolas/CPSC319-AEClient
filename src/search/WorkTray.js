@@ -8,38 +8,6 @@ const CheckboxTable = checkboxHOC(ReactTable);
 
 //https://react-table.js.org/#/story/select-table-hoc
 
-function getData(data) {
-    //TODO
-/*    const testData = [
-        {RecordNum: 'EDM-2003/001',
-            Title: 'Laboriosam at sapiente temporibus',
-            Type: 'Subject',
-            State: 'Destroyed',
-            Container: '2007/014-EDM',
-            Location: 'Edmonton',
-            Updated: '2003-12-31'
-        },
-        {RecordNum: 'EDM-2003/017:1',
-            Title: 'Consequatur culpa aute',
-            Type: 'Subject',
-            State: 'Archived - Interim',
-            Container: '2016/181-EDM',
-            Location: 'AE Corporate Office - Burnaby - Accounting',
-            Updated: '2015-12-31'
-        }];*/
-    return data.map((item, index)=>{
-        const _id = index;
-        return {
-            _id,
-            ...item,
-        }
-    });
-}
-
-function View(key, val) {
-    //TODO
-    console.log("key: ", key, " val: ",val);
-}
 
 /*function getColumns(data) {
     console.log(JSON.stringify(data));
@@ -58,7 +26,7 @@ function View(key, val) {
                     columns.push({
                         accessor: key,
                         Header: 'Record #',
-                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                        Cell: e => <a onClick={()=>{View(key, e.value)}}> {e.value} </a>
                     });
                     break;
                 }
@@ -66,7 +34,7 @@ function View(key, val) {
                     columns.push({
                         accessor: key,
                         Header: key,
-                        Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
+                        Cell: e => <a onClick={()=>{View(key, e.value)}}> {e.value} </a>
                     });
                     break;
                 }
@@ -96,25 +64,58 @@ class WorkTray extends Component {
     constructor(props) {
         super(props);
         //console.log(JSON.stringify(this.props.location.state.traydata));
-        const data = getData(this.props.location.state.traydata);
-        const columns = this.getColumns(this.props.location.state.traydata);
         this.state = {
-            data,
-            columns,
+            data: [],
+            columns: [],
             selection: [],
             selectAll: false,
+            userId: '5'
         };
     }
 
     componentWillMount() {}
-    componentDidMount() {}
+    componentDidMount() {
+        const data = this.props.location.state.traydata;
+        const columns = this.getColumns(data);
+        this.setState( {data, columns} );
+    }
 
     getColumns = (data) => {
-        console.log(JSON.stringify(data));
-        let columns = [];
-        if (!data || data.length === 0) {
+        const columns = [];
+        if (!data || data.length < 1) {
             return columns;
         }
+        let first = data[0];
+        let last = data.slice(-1)[0];
+        let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
+        Array.from(keyset).forEach((key) => {
+            if (key !== '_id') {
+                switch (key) {
+                    case 'number': {
+                        columns.push({
+                            accessor: key,
+                            Header: key,
+                            Cell: e => <a onClick={() => {this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
+                        });
+                        break;
+                    }
+                    case 'container': {
+                        columns.push({
+                            accessor: key,
+                            Header: key,
+                            Cell: e => <a onClick={() => {this.handleClick(key, e.value)}}> {e.value} </a>
+                        });
+                        break;
+                    }
+                    case 'title': case 'type': case 'state': case 'location': case 'updatedAt': {
+                    columns.push({
+                        accessor: key,
+                        Header: key,
+                    })
+                }
+                }
+            }
+        });
         let delbtn = {
             'background-color': '#ff6c60',
             'border-color': '#ff6c60',
@@ -125,40 +126,13 @@ class WorkTray extends Component {
             id: 'xbutton',
             Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={delbtn}><i className="fa fa-trash-o"/></button>
         });
-        let first = data[0];
-        let last = data.slice(-1)[0];
-        let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
-
-        Array.from(keyset).forEach((key)=>{
-            if(key!=='_id')
-            {
-                switch(key) {
-                    case 'number': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'container': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a href="#" onClick={()=>{View(key, e.value)}}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    default: {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                        })
-                    }
-                }
-            }
-        });
         return columns;
+    };
+
+    handleClick = (key, val, id) => {
+        let routePath = "/viewRecord/" + id;
+        this.props.history.push(routePath);
+        console.log("key: ", key, " val: ", val, " id: ", id);
     };
 
     deleteRow = (e) => {
@@ -224,12 +198,12 @@ class WorkTray extends Component {
             paddingTop: '20px',
             //border: '5px solid gray'
         };
-        let addbtnstyle = {
-            float: 'left',
-            display: 'block',
-            'background-color': '#b5ff87',
-            'border-color': '#FFFFFF',
-        };
+        // let addbtnstyle = {
+        //     float: 'left',
+        //     display: 'block',
+        //     'background-color': '#b5ff87',
+        //     'border-color': '#FFFFFF',
+        // };
         let h1style = {
             //display: 'inline',
         };

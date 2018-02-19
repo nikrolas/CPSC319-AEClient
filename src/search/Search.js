@@ -1,28 +1,39 @@
 import React, { Component } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import {Link} from 'react-router-dom';
+/*const routes = (
+    <Route exact path='/' component={Search}>
+        <Route path="result" component={SelectTable}>
+            <Route path="worktray" component={WorkTray}/>
+        </Route>
+    </Route>
+);*/
 
 class Search extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            searchinput: '',
-            selectvalue: 'all',
-        }
+            searchvalue: '',
+            selectvalue: 'records',
+            searchPath: ''
+        };
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleInputChange = (e) => {
+        let encodedSearchString = encodeURIComponent(e.target.value);
         this.setState({
-            'searchinput': e.target.value
+            'searchvalue': e.target.value,
+            'searchPath': '/results/' + encodedSearchString
         });
     };
     handleSelectChange = (e) => {
-        this.setState({
-            'selectvalue': e.target.value
-        });
-    };
-    handleSubmit = () => {
-        //TODO router?
-    };
+         this.setState({
+             'selectvalue': e.target.value
+         });
+     };
+
+    handleSubmit = (e) => {};
 
     render() {
         let container = {
@@ -90,11 +101,11 @@ class Search extends Component{
         return (
             <div style={container}>
                 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
-                <form>
+                <form onSubmit={this.handleSubmit}>
                     <div style={s1}>
                         <select value={this.state.value} onChange={this.handleSelectChange} style={sel}>
-                            <option value='all' selected="selected">All</option>
-                            <option value='records'>Records</option>
+                            <option value='all'>All</option>
+                            <option value='records'  selected>Records</option>
                             <option value='containers'>Containers</option>
                             <option value='users'>Users</option>
                         </select>
@@ -102,10 +113,9 @@ class Search extends Component{
 
                     <div style={searchwrap}>
                         <i class="fa fa-search" style={searchicon}/>
-                        <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search.." style={searchbox}/>
-                        <Link to={{ pathname: '/result/', state: {searchinput: this.state.searchinput, selectvalue: this.state.selectvalue} }}>
-                            {/*<button type="submit" className='btn btn-default' onSubmit={this.handleSubmit} style={submitbtn}>*/}
-                            <button type="submit" className='btn btn-default' style={submitbtn}>
+                        <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search..." style={searchbox}/>
+                        <Link to={this.state.searchPath}>
+                            <button type="submit" value="Submit" className='btn btn-default' style={submitbtn}>
                                 {/*<i class="fa fa-arrow-right" style={submiticon}></i>*/}
                                 <i class="material-icons" style={submiticon}>keyboard_arrow_right</i>
                             </button>
