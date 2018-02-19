@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
-import {Link} from 'react-router-dom';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
@@ -108,11 +107,13 @@ class WorkTray extends Component {
                         break;
                     }
                     case 'title': case 'type': case 'state': case 'location': case 'updatedAt': {
-                    columns.push({
-                        accessor: key,
-                        Header: key,
-                    })
-                }
+                        columns.push({
+                            accessor: key,
+                            Header: key,
+                        });
+                        break;
+                    }
+                    default: break;
                 }
             }
         });

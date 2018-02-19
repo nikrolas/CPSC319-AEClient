@@ -515,8 +515,10 @@ class SelectTable extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                        })
+                        });
+                        break;
                     }
+                    default: break;
                 }
             }
         });
@@ -600,9 +602,9 @@ class SelectTable extends Component {
             backgroundColor: '#b5ff87',
             borderColor: '#FFFFFF',
         };
-        let h1style = {
+        /*let h1style = {
             //display: 'inline',
-        };
+        };*/
         return (
             <div style={divstyle}>
                 <h1>Results</h1>
