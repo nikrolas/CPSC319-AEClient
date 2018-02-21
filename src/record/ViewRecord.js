@@ -77,6 +77,10 @@ class ViewRecord extends Component {
         const { navigate } = this.state;
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
+        let title = {
+            textAlign:"left",
+        };
+
         // here is the important part
         if (navigate) {
             return <Redirect to="/" push={true} />
@@ -86,69 +90,80 @@ class ViewRecord extends Component {
             <div>
                 <h1>{this.state.recordJson["number"]}</h1>
                 <Link to={updateRecordLink}>
-                    <Button> Edit Record </Button>
+                    <Button  bsStyle="primary"> Edit Record </Button>
                 </Link>
                     <Confirm
                         onConfirm={() => this.setState({ navigate: true })}
                         body="Are you sure you want to delete this?"
                         confirmText="Confirm Delete"
                         title="Deleting Record">
-                        <Button>Delete </Button>
+                        <Button bsStyle="danger">Delete Record</Button>
                     </Confirm>
                 <br/><br/>
                 <Grid>
                     <Row>
-                        <Col sm={4} smOffset={2}>
-                            <b>Title</b>
-                            <br/>
-                            {this.state.recordJson["title"]}
-                            <br/>
-                            <b>State</b>
-                            <br/>
-                            {this.state.recordJson["state"]}
-                            <br/>
-                            <b>Location</b>
-                            <br/>
-                            {this.state.recordJson["location"]}
-                            <br/>
-                            <b>Record Type</b>
-                            <br/>
-                            {this.state.recordJson["type"]}
-                            <br/>
-                            <b>Classification</b>
-                            <br/>
-                            {/*TODO*/}
-                            To Be Completed
-                            <br/>
-                            <b>Consignment Code</b>
-                            <br/>
-                            {this.state.recordJson["consignmentCode"]}
-                            <br/>
-
+                        <Col md={4} mdOffset={3}>
+                            <p style ={title}>
+                                <b>Title</b>
+                                <br/>
+                                {this.state.recordJson["title"]}
+                            </p>
+                            <p style ={title}>
+                                <b>State</b>
+                                <br/>
+                                {this.state.recordJson["state"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Location</b>
+                                <br/>
+                                {this.state.recordJson["location"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Record Type</b>
+                                <br/>
+                                {this.state.recordJson["type"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Classification</b>
+                                <br/>
+                                {/*TODO*/}
+                                To Be Completed
+                            </p>
+                            <p style ={title}>
+                                <b>Consignment Code</b>
+                                <br/>
+                                {this.state.recordJson["consignmentCode"]}
+                            </p>
                         </Col>
-                        <Col sm={3}>
-                            <b>Created At</b>
-                            <br/>
-                            {this.state.recordJson["createdAt"]}
-                            <br/>
-                            <b>Updated At</b>
-                            <br/>
-                            {this.state.recordJson["updatedAt"]}
-                            <br/>
-                            <b>Closed At</b>
-                            <br/>
-                            {this.state.recordJson["closedAt"]}
-                            <br/>
-                            <b>Retention Schedule</b>
-                            <br/>
-                            {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
-                            <br/>
+                        <Col md={5}>
+                            <p style ={title}>
+                                <b>Created At:</b>
+                                <br/>
+                                {this.state.recordJson["createdAt"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Updated At:</b>
+                                <br/>
+                                {this.state.recordJson["updatedAt"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Closed At:</b>
+                                <br/>
+                                {this.state.recordJson["closedAt"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Retention Schedule:</b>
+                                <br/>
+                                {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
+                            </p>
                         </Col>
-                    </Row>
-                    <Row>
-                        <b>Note</b>
-                        <br/>
-                        {this.state.recordJson["Notes"]}
+                        <Col md={9} mdOffset={3}>
+                            <p style ={title}>
+                                <b>Note</b>
+                                <br/>
+                                {this.state.recordJson["Notes"]}
+                            </p>
+                        </Col>
                     </Row>
                 </Grid>
             </div>

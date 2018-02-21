@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import {Link} from 'react-router-dom';
+
 /*const routes = (
     <Route exact path='/' component={Search}>
         <Route path="result" component={SelectTable}>
@@ -81,27 +82,28 @@ class Search extends Component{
             paddingLeft: '1cm',
             paddingRight: '0.5cm',
             fontSize: '15px',
+            border:'1px solid grey',
         };
         let submitbtn = {
-            //border: '2px solid red',
             float: 'right',
             marginLeft: '0',
             //width: '1.5cm',
             width: '1.2cm',
             height: '100%',
-            fill: 'rgba(0, 0, 0, 0)',
             padding: '6px',
+            'background-color':'white',
+            border:"white"
+
         };
         let submiticon = {
-            fontSize: '20px',
+            fontSize: '25px',
             //transform: 'scaleX(1.1)',
             transform: 'scale(1.5, 1.5)',
-            fill: 'rgba(0, 0, 0, 0)',
-            color: '#FFF'
+            fill: 'rgba(87,180,49, 0)',
+            color: '#57b431'
         };
         return (
             <div style={container}>
-                <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
                 <form onSubmit={this.handleSubmit}>
                     <div style={s1}>
                         {/*<select value={this.state.value} onChange={this.handleSelectChange} style={sel}>*/}
@@ -116,9 +118,8 @@ class Search extends Component{
                         <i class="fa fa-search" style={searchicon}></i>
                         <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search..." style={searchbox}></input>
                         <Link to={this.state.searchPath}>
-                            <button type="submit" value="Submit" className='btn btn-default' style={submitbtn}>
-                                {/*<i class="fa fa-arrow-right" style={submiticon}></i>*/}
-                                <i class="material-icons" style={submiticon}>keyboard_arrow_right</i>
+                            <button type="submit" value="Submit" style={submitbtn}>
+                                <i class="fa fa-angle-right" style={submiticon}></i>
                             </button>
                         </Link>
                     </div>
