@@ -5,6 +5,7 @@ import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getRecordsByNumber} from "../APIs/RecordsApi";
+import Search from "./Search";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 
@@ -432,6 +433,7 @@ class SelectTable extends Component {
             selection: [],
             selectAll: false,
             tray: [],
+            selectvalue: 'records',
             userId: '5'
         };
     }
@@ -439,6 +441,7 @@ class SelectTable extends Component {
     componentWillMount() {
         /*let setData = this.setData;
         let that = this;*/
+        this.setData(getMockData());
         getRecordsByNumber(this.props.match.params.searchString, this.state.userId)
             .then(response => {
                 console.log(response);
@@ -452,7 +455,6 @@ class SelectTable extends Component {
             })
             .catch(err => {
            console.error("Error loading search results: " + err.message);
-           this.setData(getMockData())
         });
     }
 
@@ -578,6 +580,12 @@ class SelectTable extends Component {
         console.log(JSON.stringify(this.state.tray));
     };
 
+    handleSelectChange = (e) => {
+        this.setState({
+            'selectvalue': e.target.value
+        });
+    };
+
     render() {
         const { toggleSelection, toggleAll, isSelected, updateTray } = this;
         const { data, columns, selectAll, tray} = this.state;
@@ -588,29 +596,47 @@ class SelectTable extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        let divstyle = {
-            padding: '50px',
+        let container = {
+            padding: '5%'
         };
         let tablestyle = {
-            //'margin-top': '35px',
-            paddingTop: '35px',
             //border: '5px solid gray'
+            marginTop: '10px',
         };
-        let addbtnstyle = {
+        let btncontainer = {
+            //border: '2px solid blue',
+            alignItems: 'center',
+            height: '1cm'
+        };
+        let addbtn = {
             float: 'left',
-            display: 'block',
             backgroundColor: '#b5ff87',
             borderColor: '#FFFFFF',
+        };
+        let sel = {
+            marginLeft: '1cm',
+            float: 'left',
+            height: '85%',
         };
         /*let h1style = {
             //display: 'inline',
         };*/
         return (
-            <div style={divstyle}>
+            <div style={container}>
+                <div style={{marginBottom: '1cm'}}>
+                    <Search/>
+                </div>
                 <h1>Results</h1>
-                <button style={addbtnstyle} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
-                <div style={{float: 'left', marginLeft: '1cm'}}>
-                    <Link to={{ pathname: '/worktray/', state: {traydata: tray} }}>Work Tray</Link>
+                <div style={btncontainer}>
+                    <button style={addbtn} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
+                    <select onChange={this.handleSelectChange} style={sel}>
+                        <option value='all'>All</option>
+                        <option value='records' selected>Records</option>
+                        <option value='containers'>Containers</option>
+                    </select>
+                    <div style={{float: 'left', marginLeft: '1cm', display: 'inline-flex',}}>
+                        <Link to={{ pathname: '/worktray/', state: {traydata: tray} }}>Work Tray</Link>
+                    </div>
                 </div>
                 <div style={tablestyle}>
                     <CheckboxTable
@@ -623,7 +649,6 @@ class SelectTable extends Component {
                         {...checkboxProps}
                     />
                 </div>
-                {/*{this.props.children}*/}
             </div>
         );
     }

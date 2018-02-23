@@ -191,26 +191,16 @@ class WorkTray extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        let divstyle = {
-            padding: '50px',
+        let container = {
+            padding: '5%'
         };
         let tablestyle = {
-            //'margin-top': '35px',
-            paddingTop: '20px',
             //border: '5px solid gray'
-        };
-        // let addbtnstyle = {
-        //     float: 'left',
-        //     display: 'block',
-        //     'background-color': '#b5ff87',
-        //     'border-color': '#FFFFFF',
-        // };
-        let h1style = {
-            //display: 'inline',
+            marginTop: '5%',
         };
         return (
-            <div style={divstyle}>
-                <h1 style={h1style}>Work Tray</h1>
+            <div style={container}>
+                <h1>Work Tray</h1>
                 <div style={tablestyle}>
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}
