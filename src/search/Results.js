@@ -439,23 +439,39 @@ class SelectTable extends Component {
     }
 
     componentWillMount() {
-        /*let setData = this.setData;
-        let that = this;*/
+        let searchString = this.props.match.params.searchString;
         this.setData(getMockData());
-        getRecordsByNumber(this.props.match.params.searchString, this.state.userId)
+        this.search(searchString);
+    }
+
+    search(searchString) {
+        getRecordsByNumber(searchString, this.state.userId)
             .then(response => {
                 console.log(response);
                 return response.json()
             })
             .then(data => {
-                //console.log(JSON.stringify(data));
                 if (data && data.length > 0) {
                     this.setData(data);
+                } else {
+                    this.setTableState([], []);
                 }
             })
             .catch(err => {
-           console.error("Error loading search results: " + err.message);
+                console.error("Error loading search results: " + err.message);
+            });
+    }
+
+    setTableState(data, columns) {
+        this.setState({
+            data: data,
+            columns: columns
         });
+    }
+
+    componentWillReceiveProps(newProps) {
+        let searchString = newProps.match.params.searchString;
+        this.search(searchString)
     }
 
 
@@ -483,10 +499,7 @@ class SelectTable extends Component {
             }
         });
         const columns = this.getColumns(rowdata);
-        this.setState({
-            data: rowdata,
-            columns,
-        });
+        this.setTableState(rowdata, columns);
     };
 
     getColumns = (data) => {
