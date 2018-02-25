@@ -8,7 +8,6 @@ import {getRecordsByNumber} from "../APIs/RecordsApi";
 import Search from "./Search";
 const CheckboxTable = checkboxHOC(ReactTable);
 
-
 function getMockData() {
         const testData = [
             {
@@ -413,20 +412,11 @@ function getMockData() {
             }
         ];
         return testData;
-/*    return testData.map((item, index)=>{
-        const _id = index;
-        return {
-            _id,
-            ...item,
-        }
-    });*/
 }
 
 class SelectTable extends Component {
     constructor() {
         super();
-        /*const data = getMockData();
-        const columns = this.getColumns(data);*/
         this.state = {
             data: [],
             columns: [],
@@ -439,35 +429,54 @@ class SelectTable extends Component {
     }
 
     componentWillMount() {
-        /*let setData = this.setData;
-        let that = this;*/
-        this.setData(getMockData());
-        getRecordsByNumber(this.props.match.params.searchString, this.state.userId)
+        let stored = sessionStorage.getItem("tray"+this.state.userId);
+        console.log("get stored: " + stored);
+        if (stored) {
+            /*let tray = JSON.parse(stored);
+            this.setState({ tray });*/
+            console.log("get stored stringify: " + JSON.stringify(stored));
+            console.log("get stored parsed: " + JSON.parse(stored));
+            let tray = JSON.parse(stored);
+            this.setState( { tray } );
+            //console.log(tray);
+            //console.log("tray: "+JSON.stringify(this.state.tray));
+        }
+        //this.setData(getMockData());
+        this.search(this.props.match.params.searchString);
+    }
+
+    search = (searchString) => {
+        getRecordsByNumber(searchString, this.state.userId)
             .then(response => {
                 console.log(response);
                 return response.json()
             })
             .then(data => {
-                //console.log(JSON.stringify(data));
                 if (data && data.length > 0) {
                     this.setData(data);
+                } else {
+                    this.setTableState([], []);
                 }
             })
             .catch(err => {
-           console.error("Error loading search results: " + err.message);
+                console.error("Error loading search results: " + err.message);
+            });
+    };
+
+    setTableState = (data, columns) => {
+        this.setState({
+            data: data,
+            columns: columns
         });
-    }
+    };
+
+    componentWillReceiveProps(newProps) {
+        let searchString = newProps.match.params.searchString;
+        this.search(searchString)
+    };
 
 
     setData = (data) => {
-/*        data.forEach(result => {
-            let keys = Object.keys(result);
-            keys.forEach(key => {
-                if (key.endsWith("At")) {
-                    result[key] = new Date(result[key]).toTimeString();
-                }
-            })
-        });*/
         const rowdata = data.map((item, index)=>{
             let keys = Object.keys(item);
             keys.forEach(key => {
@@ -483,10 +492,7 @@ class SelectTable extends Component {
             }
         });
         const columns = this.getColumns(rowdata);
-        this.setState({
-            data: rowdata,
-            columns,
-        });
+        this.setTableState(rowdata, columns);
     };
 
     getColumns = (data) => {
@@ -571,13 +577,27 @@ class SelectTable extends Component {
     };
 
     updateTray = () => {
+        console.log('selection: ', this.state.selection);
+        //console.log("tray: "+JSON.stringify(this.state.tray));
+        let tray = [...this.state.tray];
+        let updated = false;
         this.state.selection.forEach((id) => {
-            if (!this.state.tray.includes(this.state.data[id])) {
-                this.state.tray.push(this.state.data[id]);
+            let selected = Object.assign({}, this.state.data[id]);
+            delete selected._id;
+            let intray = tray.some((item) => {
+                return JSON.stringify(item) === JSON.stringify(selected);
+            });
+            if (!intray) {
+                tray.push(selected);
+                updated = true;
             }
         });
-        console.log('selection: ', this.state.selection);
-        console.log(JSON.stringify(this.state.tray));
+        if (updated) {
+            this.setState({tray});
+            //console.log("tray after: "+JSON.stringify(this.state.tray));
+            sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(tray));
+            console.log(sessionStorage.getItem("tray"+this.state.userId));
+        }
     };
 
     handleSelectChange = (e) => {
@@ -588,7 +608,7 @@ class SelectTable extends Component {
 
     render() {
         const { toggleSelection, toggleAll, isSelected, updateTray } = this;
-        const { data, columns, selectAll, tray} = this.state;
+        const { data, columns, selectAll} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -635,7 +655,8 @@ class SelectTable extends Component {
                         <option value='containers'>Containers</option>
                     </select>
                     <div style={{float: 'left', marginLeft: '1cm', display: 'inline-flex',}}>
-                        <Link to={{ pathname: '/worktray/', state: {traydata: tray} }}>Work Tray</Link>
+                        {/*<Link to={{ pathname: '/worktray/', state: {traydata: tray} }}>Work Tray</Link>*/}
+                        <Link to='/worktray/'>Work Tray</Link>
                     </div>
                 </div>
                 <div style={tablestyle}>
