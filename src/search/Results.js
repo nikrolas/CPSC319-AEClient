@@ -441,7 +441,7 @@ class SelectTable extends Component {
             //console.log(tray);
             //console.log("tray: "+JSON.stringify(this.state.tray));
         }
-        //this.setData(getMockData());
+        this.setData(getMockData());
         this.search(this.props.match.params.searchString);
     }
 
