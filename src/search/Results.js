@@ -430,25 +430,25 @@ class SelectTable extends Component {
 
     componentWillMount() {
         let stored = sessionStorage.getItem("tray"+this.state.userId);
-        console.log("get stored: " + stored);
+        //console.log("get stored: " + stored);
         if (stored) {
             /*let tray = JSON.parse(stored);
             this.setState({ tray });*/
-            console.log("get stored stringify: " + JSON.stringify(stored));
-            console.log("get stored parsed: " + JSON.parse(stored));
+            /*console.log("get stored stringify: " + JSON.stringify(stored));
+            console.log("get stored parsed: " + JSON.parse(stored));*/
             let tray = JSON.parse(stored);
             this.setState( { tray } );
             //console.log(tray);
             //console.log("tray: "+JSON.stringify(this.state.tray));
         }
-        this.setData(getMockData());
+        //this.setData(getMockData());
         this.search(this.props.match.params.searchString);
     }
 
     search = (searchString) => {
         getRecordsByNumber(searchString, this.state.userId)
             .then(response => {
-                console.log(response);
+                //console.log(response);
                 return response.json()
             })
             .then(data => {
@@ -459,7 +459,7 @@ class SelectTable extends Component {
                 }
             })
             .catch(err => {
-                console.error("Error loading search results: " + err.message);
+                //console.error("Error loading search results: " + err.message);
             });
     };
 
@@ -536,7 +536,7 @@ class SelectTable extends Component {
     handleClick = (key, val, id) => {
         let routePath = "/viewRecord/" + id;
         this.props.history.push(routePath);
-        console.log("key: ", key, " val: ", val, " id: ", id);
+        //console.log("key: ", key, " val: ", val, " id: ", id);
     };
 
     toggleSelection = (key) => {
@@ -577,7 +577,7 @@ class SelectTable extends Component {
     };
 
     updateTray = () => {
-        console.log('selection: ', this.state.selection);
+        //console.log('selection: ', this.state.selection);
         //console.log("tray: "+JSON.stringify(this.state.tray));
         let tray = [...this.state.tray];
         let updated = false;
@@ -596,7 +596,7 @@ class SelectTable extends Component {
             this.setState({tray});
             //console.log("tray after: "+JSON.stringify(this.state.tray));
             sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(tray));
-            console.log(sessionStorage.getItem("tray"+this.state.userId));
+            //console.log(sessionStorage.getItem("tray"+this.state.userId));
         }
     };
 

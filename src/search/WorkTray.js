@@ -22,7 +22,7 @@ class WorkTray extends Component {
         //const data = this.props.location.state.traydata;
         let stored = sessionStorage.getItem("tray"+this.state.userId);
         if (stored) {
-            console.log("stored: " + stored);
+            //console.log("stored: " + stored);
             const data = JSON.parse(stored).map((item, index)=>{
                 const _id = index;
                 return {
@@ -89,22 +89,22 @@ class WorkTray extends Component {
     handleClick = (key, val, id) => {
         let routePath = "/viewRecord/" + id;
         this.props.history.push(routePath);
-        console.log("key: ", key, " val: ", val, " id: ", id);
+        //console.log("key: ", key, " val: ", val, " id: ", id);
     };
 
     deleteRow = (e) => {
         let index = e.row._index;
-        console.log(e.row);
+        //console.log(e.row);
 
         let data = [...this.state.data];
         data.splice(index, 1);
         this.setState({data});
-        console.log(JSON.stringify(this.state.data));
+        //console.log(JSON.stringify(this.state.data));
 
         let stored = JSON.parse(sessionStorage.getItem("tray"+this.state.userId));
         stored.splice(index, 1);
         sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(stored));
-        console.log(JSON.stringify(stored));
+        //console.log(JSON.stringify(stored));
     };
 
     toggleSelection = (key) => {
