@@ -101,11 +101,11 @@ class Search extends Component{
                     </div>*/}
 
                     <div style={searchwrap}>
-                        <i class="fa fa-search" style={searchicon}/>
+                        <i className="fa fa-search" style={searchicon}/>
                         <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search..." style={searchbox}/>
                         <Link to={this.state.searchPath}>
                             <button type="submit" value="Submit" className='btn btn-default' style={submitbtn}>
-                                <i class="material-icons" style={submiticon}>keyboard_arrow_right</i>
+                                <i className="material-icons" style={submiticon}>keyboard_arrow_right</i>
                             </button>
                         </Link>
                     </div>

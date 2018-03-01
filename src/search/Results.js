@@ -8,7 +8,7 @@ import {getRecordsByNumber} from "../APIs/RecordsApi";
 import Search from "./Search";
 const CheckboxTable = checkboxHOC(ReactTable);
 
-function getMockData() {
+/*function getMockData() {
         const testData = [
             {
                 "id": 31865,
@@ -412,7 +412,7 @@ function getMockData() {
             }
         ];
         return testData;
-}
+}*/
 
 class SelectTable extends Component {
     constructor() {
