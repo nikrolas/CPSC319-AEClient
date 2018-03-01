@@ -9,32 +9,31 @@ class ViewRecord extends Component {
 
     constructor(props, context) {
         super(props, context);
-        let mockDate = new Date(1127779200000).toTimeString();
         this.state =
             {
                 recordJson: {
-                    Id: 51,
-                    Number: "EDM-2003/001",
-                    title: "Sample Record",
-                    ScheduleId: 26,
-                    TypeId: 3,
-                    ConsignmentCode: "DESTRUCTION CERTIFICATE 2009-01",
-                    StateId: 6,
-                    ContainerId: 24365,
-                    LocationId: 5,
-                    createdAt: mockDate,
-                    updatedAt: mockDate,
-                    closedAt: mockDate,
-                    ClassificationIds: [3, 4, 5, 6],
-                    state: "Active",
-                    location: "AE Corporate Office - Edmonton - Accounting",
-                    type: "AE CORP - ACCOUNTING - EDM - PROJECT BILLINGS",
-                    consignmentCode: null,
-                    schedule: "FINANCIAL MANAGEMENT - ACCOUNTING",
-                    scheduleYear: 6,
-                    Notes: "This is a note!"
+                    Id: "",
+                    Number: "",
+                    title: "",
+                    ScheduleId: "",
+                    TypeId: "",
+                    ConsignmentCode: "",
+                    StateId: "",
+                    ContainerId: "",
+                    LocationId: "",
+                    createdAt: "",
+                    updatedAt: "",
+                    closedAt: "",
+                    ClassificationIds: "",
+                    state: "",
+                    location: "",
+                    type: "",
+                    consignmentCode: "",
+                    schedule: "",
+                    scheduleYear: "",
+                    Notes: ""
                 },
-                navigate:false
+                navdelete:false
             };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -69,12 +68,19 @@ class ViewRecord extends Component {
     }
 
     handleSubmit(event) {
-        alert('Form has been submitted - for rollback');
-        event.preventDefault();
+        fetch('http://localhost:8080/record/' + this.state.recordJson["number"] + '?userId=500', {
+            method: 'DELETE',
+        })
+            .then(result => {
+                console.log('success====:', result);
+                this.setState({navdelete: true});
+            })
+            .catch(error => console.log('error============:', error));
+        //event.preventDefault();
     }
 
     render() {
-        const { navigate } = this.state;
+        const { navdelete } = this.state;
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         let title = {
@@ -82,8 +88,8 @@ class ViewRecord extends Component {
         };
 
         // here is the important part
-        if (navigate) {
-            return <Redirect to="/" push={true} />
+        if (navdelete) {
+            return <Redirect to="/results" push={true} />
         }
 
         return (
@@ -93,7 +99,7 @@ class ViewRecord extends Component {
                     <Button  bsStyle="primary"> Edit Record </Button>
                 </Link>
                     <Confirm
-                        onConfirm={() => this.setState({ navigate: true })}
+                        onConfirm={this.handleSubmit}
                         body="Are you sure you want to delete this?"
                         confirmText="Confirm Delete"
                         title="Deleting Record">

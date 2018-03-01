@@ -18,7 +18,7 @@ class Search extends Component{
             searchPath: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        //this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleInputChange = (e) => {
         let encodedSearchString = encodeURIComponent(e.target.value);
@@ -53,14 +53,13 @@ class Search extends Component{
             height: '1cm'
         };
         let searchicon = {
-            //border: '2px solid red',
             position: 'absolute',
             float: 'left',
             marginTop: '8px',
             marginLeft: '10px',
             fontSize: '20px',
-            fill: 'rgba(0, 0, 0, 0)',
-            opacity: '0.3',
+            color: '#00569c',
+            opacity: '0.7',
         };
         let searchbox = {
             width: '100%',
@@ -77,7 +76,7 @@ class Search extends Component{
             width: '1.2cm',
             height: '100%',
             padding: '6px',
-            'background-color':'white',
+            backgroundColor:'white',
             border:"white"
 
         };
@@ -113,7 +112,7 @@ class Search extends Component{
                         <i className="fa fa-search" style={searchicon}/>
                         <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search..." style={searchbox}/>
                         <Link to={this.state.searchPath}>
-                            <button type="submit" value="Submit" className='btn btn-default' style={submitbtn}>
+                            <button type="submit" value="Submit" className='btn' style={submitbtn}>
                                 <i className="material-icons" style={submiticon}>keyboard_arrow_right</i>
                             </button>
                         </Link>
