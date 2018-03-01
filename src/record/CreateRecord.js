@@ -107,6 +107,26 @@ class CreateRecord extends Component {
 
     handleSubmit(event) {
         alert('Form has been submitted');
+        fetch('http://localhost:8080/record?userId=500', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body:JSON.stringify({
+                title: this.state.title,
+                number: this.state.recordNumber,
+                scheduleId: "10",
+                typeId:"3",
+                consignmentCode: "RF011329724",
+                containerId: "166132",
+                locationId: "5",
+                classifications: "PROJECT MANAGEMENT/Budgets and Schedules",
+                notes: "11",
+            })
+        })
+            .then(result => console.log('success====:', result))
+            .catch(error => console.log('error============:', error));
         event.preventDefault();
     }
 

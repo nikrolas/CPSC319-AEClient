@@ -6,15 +6,16 @@ import 'react-banner/dist/style.css'
 class LayoutBanner extends Component {
     render() {
         return (
-            <div>
                 <Banner
                     search = {false}
                     logo= {<img src={banner_logo} className="App-logo" alt="logo" />}
                     url={ window.location.pathname }
                     links={[
-                        { "title": "New Record", "url": "/createRecord" }
+                        { "title": "Search", "url": "/results" },
+                        { "title": "Work Tray", "url": "/worktray" },
+                        { "title": "New Record", "url": "/createRecord" },
+
                     ]} />
-            </div>
         );
     }
 }
