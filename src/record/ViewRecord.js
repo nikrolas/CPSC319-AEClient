@@ -68,7 +68,7 @@ class ViewRecord extends Component {
     }
 
     handleSubmit(event) {
-        fetch('http://localhost:8080/record/' + this.state.recordJson["number"] + '?userId=500', {
+        fetch('http://localhost:8080/record/' + this.props.match.params.recordId + '?userId=500', {
             method: 'DELETE',
         })
             .then(result => {
