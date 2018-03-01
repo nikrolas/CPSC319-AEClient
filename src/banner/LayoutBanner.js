@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import banner_logo from './images/AE_Logo.png';
+import banner_logo from './images/img_ae_wordmark+tagline_colour.png';
 import Banner from 'react-banner'
 import 'react-banner/dist/style.css'
 

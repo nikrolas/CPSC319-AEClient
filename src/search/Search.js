@@ -1,17 +1,24 @@
 import React, { Component } from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import {Link} from 'react-router-dom';
+/*const routes = (
+    <Route exact path='/' component={Search}>
+        <Route path="result" component={SelectTable}>
+            <Route path="worktray" component={WorkTray}/>
+        </Route>
+    </Route>
+);*/
 
 class Search extends Component{
     constructor(props) {
         super(props);
         this.state = {
             searchvalue: '',
-            //selectvalue: 'records',
+            selectvalue: 'all',
             searchPath: ''
         };
         this.handleInputChange = this.handleInputChange.bind(this);
-        //this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
     handleInputChange = (e) => {
         let encodedSearchString = encodeURIComponent(e.target.value);
@@ -61,23 +68,25 @@ class Search extends Component{
             paddingLeft: '1cm',
             paddingRight: '0.5cm',
             fontSize: '15px',
+            border:'1px solid grey',
         };
         let submitbtn = {
-            //border: '2px solid red',
             float: 'right',
             marginLeft: '0',
             //width: '1.5cm',
             width: '1.2cm',
             height: '100%',
-            fill: 'rgba(0, 0, 0, 0)',
             padding: '6px',
+            'background-color':'white',
+            border:"white"
+
         };
         let submiticon = {
-            fontSize: '20px',
+            fontSize: '25px',
             //transform: 'scaleX(1.1)',
             transform: 'scale(1.5, 1.5)',
-            fill: 'rgba(0, 0, 0, 0)',
-            color: '#FFF'
+            fill: 'rgba(87,180,49, 0)',
+            color: '#57b431'
         };
         /*let s1 = {
             //border: '2px solid green',
