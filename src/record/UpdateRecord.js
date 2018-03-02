@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, Checkbox} from 'react-bootstrap'
-import {getRecordById} from "../APIs/RecordsApi";
+import {getRecordById,updateRecord} from "../APIs/RecordsApi";
 
 class UpdateRecord extends Component {
 
@@ -88,7 +88,7 @@ class UpdateRecord extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId, 5)
+        getRecordById(this.props.match.params.recordId)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
@@ -158,6 +158,9 @@ class UpdateRecord extends Component {
 
     handleSubmit(event) {
         alert('Form has been submitted');
+        updateRecord(this.props.match.params.recordId, this.state)
+            .then(result => console.log('success====:', result))
+            .catch(error => console.log('error============:', error));
         event.preventDefault();
     }
 

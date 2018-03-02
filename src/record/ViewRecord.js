@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getRecordById} from "../APIs/RecordsApi";
+import {getRecordById, deleteRecordById} from "../APIs/RecordsApi";
 import {Row, Col, Grid, Button} from 'react-bootstrap'
 import {Link,Redirect} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
@@ -42,7 +42,7 @@ class ViewRecord extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId, 5)
+        getRecordById(this.props.match.params.recordId)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
@@ -67,16 +67,13 @@ class ViewRecord extends Component {
 
     }
 
-    handleSubmit(event) {
-        fetch('http://localhost:8080/record/' + this.props.match.params.recordId + '?userId=500', {
-            method: 'DELETE',
-        })
+    handleSubmit() {
+        deleteRecordById(this.props.match.params.recordId)
             .then(result => {
                 console.log('success====:', result);
                 this.setState({navdelete: true});
             })
             .catch(error => console.log('error============:', error));
-        //event.preventDefault();
     }
 
     render() {
