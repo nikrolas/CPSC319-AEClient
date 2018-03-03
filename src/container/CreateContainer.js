@@ -10,7 +10,8 @@ class CreateContainer extends Component {
                 title: "",
                 locations: ["Burnaby", "Vancouver", "Richmond"],
                 destructionDate: "September 12, 2010 6:52PM", //TODO: Hardcoded date
-                notes: ""
+                notes: "",
+                records: props.selectedItems
             };
 
 
@@ -23,7 +24,8 @@ class CreateContainer extends Component {
 
     }
 
-    handleChange(e) {}
+    handleChange(e) {
+    }
 
     handleSubmit(event) {
         alert('Form has been submitted');
@@ -34,7 +36,7 @@ class CreateContainer extends Component {
         const listLocationsJson = this.state.locations.map((item, i) =>
             <option key={i} value={i}>{item}</option>);
         const destructionDate = <div>{this.state.destructionDate}</div>;
-        const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
+        const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
 
         return (
             <div>
@@ -65,7 +67,7 @@ class CreateContainer extends Component {
                     </FormGroup>
                     <FormGroup controlId="formControlsTextarea">
                         <ControlLabel>Notes</ControlLabel>
-                        <FormControl componentClass="textarea" placeholder="Enter notes" />
+                        <FormControl componentClass="textarea" placeholder="Enter notes"/>
                     </FormGroup>
                     <Button type="submit">Cancel</Button>
                     <Button type="submit">Submit</Button>

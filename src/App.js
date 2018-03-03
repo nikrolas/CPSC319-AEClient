@@ -9,19 +9,48 @@ import LayoutBanner from './banner/LayoutBanner';
 import SelectTable from "./search/Results";
 import WorkTray from "./search/WorkTray";
 import Home from "./search/Home";
+import ActionBar from "./banner/ActionBar";
+
+const renderMergedProps = (component, ...rest) => {
+    const finalProps = Object.assign({}, ...rest);
+    return (
+        React.createElement(component, finalProps)
+    );
+};
+
+const RouteWrapper = ({ component, ...rest }) => {
+    return (
+        <Route {...rest} render={routeProps => {
+            return renderMergedProps(component, routeProps, rest);
+        }}/>
+    );
+};
 
 class App extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedItems: []
+        };
+    }
+
+    setSelectedItems = (items) => {
+        this.setState({selectedItems: items});
+    };
+
     render() {
         return (
             <div className="App">
                 <LayoutBanner/>
+                <ActionBar selectedItems={this.state.selectedItems}/>
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                 <Route exact path='/' component={Home}/>
-                <Route path="/results/:searchString?" component={SelectTable}/>
+                <RouteWrapper path="/results/:searchString?" onItemSelect={this.setSelectedItems} component={SelectTable}/>
                 <Route path="/worktray" component={WorkTray}/>
-                <Route path='/createContainer/' component={CreateContainer}/>
+                <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} component={CreateContainer}/>
             </div>
         );
     }

@@ -416,8 +416,8 @@ const CheckboxTable = checkboxHOC(ReactTable);
 }*/
 
 class SelectTable extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             data: [],
             columns: [],
@@ -427,6 +427,7 @@ class SelectTable extends Component {
             selectvalue: 'records',
             userId: '5',
             searchStringOfData: ''
+            onItemSelectCallback: props.onItemSelect
         };
     }
 
@@ -445,6 +446,10 @@ class SelectTable extends Component {
         }
         //this.setData(getMockData());
         this.search(this.props.match.params.searchString);
+    }
+
+    componentWillUnmount() {
+        this.state.onItemSelectCallback([]);
     }
 
     search = (searchString) => {
@@ -553,6 +558,14 @@ class SelectTable extends Component {
         //console.log("key: ", key, " val: ", val, " id: ", id);
     };
 
+    getRecordsFromRowIds = (rowIds) => {
+        let records = [];
+        rowIds.forEach((rowId) => {
+            records.push(this.state.data[rowId]);
+        });
+        return records;
+    };
+
     toggleSelection = (key) => {
         // start off with the existing state
         let selection = [...this.state.selection];
@@ -566,6 +579,7 @@ class SelectTable extends Component {
         } else { // it does not exist so add it
             selection.push(key);
         }
+        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
         // update the state
         this.setState({selection});
     };
@@ -583,7 +597,8 @@ class SelectTable extends Component {
                 selection.push(item._original._id);
             })
         }
-        this.setState({selectAll, selection})
+        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
+        this.setState({ selectAll, selection })
     };
 
     isSelected = (key) => {
