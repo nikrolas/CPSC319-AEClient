@@ -11,9 +11,7 @@ class LayoutBanner extends Component {
                     search = {false}
                     logo= {<img src={banner_logo} className="App-logo" alt="logo" />}
                     url={ window.location.pathname }
-                    links={[
-                        { "title": "New Record", "url": "/createRecord" }
-                    ]} />
+                    />
             </div>
         );
     }
