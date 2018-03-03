@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Checkbox} from 'react-bootstrap'
+import {Button, FormGroup, ControlLabel, FormControl, Checkbox, HelpBlock} from 'react-bootstrap'
 import {createRecord} from "../APIs/RecordsApi";
 
 class CreateRecord extends Component {
@@ -8,6 +8,8 @@ class CreateRecord extends Component {
         super(props, context);
         this.state =
             {
+                titleValidationMsg:"",
+                titleValidationState:null,
                 recordType: "",
                 recordNumber: "",
                 title: "",
@@ -62,17 +64,23 @@ class CreateRecord extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    //TODO - Validationstate is working but will have to likely create many for different validations
-    getValidationState() {
-        const length = this.state.title.length;
-        if (length > 10) return 'success';
-        else if (length > 5) return 'warning';
-        else if (length > 0) return 'error';
-        return null;
-    }
-
     handleChange(e) {
-        this.setState({[e.target.name]: e.target.value});
+        e.persist();
+        this.setState({[e.target.name]: e.target.value}, ()=> {
+            if(e.target.name === "title") {
+                const length = this.state.title.length;
+                if (length >= 1 && length < 50) {
+                    this.setState({titleValidationState:'success'});
+                }
+                else if (length >=50){
+                    this.setState({titleValidation:"Please enter less than 50 characters"})
+                    this.setState({titleValidationState:'error'});
+                }
+                else {
+                    this.setState({titleValidationState:null});
+                }
+            }
+        });
         //When RecordType is changed, adjust record number
         if (e.target.name === "recordType") {
             for (var k in this.state.recordJson) {
@@ -123,10 +131,17 @@ class CreateRecord extends Component {
             <option key={i} value={i}>{item.name}</option>);
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
 
+        let formStyle = {
+            margin: 'auto',
+            width: '50%',
+            padding: '10px',
+            textAlign:'left'
+        }
+
         return (
             <div>
                 <h1>Create a New Record</h1>
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleSubmit} style = {formStyle}>
                     <FormGroup
                         controlId="formControlsSelect "
                         onChange={this.handleChange}
@@ -162,7 +177,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                     </FormGroup>
                     <FormGroup
-                        validationState={this.getValidationState()}
+                        validationState={this.state.titleValidationState}
                     >
                         <ControlLabel>Title {requiredLabel}</ControlLabel>
                         <FormControl
@@ -173,6 +188,10 @@ class CreateRecord extends Component {
                             onChange={this.handleChange}
                         />
                         <FormControl.Feedback/>
+                        { this.state.titleValidationState === "error"
+                            ?<HelpBlock>{this.state.titleValidation}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect " onChange={this.handleChange}>
                         <ControlLabel>Classification {requiredLabel}</ControlLabel>
