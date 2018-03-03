@@ -16,6 +16,7 @@ class UpdateRecord extends Component {
                 containerNumber: "",
                 consignmentCode: "",
                 location: "Burnaby",
+                notes:"",
                 classificationChildren: [],
                 responseJson:{
                     Id: 51,
@@ -171,11 +172,18 @@ class UpdateRecord extends Component {
             <option key={i} value={i}>{item.name}</option>);
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
 
+        let formStyle = {
+            margin: 'auto',
+            width: '50%',
+            padding: '10px',
+            textAlign:'left'
+        }
+
         return (
             <div>
                 <h1>Update Record</h1>
                 <h2>{this.state.responseJson["number"]}</h2>
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleSubmit}  style = {formStyle}>
                     <FormGroup
                         controlId="formBasicText"
                         validationState={this.getValidationState()}
@@ -264,6 +272,16 @@ class UpdateRecord extends Component {
                             name="consignmentCode"
                             type="text"
                             value={this.state.responseJson["consignmentCode"]}
+                            placeholder="Enter text"
+                            onChange={this.handleChange}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Notes</ControlLabel>
+                        <FormControl
+                            name="notes"
+                            componentClass="textarea"
+                            value={this.state.notes}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />

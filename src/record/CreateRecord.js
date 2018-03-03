@@ -17,6 +17,7 @@ class CreateRecord extends Component {
                 consignmentCode: "",
                 location: "Burnaby",
                 classificationChildren: [],
+                notes:"",
                 recordJson: [{
                     "id": "10",
                     "name": "CASE RECORDS",
@@ -228,6 +229,16 @@ class CreateRecord extends Component {
                             name="consignmentCode"
                             type="text"
                             value={this.state.consignmentCode}
+                            placeholder="Enter text"
+                            onChange={this.handleChange}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Notes</ControlLabel>
+                        <FormControl
+                            name="notes"
+                            componentClass="textarea"
+                            value={this.state.notes}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
