@@ -235,10 +235,16 @@ class CreateRecord extends Component {
             var key = keys[i];
             if (regexValidationState.test(key)) {
                 if(this.state[key] === null) {
+                    failValidation = true;
                     var returnObj = {};
                     returnObj[key] = "error";
-                    failValidation = true;
                     this.setState(returnObj);
+                    var returnObjMsg = {};
+                    var keyValidationMsg = key.replace("ValidationState", "ValidationMsg");
+                    returnObjMsg[keyValidationMsg]= "Please fill out the required field.";
+                    this.setState(returnObjMsg);
+
+
                 }
                 if(this.state[key] === "error") {
                     failValidation = true;
