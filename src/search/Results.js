@@ -561,7 +561,9 @@ class SelectTable extends Component {
     getRecordsFromRowIds = (rowIds) => {
         let records = [];
         rowIds.forEach((rowId) => {
-            records.push(this.state.data[rowId]);
+            let record = Object.assign({}, this.state.data[rowId]);
+            delete record._id;
+            records.push(record);
         });
         return records;
     };

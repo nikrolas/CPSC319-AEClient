@@ -39,7 +39,7 @@ class CreateContainer extends Component {
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
 
         return (
-            <div>
+            <div style={{margin: '0 5% 0 5%'}}>
                 <h1>New Container</h1>
                 <b>Due for destruction</b>
                 <div>{destructionDate}</div>
