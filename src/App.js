@@ -5,11 +5,10 @@ import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
 import UpdateRecord from './record/UpdateRecord';
 import CreateContainer from "./container/CreateContainer";
-import LayoutBanner from './banner/LayoutBanner';
 import SelectTable from "./search/Results";
 import WorkTray from "./search/WorkTray";
 import Home from "./search/Home";
-import ActionBar from "./banner/ActionBar";
+import NavigationBar from "./banner/NavigationBar";
 
 const renderMergedProps = (component, ...rest) => {
     const finalProps = Object.assign({}, ...rest);
@@ -42,8 +41,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <LayoutBanner/>
-                <ActionBar selectedItems={this.state.selectedItems}/>
+                <NavigationBar selectedItems={this.state.selectedItems}/>
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
