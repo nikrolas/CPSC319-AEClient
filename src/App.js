@@ -47,7 +47,7 @@ class App extends Component {
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                 <Route exact path='/' component={Home}/>
                 <RouteWrapper path="/results/:searchString?" onItemSelect={this.setSelectedItems} component={SelectTable}/>
-                <Route path="/worktray" component={WorkTray}/>
+                <RouteWrapper path="/worktray" onItemSelect={this.setSelectedItems} component={WorkTray}/>
                 <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} component={CreateContainer}/>
             </div>
         );

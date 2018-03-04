@@ -6,14 +6,15 @@ import checkboxHOC from 'react-table/lib/hoc/selectTable';
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class WorkTray extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             data: [],
             columns: [],
             selection: [],
             selectAll: false,
-            userId: '5'
+            userId: '5',
+            onItemSelectCallback: props.onItemSelect
         };
     }
 
@@ -33,6 +34,9 @@ class WorkTray extends Component {
             const columns = this.getColumns(data);
             this.setState({data, columns});
         }
+    }
+    componentWillUnmount() {
+        this.state.onItemSelectCallback([]);
     }
 
     getColumns = (data) => {
@@ -107,6 +111,16 @@ class WorkTray extends Component {
         //console.log(JSON.stringify(stored));
     };
 
+    getRecordsFromRowIds = (rowIds) => {
+        let records = [];
+        rowIds.forEach((rowId) => {
+            let record = Object.assign({}, this.state.data[rowId]);
+            delete record._id;
+            records.push(record);
+        });
+        return records;
+    };
+
     toggleSelection = (key) => {
         // start off with the existing state
         let selection = [...this.state.selection];
@@ -120,6 +134,7 @@ class WorkTray extends Component {
         } else { // it does not exist so add it
             selection.push(key);
         }
+        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
         // update the state
         this.setState({ selection });
     };
@@ -137,6 +152,7 @@ class WorkTray extends Component {
                 selection.push(item._original._id);
             })
         }
+        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
         this.setState({ selectAll, selection })
     };
 
