@@ -1,25 +1,35 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 80px;
-  float:left;
+    margin-top: -30px;
+    height: 80px;
+    float: left;
 }
 
 .App-header {
-  background-color: #32CD32;
-  height: 100px;
-  padding: 20px;
-  color: white;
+    background-color: #32CD32;
+    height: 100px;
+    padding: 20px;
+    color: white;
 }
 
 .App-title {
-  font-size: 1.5em;
+    font-size: 1.5em;
 }
 
 .App-intro {
-  font-size: large;
+    font-size: large;
 }
 
+.navbar {
+    border-radius: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.navbar li {
+    padding-top: 16px;
+}
 
