@@ -66,7 +66,7 @@ class WorkTray extends Component {
                         });
                         break;
                     }
-                    case 'title': case 'type': case 'state': case 'location': case 'updatedAt': {
+                    case 'title': case 'type': case 'state': case 'location': case 'scheduleYear': case 'consignmentCode': {
                         columns.push({
                             accessor: key,
                             Header: key,
