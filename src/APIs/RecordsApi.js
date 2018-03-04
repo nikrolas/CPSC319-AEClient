@@ -31,11 +31,11 @@ export function createRecord(state) {
             number: state.recordNumber,
             scheduleId: "10",
             typeId:"3",
-            consignmentCode: "RF011329724",
-            containerId: "166132",
+            consignmentCode: state.consignmentCode,
+            containerId: state.container,
             locationId: "5",
             classifications: "PROJECT MANAGEMENT/Budgets and Schedules",
-            notes: "11",
+            notes: state.notes,
         })
     })
 }

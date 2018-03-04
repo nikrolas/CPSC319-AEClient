@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Checkbox, HelpBlock} from 'react-bootstrap'
+import {Button, FormGroup, ControlLabel, FormControl, Checkbox, HelpBlock, Alert} from 'react-bootstrap'
 import {createRecord} from "../APIs/RecordsApi";
 
 class CreateRecord extends Component {
@@ -8,6 +8,7 @@ class CreateRecord extends Component {
         super(props, context);
         this.state =
             {
+                alertMsg:"",
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
                 recordType: "",
@@ -18,7 +19,7 @@ class CreateRecord extends Component {
 
                 //TODO Record Number
                 recordNumberValidationMsg:"",
-                recordNumberValidationState:"null",
+                recordNumberValidationState:"success",
                 recordNumber: "",
 
                 titleValidationMsg:"",
@@ -26,21 +27,25 @@ class CreateRecord extends Component {
                 title: "",
 
                 //TODO Classifications
+                classificationValidationMsg:"",
+                classificationValidationState:"success",
+                classification: "",
+
 
                 retentionValidationMsg:"",
                 retentionValidationState:null,
                 retentionSchedule:"",
 
                 containerValidationMsg:"",
-                containerValidationState:null,
+                containerValidationState:"success",
                 container: "",
 
                 consignmentCodeValidationMsg:"",
-                consignmentCodeValidationState:null,
+                consignmentCodeValidationState:"success",
                 consignmentCode: "",
 
                 notesValidationMsg:"",
-                notesValidationState:null,
+                notesValidationState:"success",
                 notes:"",
 
                 classificationChildren: [],
@@ -163,7 +168,7 @@ class CreateRecord extends Component {
                     this.setState({containerValidationMsg:'Please enter numbers only'});
                 }
                 else {
-                    this.setState({containerValidationState:null});
+                    this.setState({containerValidationState:'success'});
                 }
             }
 
@@ -177,7 +182,14 @@ class CreateRecord extends Component {
                     this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
                 }
                 else {
-                    this.setState({consignmentCodeValidationState:null});
+                    this.setState({consignmentCodeValidationState:'success'});
+                }
+            }
+
+            if(e.target.name === "notes") {
+                const length = this.state.notes.length;
+                if (length >= 0) {
+                    this.setState({notesValidationState:'success'});
                 }
             }
 
@@ -216,10 +228,33 @@ class CreateRecord extends Component {
     };
 
     handleSubmit(event) {
-        alert('Form has been submitted');
-        createRecord(this.state)
-            .then(result => console.log('success====:', result))
-            .catch(error => console.log('error============:', error));
+        const regexValidationState = /^.*ValidationState$/;
+        var keys = Object.keys(this.state);
+        var failValidation = false;
+        for(var i=0;i<keys.length;i++){
+            var key = keys[i];
+            if (regexValidationState.test(key)) {
+                if(this.state[key] === null) {
+                    var returnObj = {};
+                    returnObj[key] = "error";
+                    failValidation = true;
+                    this.setState(returnObj);
+                }
+                if(this.state[key] === "error") {
+                    failValidation = true;
+                }
+            }
+        }
+        if(!failValidation) {
+            createRecord(this.state)
+                .then(result => {
+                    console.log('success====:', result)
+                })
+                .catch(error => {
+                    this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                    window.scrollTo(0, 0)
+                });
+        }
         event.preventDefault();
     }
 
@@ -243,6 +278,10 @@ class CreateRecord extends Component {
 
         return (
             <div>
+                {this.state.alertMsg.length !== 0
+                    ?<Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    :null
+                }
                 <h1>Create a New Record</h1>
                 <form onSubmit={this.handleSubmit} style = {formStyle}>
                     <FormGroup
@@ -258,6 +297,10 @@ class CreateRecord extends Component {
                             {listRecordTypeJson}
                         </FormControl>
                         <FormControl.Feedback/>
+                        { this.state.recordTypeValidationState === "error"
+                            ?<HelpBlock>{this.state.recordTypeValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <FormGroup
                         controlId="formControlsSelect"
@@ -272,9 +315,15 @@ class CreateRecord extends Component {
                         {listLocationJson}
                         </FormControl>
                         <FormControl.Feedback/>
+                        { this.state.locationValidationState === "error"
+                            ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
+                    {/*TODO RecordNumber*/}
                     <FormGroup
                         controlId="formBasicText"
+                        validationState={this.state.recordNumberValidationState}
                     >
                         <ControlLabel>Record Number {requiredLabel}</ControlLabel>
                         <FormControl
@@ -285,7 +334,11 @@ class CreateRecord extends Component {
                             onChange={this.handleChange}
                         />
                         <FormControl.Feedback/>
-                    </FormGroup>
+                        { this.state.recordNumberValidationState === "error"
+                            ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
+                            :null
+                        }
+                        </FormGroup>
                     <FormGroup
                         validationState={this.state.titleValidationState}
                     >
@@ -303,13 +356,23 @@ class CreateRecord extends Component {
                             :null
                         }
                     </FormGroup>
-                    <FormGroup controlId="formControlsSelect " onChange={this.handleChange}>
+                   {/* TODO Classifications */}
+                    <FormGroup
+                        controlId="formControlsSelect "
+                        onChange={this.handleChange}
+                        validationState={this.state.classificationValidationState}
+                    >
                         <ControlLabel>Classification {requiredLabel}</ControlLabel>
                         <FormControl name="classification"
                                      componentClass="select"
                                      placeholder="select">
                             {listClassificationJson}
                         </FormControl>
+                        <FormControl.Feedback/>
+                        { this.state.classificationValidationState === "error"
+                            ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <FormGroup>
                         {this.returnCheckboxes()}
@@ -325,6 +388,10 @@ class CreateRecord extends Component {
                             {listRetentionScheduleJson}
                         </FormControl>
                         <FormControl.Feedback/>
+                        { this.state.retentionValidationState === "error"
+                            ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
 
                     <FormGroup
@@ -362,7 +429,9 @@ class CreateRecord extends Component {
                             :null
                         }
                     </FormGroup>
-                    <FormGroup>
+                    <FormGroup
+                        validationState={this.state.notesValidationState}
+                    >
                         <ControlLabel>Notes</ControlLabel>
                         <FormControl
                             name="notes"
@@ -371,6 +440,11 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
+                        <FormControl.Feedback/>
+                        { this.state.notesValidationState === "error"
+                            ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <Button type="submit">Submit</Button>
                 </form>
