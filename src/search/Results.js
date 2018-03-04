@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactTable from 'react-table';
 import {Link} from 'react-router-dom';
 import "react-table/react-table.css";
@@ -6,6 +6,7 @@ import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getRecordsByNumber} from "../APIs/RecordsApi";
 import Search from "./Search";
+
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class SelectTable extends Component {
@@ -18,12 +19,13 @@ class SelectTable extends Component {
             selectAll: false,
             tray: [],
             selectvalue: 'records',
-            userId: '5'
+            userId: '5',
+            searchStringOfData: ''
         };
     }
 
     componentWillMount() {
-        let stored = sessionStorage.getItem("tray"+this.state.userId);
+        let stored = sessionStorage.getItem("tray" + this.state.userId);
         //console.log("get stored: " + stored);
         if (stored) {
             /*let tray = JSON.parse(stored);
@@ -31,7 +33,7 @@ class SelectTable extends Component {
             /*console.log("get stored stringify: " + JSON.stringify(stored));
             console.log("get stored parsed: " + JSON.parse(stored));*/
             let tray = JSON.parse(stored);
-            this.setState( { tray } );
+            this.setState({tray});
             //console.log(tray);
             //console.log("tray: "+JSON.stringify(this.state.tray));
         }
@@ -51,9 +53,10 @@ class SelectTable extends Component {
                 } else {
                     this.setTableState([], []);
                 }
+                this.setState({searchStringOfData: searchString});
             })
             .catch(err => {
-                //console.error("Error loading search results: " + err.message);
+                console.error("Error loading search results: " + err.message);
             });
     };
 
@@ -66,12 +69,14 @@ class SelectTable extends Component {
 
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
-        this.search(searchString)
+        if (searchString !== this.state.searchStringOfData) {
+            this.search(searchString);
+        }
     };
 
 
     setData = (data) => {
-        const rowdata = data.map((item, index)=>{
+        const rowdata = data.map((item, index) => {
             let keys = Object.keys(item);
             keys.forEach(key => {
                 if (key.endsWith("At")) {
@@ -101,7 +106,9 @@ class SelectTable extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                            Cell: e => <a onClick={() => {this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
+                            Cell: e => <a onClick={() => {
+                                this.handleClick(key, e.value, e.row._original.id)
+                            }}> {e.value} </a>
                         });
                         break;
                     }
@@ -109,18 +116,25 @@ class SelectTable extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                            Cell: e => <a onClick={() => {this.handleClick(key, e.value)}}> {e.value} </a>
+                            Cell: e => <a onClick={() => {
+                                this.handleClick(key, e.value)
+                            }}> {e.value} </a>
                         });
                         break;
                     }
-                    case 'title': case 'type': case 'state': case 'location': case 'updatedAt': {
+                    case 'title':
+                    case 'type':
+                    case 'state':
+                    case 'location':
+                    case 'updatedAt': {
                         columns.push({
                             accessor: key,
                             Header: key,
                         });
                         break;
                     }
-                    default: break;
+                    default:
+                        break;
                 }
             }
         });
@@ -147,7 +161,7 @@ class SelectTable extends Component {
             selection.push(key);
         }
         // update the state
-        this.setState({ selection });
+        this.setState({selection});
     };
 
     toggleAll = () => {
@@ -163,7 +177,7 @@ class SelectTable extends Component {
                 selection.push(item._original._id);
             })
         }
-        this.setState({ selectAll, selection })
+        this.setState({selectAll, selection})
     };
 
     isSelected = (key) => {
@@ -189,7 +203,7 @@ class SelectTable extends Component {
         if (updated) {
             this.setState({tray});
             //console.log("tray after: "+JSON.stringify(this.state.tray));
-            sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(tray));
+            sessionStorage.setItem("tray" + this.state.userId, JSON.stringify(tray));
             //console.log(sessionStorage.getItem("tray"+this.state.userId));
         }
     };
@@ -201,8 +215,8 @@ class SelectTable extends Component {
     };
 
     render() {
-        const { toggleSelection, toggleAll, isSelected, updateTray } = this;
-        const { data, columns, selectAll} = this.state;
+        const {toggleSelection, toggleAll, isSelected, updateTray} = this;
+        const {data, columns, selectAll} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -238,7 +252,7 @@ class SelectTable extends Component {
         return (
             <div style={container}>
                 <div style={{marginBottom: '1cm'}}>
-                    <Search/>
+                    <Search searchValue={this.props.match.params.searchString}/>
                 </div>
                 <div style={btncontainer}>
                     <button style={addbtn} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
@@ -254,7 +268,7 @@ class SelectTable extends Component {
                 </div>
                 <div style={tablestyle}>
                     <CheckboxTable
-                        ref={(r)=>this.checkboxTable=r}
+                        ref={(r) => this.checkboxTable = r}
                         data={data}
                         columns={columns}
                         defaultPageSize={10}

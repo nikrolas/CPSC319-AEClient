@@ -1,49 +1,37 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import 'font-awesome/css/font-awesome.min.css';
 import {Link} from 'react-router-dom';
-/*const routes = (
-    <Route exact path='/' component={Search}>
-        <Route path="result" component={SelectTable}>
-            <Route path="worktray" component={WorkTray}/>
-        </Route>
-    </Route>
-);*/
 
-class Search extends Component{
+class Search extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            searchvalue: '',
-            selectvalue: 'all',
+        this.state = this.createStateFromInput(props.searchValue);
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    handleInputChange = (e) => {
+        this.setState(this.createStateFromInput(e.target.value));
+    };
+
+    createStateFromInput = (value) => {
+        let result = {
+            searchValue: '',
             searchPath: ''
         };
-        this.handleInputChange = this.handleInputChange.bind(this);
-        //this.handleSubmit = this.handleSubmit.bind(this);
-    }
-    handleInputChange = (e) => {
-        let encodedSearchString = encodeURIComponent(e.target.value);
-        this.setState({
-            'searchvalue': e.target.value,
-            'searchPath': '/results/' + encodedSearchString
-        });
-    };
-    /*handleSelectChange = (e) => {
-         this.setState({
-             'selectvalue': e.target.value
-         });
-     };
 
-    handleSubmit = (e) => {};*/
+        if (value) {
+            value = value.trim();
+            let encodedSearchString = encodeURIComponent(value);
+            result = {
+                searchValue: value,
+                searchPath: '/results/' + encodedSearchString
+            };
+        }
+
+        return result;
+    };
 
     render() {
-        /*let container = {
-            //border: '2px solid black',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '10% 0 5% 0',
-            height: '1cm',
-        };*/
         let searchwrap = {
             //border: '2px solid blue',
             display: 'inline-flex',
@@ -87,29 +75,14 @@ class Search extends Component{
             fill: 'rgba(87,180,49, 0)',
             color: '#57b431'
         };
-        /*let s1 = {
-            //border: '2px solid green',
-            display: 'inline-flex',
-            height: '1cm',
-        };
-        let sel = {
-            height: '1cm'
-        };*/
+
         return (
             <div>
                 <form onSubmit={this.handleSubmit}>
-                    {/*<div style={s1}>
-                        <select onChange={this.handleSelectChange} style={sel}>
-                            <option value='all'>All</option>
-                            <option value='records'  selected>Records</option>
-                            <option value='containers'>Containers</option>
-                            <option value='users'>Users</option>
-                        </select>
-                    </div>*/}
-
                     <div style={searchwrap}>
                         <i className="fa fa-search" style={searchicon}/>
-                        <input type="text"  value={this.state.value} onChange={this.handleInputChange} placeholder="Search..." style={searchbox}/>
+                        <input type="text" defaultValue={this.state.searchValue} value={this.state.value}
+                               onChange={this.handleInputChange} placeholder="Search..." style={searchbox}/>
                         <Link to={this.state.searchPath}>
                             <button type="submit" value="Submit" className='btn' style={submitbtn}>
                                 <i className="fa fa-angle-right" style={submiticon}/>
@@ -121,4 +94,5 @@ class Search extends Component{
         )
     }
 }
+
 export default Search;
