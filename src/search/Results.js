@@ -424,7 +424,8 @@ class SelectTable extends Component {
             selectAll: false,
             tray: [],
             selectvalue: 'records',
-            userId: '5'
+            userId: '5',
+            searchStringOfData: ''
         };
     }
 
@@ -446,21 +447,24 @@ class SelectTable extends Component {
     }
 
     search = (searchString) => {
-        getRecordsByNumber(searchString, this.state.userId)
-            .then(response => {
-                //console.log(response);
-                return response.json()
-            })
-            .then(data => {
-                if (data && data.length > 0) {
-                    this.setData(data);
-                } else {
-                    this.setTableState([], []);
-                }
-            })
-            .catch(err => {
-                //console.error("Error loading search results: " + err.message);
-            });
+        if (searchString !== this.state.searchStringOfData) {
+            getRecordsByNumber(searchString, this.state.userId)
+                .then(response => {
+                    //console.log(response);
+                    return response.json()
+                })
+                .then(data => {
+                    if (data && data.length > 0) {
+                        this.setData(data);
+                    } else {
+                        this.setTableState([], []);
+                    }
+                    this.setState({searchStringOfData: searchString});
+                })
+                .catch(err => {
+                    console.error("Error loading search results: " + err.message);
+                });
+        }
     };
 
     setTableState = (data, columns) => {
@@ -472,7 +476,7 @@ class SelectTable extends Component {
 
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
-        this.search(searchString)
+        this.search(searchString);
     };
 
 
@@ -644,7 +648,7 @@ class SelectTable extends Component {
         return (
             <div style={container}>
                 <div style={{marginBottom: '1cm'}}>
-                    <Search/>
+                    <Search searchValue={this.props.match.params.searchString}/>
                 </div>
                 <h1>Results</h1>
                 <div style={btncontainer}>
