@@ -8,16 +8,50 @@ class CreateRecord extends Component {
         super(props, context);
         this.state =
             {
+                recordTypeValidationMsg:"",
+                recordTypeValidationState:null,
+                recordType: "",
+
+                locationValidationMsg:"",
+                locationValidationState:"success",
+                location: "",
+
+                //TODO Record Number
+                recordNumberValidationMsg:"",
+                recordNumberValidationState:"null",
+                recordNumber: "",
+
                 titleValidationMsg:"",
                 titleValidationState:null,
-                recordType: "",
-                recordNumber: "",
                 title: "",
-                containerNumber: "",
+
+                //TODO Classifications
+
+                retentionValidationMsg:"",
+                retentionValidationState:null,
+                retentionSchedule:"",
+
+                containerValidationMsg:"",
+                containerValidationState:null,
+                container: "",
+
+                consignmentCodeValidationMsg:"",
+                consignmentCodeValidationState:null,
                 consignmentCode: "",
-                location: "Burnaby",
-                classificationChildren: [],
+
+                notesValidationMsg:"",
+                notesValidationState:null,
                 notes:"",
+
+                classificationChildren: [],
+                locationJson: [{
+                    "id": "1",
+                    "location": "Burnaby",
+                }, {
+                    "id": "2",
+                    "location": "Richmond",
+                }],
+
                 recordJson: [{
                     "id": "10",
                     "name": "CASE RECORDS",
@@ -68,19 +102,85 @@ class CreateRecord extends Component {
     handleChange(e) {
         e.persist();
         this.setState({[e.target.name]: e.target.value}, ()=> {
+            //Validation handling here
+            if(e.target.name === "recordType") {
+                const length = this.state.recordType.length;
+                if (length >= 1) {
+                    this.setState({recordTypeValidationState: 'success'});
+                }
+                else {
+                    this.setState({titleValidationState: null});
+                }
+            }
+            if(e.target.name === "location") {
+                const length = this.state.location.length;
+                if (length >= 1) {
+                    this.setState({locationValidationState: 'success'});
+                }
+                else {
+                    this.setState({locationValidationState: null});
+                }
+            }
+            //TODO Record Number
+
             if(e.target.name === "title") {
                 const length = this.state.title.length;
-                if (length >= 1 && length < 50) {
+                if (length >= 1 && length < 256) {
                     this.setState({titleValidationState:'success'});
                 }
                 else if (length >=50){
-                    this.setState({titleValidation:"Please enter less than 50 characters"})
+                    this.setState({titleValidationMsg:"Please enter less than 256 characters"})
                     this.setState({titleValidationState:'error'});
                 }
                 else {
                     this.setState({titleValidationState:null});
                 }
             }
+            //TODO Classification
+            if(e.target.name === "retentionSchedule") {
+                const length = this.state.retentionSchedule.length;
+                if (length >= 1) {
+                    this.setState({retentionValidationState:'success'});
+                }
+                else {
+                    this.setState({retentionValidationState:null});
+                }
+            }
+            if(e.target.name === "container") {
+                const regexNumbers = /^[0-9\b]{1,11}$/;
+                const regexNumbersExceed = /^[0-9\b]{12,}$/;
+                const regexNotNumbers = /[^0-9]+/;
+
+                if (regexNumbers.test(this.state.container)) {
+                    this.setState({containerValidationState:'success'});
+                }
+                else if (regexNumbersExceed.test(this.state.container)) {
+                    this.setState({containerValidationState:'error'});
+                    this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
+                }
+                else if (regexNotNumbers.test(this.state.container)){
+                    this.setState({containerValidationState:'error'});
+                    this.setState({containerValidationMsg:'Please enter numbers only'});
+                }
+                else {
+                    this.setState({containerValidationState:null});
+                }
+            }
+
+            if(e.target.name === "consignmentCode") {
+                const length = this.state.consignmentCode.length;
+                if (length >= 1 && length <= 50) {
+                    this.setState({consignmentCodeValidationState:'success'});
+                }
+                else if (length > 50) {
+                    this.setState({consignmentCodeValidationState:'error'});
+                    this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
+                }
+                else {
+                    this.setState({consignmentCodeValidationState:null});
+                }
+            }
+
         });
         //When RecordType is changed, adjust record number
         if (e.target.name === "recordType") {
@@ -126,6 +226,8 @@ class CreateRecord extends Component {
     render() {
         const listRecordTypeJson = this.state.recordJson.map((item, i) => <option key={i}
                                                                                   value={i}>{item.name}</option>);
+        const listLocationJson = this.state.locationJson.map((item, i) => <option key={i}
+                                                                                  value={i}>{item.location}</option>);
         const listClassificationJson = this.state.classificationJson.map((item, i) =>
             <option key={i} value={i}>{item.name}</option>);
         const listRetentionScheduleJson = this.state.retentionScheduleJson.map((item, i) =>
@@ -144,25 +246,32 @@ class CreateRecord extends Component {
                 <h1>Create a New Record</h1>
                 <form onSubmit={this.handleSubmit} style = {formStyle}>
                     <FormGroup
-                        controlId="formControlsSelect "
+                        controlId="formControlsSelect"
                         onChange={this.handleChange}
+                        validationState={this.state.recordTypeValidationState}
                     >
                         <ControlLabel>Record Type {requiredLabel}</ControlLabel>
                         <FormControl name="recordType"
                                      componentClass="select"
-                                     placeholder="select">
+                        >
+                            <option value="" disabled selected>(Select a record type)</option>
                             {listRecordTypeJson}
                         </FormControl>
+                        <FormControl.Feedback/>
                     </FormGroup>
-                    <FormGroup>
+                    <FormGroup
+                        controlId="formControlsSelect"
+                        onChange={this.handleChange}
+                        validationState={this.state.locationValidationState}
+                    >
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
                         <FormControl
-                            disabled
-                            type="text"
-                            value={this.state.location}
-                            placeholder="Enter text"
-                            onChange={this.handleChange}
-                        />
+                            name="location"
+                            componentClass="select"
+                        >
+                        {listLocationJson}
+                        </FormControl>
+                        <FormControl.Feedback/>
                     </FormGroup>
                     <FormGroup
                         controlId="formBasicText"
@@ -190,7 +299,7 @@ class CreateRecord extends Component {
                         />
                         <FormControl.Feedback/>
                         { this.state.titleValidationState === "error"
-                            ?<HelpBlock>{this.state.titleValidation}</HelpBlock>
+                            ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
                             :null
                         }
                     </FormGroup>
@@ -205,26 +314,41 @@ class CreateRecord extends Component {
                     <FormGroup>
                         {this.returnCheckboxes()}
                     </FormGroup>
-                    <FormGroup controlId="formControlsSelect ">
+                    <FormGroup controlId="formControlsSelect"
+                               onChange={this.handleChange}
+                               validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
                         <FormControl name="retentionSchedule"
                                      componentClass="select"
                                      placeholder="select">
+                            <option value="" disabled selected>(Select a record type)</option>
                             {listRetentionScheduleJson}
                         </FormControl>
+                        <FormControl.Feedback/>
                     </FormGroup>
-                    <FormGroup>
+
+                    <FormGroup
+                        validationState={this.state.containerValidationState}
+                    >
                         <ControlLabel>Container Number</ControlLabel>
                         <FormControl
-                            name="containerNumber"
+                            name="container"
                             type="text"
-                            value={this.state.containerNumber}
-                            placeholder="Enter text"
+                            value={this.state.container}
+                            placeholder="Enter digits"
                             onChange={this.handleChange}
                         />
+                        <FormControl.Feedback/>
+                        { this.state.containerValidationState === "error"
+                            ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
-                    <FormGroup>
-                        <ControlLabel>Consignment Code {requiredLabel}</ControlLabel>
+
+                    <FormGroup
+                        validationState={this.state.consignmentCodeValidationState}
+                    >
+                        <ControlLabel>Consignment Code</ControlLabel>
                         <FormControl
                             name="consignmentCode"
                             type="text"
@@ -232,6 +356,11 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
+                        <FormControl.Feedback/>
+                        { this.state.consignmentCodeValidationState === "error"
+                            ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <FormGroup>
                         <ControlLabel>Notes</ControlLabel>
