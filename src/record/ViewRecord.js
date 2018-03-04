@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {getRecordById, deleteRecordById} from "../APIs/RecordsApi";
-import {Row, Col, Grid, Button} from 'react-bootstrap'
+import {Row, Col, Grid, Button, ButtonToolbar} from 'react-bootstrap'
 import {Link,Redirect} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
 
@@ -83,6 +83,11 @@ class ViewRecord extends Component {
         let title = {
             textAlign:"left",
         };
+        let btnStyle = {
+            display:"flex",
+            justifyContent:"center"
+        };
+
 
         // here is the important part
         if (navdelete) {
@@ -92,6 +97,7 @@ class ViewRecord extends Component {
         return (
             <div>
                 <h1>{this.state.recordJson["number"]}</h1>
+                <ButtonToolbar style = {btnStyle}>
                 <Link to={updateRecordLink}>
                     <Button  bsStyle="primary"> Edit Record </Button>
                 </Link>
@@ -102,6 +108,7 @@ class ViewRecord extends Component {
                         title="Deleting Record">
                         <Button bsStyle="danger">Delete Record</Button>
                     </Confirm>
+                </ButtonToolbar>
                 <br/><br/>
                 <Grid>
                     <Row>
