@@ -486,12 +486,12 @@ class SelectTable extends Component {
 
     setData = (data) => {
         const rowdata = data.map((item, index)=>{
-            let keys = Object.keys(item);
+            /*let keys = Object.keys(item);
             keys.forEach(key => {
                 if (key.endsWith("At")) {
                     item[key] = new Date(item[key]).toTimeString();
                 }
-            });
+            });*/
 
             const _id = index;
             return {
@@ -527,7 +527,7 @@ class SelectTable extends Component {
                         });
                         break;
                     }
-                    case 'title': case 'type': case 'state': case 'location': case 'updatedAt': {
+                    case 'title': case 'type': case 'state': case 'location': case 'scheduleYear': case 'consignmentCode': {
                         columns.push({
                             accessor: key,
                             Header: key,
@@ -647,9 +647,6 @@ class SelectTable extends Component {
             float: 'left',
             height: '85%',
         };
-        /*let h1style = {
-            //display: 'inline',
-        };*/
         return (
             <div style={container}>
                 <div style={{marginBottom: '1cm'}}>
