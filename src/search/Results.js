@@ -426,7 +426,6 @@ class SelectTable extends Component {
             tray: [],
             selectvalue: 'records',
             userId: '5',
-            searchStringOfData: '',
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
         };
@@ -465,7 +464,6 @@ class SelectTable extends Component {
                 } else {
                     this.setTableState([], []);
                 }
-                this.setState({searchStringOfData: searchString});
             })
             .catch(err => {
                 console.error("Error loading search results: " + err.message);
@@ -483,14 +481,14 @@ class SelectTable extends Component {
 
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
-        if (searchString !== this.state.searchStringOfData) {
+        if (searchString != this.props.match.params.searchString) {
             this.search(searchString);
         }
     };
 
 
     setData = (data) => {
-        const rowdata = data.map((item, index)=>{
+        const rowdata = data.map((item, index) => {
             /*let keys = Object.keys(item);
             keys.forEach(key => {
                 if (key.endsWith("At")) {
@@ -536,7 +534,12 @@ class SelectTable extends Component {
                         });
                         break;
                     }
-                    case 'title': case 'type': case 'state': case 'location': case 'scheduleYear': case 'consignmentCode': {
+                    case 'title':
+                    case 'type':
+                    case 'state':
+                    case 'location':
+                    case 'scheduleYear':
+                    case 'consignmentCode': {
                         columns.push({
                             accessor: key,
                             Header: key,
@@ -571,7 +574,7 @@ class SelectTable extends Component {
             selection.push(key);
         }
         // update the state
-        this.setState({ selection }, () => this.state.onItemSelectCallback(this.state.selection));
+        this.setState({selection}, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     toggleAll = () => {
@@ -588,7 +591,7 @@ class SelectTable extends Component {
             })
         }
         // update the state
-        this.setState({ selectAll, selection }, () => this.state.onItemSelectCallback(this.state.selection))
+        this.setState({selectAll, selection}, () => this.state.onItemSelectCallback(this.state.selection))
     };
 
     isSelected = (key) => {
