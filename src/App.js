@@ -30,12 +30,18 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            resultsData: [],
+            resultsColumns: [],
             selectedItems: []
         };
     }
 
     setSelectedItems = (items) => {
         this.setState({selectedItems: items});
+    };
+
+    setResultsStates = (data, columns) => {
+        this.setState({resultsData: data, resultsColumns: columns});
     };
 
     render() {
@@ -46,9 +52,9 @@ class App extends Component {
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                 <Route exact path='/' component={Home}/>
-                <RouteWrapper path="/results/:searchString?" onItemSelect={this.setSelectedItems} component={SelectTable}/>
+                <RouteWrapper path="/results/:searchString?" onItemSelect={this.setSelectedItems} onDataUpdate={this.setResultsStates} component={SelectTable}/>
                 <RouteWrapper path="/worktray" onItemSelect={this.setSelectedItems} component={WorkTray}/>
-                <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} component={CreateContainer}/>
+                <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} resultsData={this.state.resultsData} resultsColumns={this.resultsColumns} component={CreateContainer}/>
             </div>
         );
     }
