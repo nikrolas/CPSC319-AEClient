@@ -222,7 +222,7 @@ class SelectTable extends Component {
             selectAll: false,
             selection: []
         }, () => {
-            this.state.onItemSelectCallback(this.state.selection),
+            this.state.onItemSelectCallback(this.state.selection);
             this.state.onDataUpdateCallback(this.state.data, this.state.columns);
         });
     };

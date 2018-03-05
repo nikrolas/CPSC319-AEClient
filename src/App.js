@@ -53,7 +53,7 @@ class App extends Component {
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                 <Route exact path='/' component={Home}/>
                 <RouteWrapper path="/results/:searchString?" onItemSelect={this.setSelectedItems} onDataUpdate={this.setResultsStates} component={SelectTable}/>
-                <RouteWrapper path="/worktray" onItemSelect={this.setSelectedItems} onDataUpdate={this.setResultsStates} component={SelectTable} component={WorkTray}/>
+                <RouteWrapper path="/worktray" onItemSelect={this.setSelectedItems} onDataUpdate={this.setResultsStates} component={WorkTray}/>
                 <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
             </div>
         );
