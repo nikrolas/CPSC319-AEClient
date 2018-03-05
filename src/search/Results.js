@@ -372,16 +372,16 @@ class SelectTable extends Component {
             'selectvalue': e.target.value
         });
         switch (e.target.value) {
-            case 'all': {
-                this.setData(this.state.rdata.concat(this.state.cdata));
-                break;
-            }
             case 'records': {
                 this.setData(this.state.rdata);
                 break;
             }
             case 'containers': {
                 this.setData(this.state.cdata);
+                break;
+            }
+            default: {
+                this.setData(this.state.rdata.concat(this.state.cdata));
                 break;
             }
         }
