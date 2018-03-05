@@ -14,7 +14,8 @@ class WorkTray extends Component {
             selection: [],
             selectAll: false,
             userId: '5',
-            onItemSelectCallback: props.onItemSelect
+            onItemSelectCallback: props.onItemSelect,
+            onDataUpdateCallback: props.onDataUpdate
         };
     }
 
@@ -32,7 +33,9 @@ class WorkTray extends Component {
                 }
             });
             const columns = this.getColumns(data);
-            this.setState({data, columns});
+            this.setState({data, columns}, () => {
+                this.state.onDataUpdateCallback(this.state.data, this.state.columns);
+            });
         }
     }
     componentWillUnmount() {
@@ -120,7 +123,9 @@ class WorkTray extends Component {
 
         let data = [...this.state.data];
         data.splice(index, 1);
-        this.setState({data});
+        this.setState({data}, () => {
+            this.state.onDataUpdateCallback(this.state.data, this.state.columns);
+        });
         //console.log(JSON.stringify(this.state.data));
 
         let stored = JSON.parse(sessionStorage.getItem("tray"+this.state.userId));

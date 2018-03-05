@@ -218,8 +218,11 @@ class SelectTable extends Component {
     setTableState = (data, columns) => {
         this.setState({
             data: data,
-            columns: columns
+            columns: columns,
+            selectAll: false,
+            selection: []
         }, () => {
+            this.state.onItemSelectCallback(this.state.selection),
             this.state.onDataUpdateCallback(this.state.data, this.state.columns);
         });
     };
@@ -441,7 +444,6 @@ class SelectTable extends Component {
                         <option value='containers'>Containers</option>
                     </select>
                     <div style={{float: 'left', marginLeft: '1cm', display: 'inline-flex',}}>
-                        {/*<Link to={{ pathname: '/worktray/', state: {traydata: tray} }}>Work Tray</Link>*/}
                         <Link to='/worktray/'>Work Tray</Link>
                     </div>
                 </div>
