@@ -189,7 +189,6 @@ class SelectTable extends Component {
     }
 
     search = (searchString) => {
-        /*let rdata = [];
         getRecordsByNumber(searchString, this.state.userId)
             .then(response => {
                 //console.log(response);
@@ -198,19 +197,22 @@ class SelectTable extends Component {
             .then(data => {
                 if (data && data.length > 0) {
                     //this.setData(data);
-                    rdata = data;
+                    let rdata = data;
+                    let cdata = getMockContainers();
+                    this.setState({rdata, cdata});
+                    this.setData(rdata.concat(cdata));
                 } else {
                     this.setTableState([], []);
                 }
             })
             .catch(err => {
                 console.error("Error loading search results: " + err.message);
-            });*/
+            });
 
-        let rdata = getMockData();
+        /*let rdata = getMockData();
         let cdata = getMockContainers();
         this.setState({rdata, cdata});
-        this.setData(rdata.concat(cdata));
+        this.setData(rdata.concat(cdata));*/
     };
 
     setTableState = (data, columns) => {
