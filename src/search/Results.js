@@ -127,23 +127,23 @@ const CheckboxTable = checkboxHOC(ReactTable);
 function getMockContainers() {
     return [
         {
-            "containerId":10749,
-            "container":"2006.001-TES",
-            "title":"Sample Container",
-            "consignmentCode":"362817350",
-            "createdAt":1063677156,
-            "updatedAt":1063677156,
-            "notes":"This is a note!",
+            "containerId": 10749,
+            "container": "2006.001-TES",
+            "title": "Sample Container",
+            "consignmentCode": "362817350",
+            "createdAt": 1063677156,
+            "updatedAt": 1063677156,
+            "notes": "This is a note!",
             'Destruction Date': 1063677156
         },
         {
-            "containerId":99999,
-            "container":"2006.001-TES",
-            "title":"Sample Container 2",
-            "consignmentCode":"111111",
-            "createdAt":1063677156,
-            "updatedAt":1063677156,
-            "notes":"This is a note!",
+            "containerId": 99999,
+            "container": "2006.001-TES",
+            "title": "Sample Container 2",
+            "consignmentCode": "111111",
+            "createdAt": 1063677156,
+            "updatedAt": 1063677156,
+            "notes": "This is a note!",
             'Destruction Date': 1063677156
         }
     ];
@@ -264,7 +264,7 @@ class SelectTable extends Component {
                             accessor: key,
                             Header: key,
                             Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.value, e.row._original.id)
+                                this.handleClick(key, e.row._original.id, 'record')
                             }}> {e.value} </a>
                         });
                         break;
@@ -274,7 +274,7 @@ class SelectTable extends Component {
                             accessor: key,
                             Header: key,
                             Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.value)
+                                this.handleClick(key, e.row._original.containerId, 'container')
                             }}> {e.value} </a>
                         });
                         break;
@@ -299,10 +299,18 @@ class SelectTable extends Component {
         return columns;
     };
 
-    handleClick = (key, val, id) => {
-        let routePath = "/viewRecord/" + id;
-        this.props.history.push(routePath);
-        //console.log("key: ", key, " val: ", val, " id: ", id);
+    handleClick = (key, id, type) => {
+        let subPath = "";
+        if (type === 'record') {
+            subPath = "/viewRecord/";
+        } else if (type === 'container') {
+            subPath = "/viewContainer/";
+        }
+
+        if (subPath.length > 0) {
+            let routePath = subPath + id;
+            this.props.history.push(routePath);
+        }
     };
 
     toggleSelection = (key) => {

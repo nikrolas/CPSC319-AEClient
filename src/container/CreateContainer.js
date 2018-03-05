@@ -86,7 +86,7 @@ class CreateContainer extends Component {
 
         const recordsTable = {
             height: "300px",
-            "overflow-y": "scroll"
+            overflowY: "auto"
         };
 
         return (
