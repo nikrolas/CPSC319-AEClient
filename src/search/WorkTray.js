@@ -54,7 +54,9 @@ class WorkTray extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                            Cell: e => <a onClick={() => {this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
+                            Cell: e => <a onClick={() => {
+                                this.handleClick(key, e.row._original.id, 'record')
+                            }}> {e.value} </a>
                         });
                         break;
                     }
@@ -62,18 +64,26 @@ class WorkTray extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                            Cell: e => <a onClick={() => {this.handleClick(key, e.value)}}> {e.value} </a>
+                            Cell: e => <a onClick={() => {
+                                this.handleClick(key, e.row._original.containerId, 'container')
+                            }}> {e.value} </a>
                         });
                         break;
                     }
-                    case 'title': case 'type': case 'state': case 'location': case 'scheduleYear': case 'consignmentCode': {
+                    case 'title':
+                    case 'type':
+                    case 'state':
+                    case 'location':
+                    case 'scheduleYear':
+                    case 'consignmentCode': {
                         columns.push({
                             accessor: key,
                             Header: key,
                         });
                         break;
                     }
-                    default: break;
+                    default:
+                        break;
                 }
             }
         });
@@ -90,10 +100,18 @@ class WorkTray extends Component {
         return columns;
     };
 
-    handleClick = (key, val, id) => {
-        let routePath = "/viewRecord/" + id;
-        this.props.history.push(routePath);
-        //console.log("key: ", key, " val: ", val, " id: ", id);
+    handleClick = (key, id, type) => {
+        let subPath = "";
+        if (type === 'record') {
+            subPath = "/viewRecord/";
+        } else if (type === 'container') {
+            subPath = "/viewContainer/";
+        }
+
+        if (subPath.length > 0) {
+            let routePath = subPath + id;
+            this.props.history.push(routePath);
+        }
     };
 
     deleteRow = (e) => {
@@ -134,9 +152,8 @@ class WorkTray extends Component {
         } else { // it does not exist so add it
             selection.push(key);
         }
-        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
         // update the state
-        this.setState({ selection });
+        this.setState({selection}, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     toggleAll = () => {
@@ -152,8 +169,7 @@ class WorkTray extends Component {
                 selection.push(item._original._id);
             })
         }
-        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
-        this.setState({ selectAll, selection })
+        this.setState({selectAll, selection}, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     isSelected = (key) => {
