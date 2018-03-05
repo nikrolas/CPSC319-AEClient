@@ -8,6 +8,30 @@ import {getRecordsByNumber} from "../APIs/RecordsApi";
 import Search from "./Search";
 
 const CheckboxTable = checkboxHOC(ReactTable);
+function getMockContainers() {
+    return [
+        {
+            "containerId": 10749,
+            "container": "2006.001-TES",
+            "title": "Sample Container",
+            "consignmentCode": "362817350",
+            "createdAt": 1063677156,
+            "updatedAt": 1063677156,
+            "notes": "This is a note!",
+            'Destruction Date': 1063677156
+        },
+        {
+            "containerId": 99999,
+            "container": "2006.001-TES",
+            "title": "Sample Container 2",
+            "consignmentCode": "111111",
+            "createdAt": 1063677156,
+            "updatedAt": 1063677156,
+            "notes": "This is a note!",
+            'Destruction Date': 1063677156
+        }
+    ];
+}
 
 class SelectTable extends Component {
     constructor(props) {
