@@ -327,7 +327,11 @@ class SelectTable extends Component {
             selection.push(key);
         }
         // update the state
-        this.setState({selection}, () => this.state.onItemSelectCallback(this.state.selection));
+        this.setState({selection}, () => {
+                if (this.state.selectvalue !== 'containers')
+                    this.state.onItemSelectCallback(this.state.selection)
+            }
+        );
     };
 
     toggleAll = () => {
@@ -344,7 +348,11 @@ class SelectTable extends Component {
             })
         }
         // update the state
-        this.setState({selectAll, selection}, () => this.state.onItemSelectCallback(this.state.selection))
+        this.setState({selectAll, selection}, () => {
+                if (this.state.selectvalue !== 'containers')
+                    this.state.onItemSelectCallback(this.state.selection)
+            }
+        );
     };
 
     isSelected = (key) => {

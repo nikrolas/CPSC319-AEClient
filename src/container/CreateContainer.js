@@ -25,7 +25,8 @@ class CreateContainer extends Component {
     getSelectedRecords = (records, selection) => {
         let selectedRecords = [];
         selection.forEach((index) => {
-            selectedRecords.push(records[index]);
+            if (records[index].hasOwnProperty('number') && records[index].hasOwnProperty('id'))
+                selectedRecords.push(records[index]);
         });
         return selectedRecords;
     };
