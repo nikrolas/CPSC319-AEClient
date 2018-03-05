@@ -47,7 +47,7 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <NavigationBar selectedItems={this.state.selectedItems}/>
+                <NavigationBar selectedItems={this.state.selectedItems} resultsData={this.state.resultsData}/>
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>

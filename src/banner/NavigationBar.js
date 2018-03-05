@@ -7,7 +7,15 @@ class NavigationBar extends Component {
 
     renderContainerButton = () => {
         if (this.props.selectedItems && this.props.selectedItems.length > 0) {
-            return <NavItem componentClass={Link} href="/createContainer" to="/createContainer">
+            let hasRecords = false;
+            this.props.selectedItems.forEach((index) => {
+                if (this.props.resultsData[index].hasOwnProperty('number')) {
+                    hasRecords = true;
+                    return;
+                }
+            });
+            if (hasRecords)
+                return <NavItem componentClass={Link} href="/createContainer" to="/createContainer">
                     Contain Records
                 </NavItem>;
         }
