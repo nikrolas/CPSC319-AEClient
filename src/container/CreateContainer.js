@@ -66,7 +66,7 @@ class CreateContainer extends Component {
         createContainer(formData, 5).then(response => {
             return response.json();
         }).then(data => {
-            alert(data.statusCode);
+            alert("Endpoint not implemented yet.");
         }).catch(err => {
             alert("Endpoint not implemented yet.");
         })
