@@ -10,17 +10,20 @@ import Search from "./Search";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class SelectTable extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             data: [],
+            rdata: [],
+            cdata: [],
             columns: [],
             selection: [],
             selectAll: false,
             tray: [],
-            selectvalue: 'records',
+            selectvalue: 'all',
             userId: '5',
-            searchStringOfData: ''
+            onItemSelectCallback: props.onItemSelect,
+            onDataUpdateCallback: props.onDataUpdate
         };
     }
 
@@ -41,19 +44,26 @@ class SelectTable extends Component {
         this.search(this.props.match.params.searchString);
     }
 
+    componentWillUnmount() {
+        this.state.onItemSelectCallback([]);
+    }
+
     search = (searchString) => {
-        getRecordsByNumber(searchString)
+        getRecordsByNumber(searchString, this.state.userId)
             .then(response => {
                 //console.log(response);
                 return response.json()
             })
             .then(data => {
                 if (data && data.length > 0) {
-                    this.setData(data);
+                    //this.setData(data);
+                    let rdata = data;
+                    let cdata = getMockContainers();
+                    this.setState({rdata, cdata});
+                    this.setData(rdata.concat(cdata));
                 } else {
                     this.setTableState([], []);
                 }
-                this.setState({searchStringOfData: searchString});
             })
             .catch(err => {
                 console.error("Error loading search results: " + err.message);
@@ -63,13 +73,18 @@ class SelectTable extends Component {
     setTableState = (data, columns) => {
         this.setState({
             data: data,
-            columns: columns
+            columns: columns,
+            selectAll: false,
+            selection: []
+        }, () => {
+            this.state.onItemSelectCallback(this.state.selection);
+            this.state.onDataUpdateCallback(this.state.data, this.state.columns);
         });
     };
 
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
-        if (searchString !== this.state.searchStringOfData) {
+        if (searchString !== this.props.match.params.searchString) {
             this.search(searchString);
         }
     };
@@ -77,12 +92,12 @@ class SelectTable extends Component {
 
     setData = (data) => {
         const rowdata = data.map((item, index) => {
-            let keys = Object.keys(item);
+            /*let keys = Object.keys(item);
             keys.forEach(key => {
                 if (key.endsWith("At")) {
                     item[key] = new Date(item[key]).toTimeString();
                 }
-            });
+            });*/
 
             const _id = index;
             return {
@@ -107,7 +122,7 @@ class SelectTable extends Component {
                             accessor: key,
                             Header: key,
                             Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.value, e.row._original.id)
+                                this.handleClick(key, e.row._original.id, 'record')
                             }}> {e.value} </a>
                         });
                         break;
@@ -117,7 +132,7 @@ class SelectTable extends Component {
                             accessor: key,
                             Header: key,
                             Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.value)
+                                this.handleClick(key, e.row._original.containerId, 'container')
                             }}> {e.value} </a>
                         });
                         break;
@@ -126,7 +141,8 @@ class SelectTable extends Component {
                     case 'type':
                     case 'state':
                     case 'location':
-                    case 'updatedAt': {
+                    case 'scheduleYear':
+                    case 'consignmentCode': {
                         columns.push({
                             accessor: key,
                             Header: key,
@@ -141,10 +157,18 @@ class SelectTable extends Component {
         return columns;
     };
 
-    handleClick = (key, val, id) => {
-        let routePath = "/viewRecord/" + id;
-        this.props.history.push(routePath);
-        //console.log("key: ", key, " val: ", val, " id: ", id);
+    handleClick = (key, id, type) => {
+        let subPath = "";
+        if (type === 'record') {
+            subPath = "/viewRecord/";
+        } else if (type === 'container') {
+            subPath = "/viewContainer/";
+        }
+
+        if (subPath.length > 0) {
+            let routePath = subPath + id;
+            this.props.history.push(routePath);
+        }
     };
 
     toggleSelection = (key) => {
@@ -161,7 +185,7 @@ class SelectTable extends Component {
             selection.push(key);
         }
         // update the state
-        this.setState({selection});
+        this.setState({selection}, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     toggleAll = () => {
@@ -177,7 +201,8 @@ class SelectTable extends Component {
                 selection.push(item._original._id);
             })
         }
-        this.setState({selectAll, selection})
+        // update the state
+        this.setState({selectAll, selection}, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     isSelected = (key) => {
@@ -212,6 +237,20 @@ class SelectTable extends Component {
         this.setState({
             'selectvalue': e.target.value
         });
+        switch (e.target.value) {
+            case 'records': {
+                this.setData(this.state.rdata);
+                break;
+            }
+            case 'containers': {
+                this.setData(this.state.cdata);
+                break;
+            }
+            default: {
+                this.setData(this.state.rdata.concat(this.state.cdata));
+                break;
+            }
+        }
     };
 
     render() {
@@ -246,9 +285,6 @@ class SelectTable extends Component {
             float: 'left',
             height: '85%',
         };
-        /*let h1style = {
-            //display: 'inline',
-        };*/
         return (
             <div style={container}>
                 <div style={{marginBottom: '1cm'}}>
@@ -257,12 +293,11 @@ class SelectTable extends Component {
                 <div style={btncontainer}>
                     <button style={addbtn} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
                     <select onChange={this.handleSelectChange} style={sel}>
-                        <option value='all'>All</option>
-                        <option value='records' selected>Records</option>
+                        <option value='all' selected>All</option>
+                        <option value='records'>Records</option>
                         <option value='containers'>Containers</option>
                     </select>
                     <div style={{float: 'left', marginLeft: '1cm', display: 'inline-flex',}}>
-                        {/*<Link to={{ pathname: '/worktray/', state: {traydata: tray} }}>Work Tray</Link>*/}
                         <Link to='/worktray/'>Work Tray</Link>
                     </div>
                 </div>

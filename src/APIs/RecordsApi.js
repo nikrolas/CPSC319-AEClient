@@ -1,7 +1,4 @@
-//THIS IS FOR LOCAL
-let serviceRoot = "http://localhost:8080";
-//THIS IS FOR PRODUCTION
-//let serviceRoot = "http://ec2-18-220-64-10.us-east-2.compute.amazonaws.com:8080/DiscoveryChannel-1.0-SNAPSHOT";
+import {serviceRoot} from "./ServiceRoot";
 
 let recordsPath = "/records";
 let userId = "500";
@@ -9,7 +6,7 @@ export function getRecordsByNumber(recordNumber) {
     return fetch(serviceRoot + recordsPath + "?num=" + recordNumber + "&userId=" + userId);
 }
 
-export function getRecordById(recordId) {
+export function getRecordById(recordId, userId) {
     return fetch(serviceRoot + recordsPath + "/" + recordId + "?userId=" + userId);
 }
 

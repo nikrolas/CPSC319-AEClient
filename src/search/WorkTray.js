@@ -6,14 +6,16 @@ import checkboxHOC from 'react-table/lib/hoc/selectTable';
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class WorkTray extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             data: [],
             columns: [],
             selection: [],
             selectAll: false,
-            userId: '5'
+            userId: '5',
+            onItemSelectCallback: props.onItemSelect,
+            onDataUpdateCallback: props.onDataUpdate
         };
     }
 
@@ -31,8 +33,13 @@ class WorkTray extends Component {
                 }
             });
             const columns = this.getColumns(data);
-            this.setState({data, columns});
+            this.setState({data, columns}, () => {
+                this.state.onDataUpdateCallback(this.state.data, this.state.columns);
+            });
         }
+    }
+    componentWillUnmount() {
+        this.state.onItemSelectCallback([]);
     }
 
     getColumns = (data) => {
@@ -50,7 +57,9 @@ class WorkTray extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                            Cell: e => <a onClick={() => {this.handleClick(key, e.value, e.row._original.id)}}> {e.value} </a>
+                            Cell: e => <a onClick={() => {
+                                this.handleClick(key, e.row._original.id, 'record')
+                            }}> {e.value} </a>
                         });
                         break;
                     }
@@ -58,18 +67,26 @@ class WorkTray extends Component {
                         columns.push({
                             accessor: key,
                             Header: key,
-                            Cell: e => <a onClick={() => {this.handleClick(key, e.value)}}> {e.value} </a>
+                            Cell: e => <a onClick={() => {
+                                this.handleClick(key, e.row._original.containerId, 'container')
+                            }}> {e.value} </a>
                         });
                         break;
                     }
-                    case 'title': case 'type': case 'state': case 'location': case 'updatedAt': {
+                    case 'title':
+                    case 'type':
+                    case 'state':
+                    case 'location':
+                    case 'scheduleYear':
+                    case 'consignmentCode': {
                         columns.push({
                             accessor: key,
                             Header: key,
                         });
                         break;
                     }
-                    default: break;
+                    default:
+                        break;
                 }
             }
         });
@@ -86,10 +103,18 @@ class WorkTray extends Component {
         return columns;
     };
 
-    handleClick = (key, val, id) => {
-        let routePath = "/viewRecord/" + id;
-        this.props.history.push(routePath);
-        //console.log("key: ", key, " val: ", val, " id: ", id);
+    handleClick = (key, id, type) => {
+        let subPath = "";
+        if (type === 'record') {
+            subPath = "/viewRecord/";
+        } else if (type === 'container') {
+            subPath = "/viewContainer/";
+        }
+
+        if (subPath.length > 0) {
+            let routePath = subPath + id;
+            this.props.history.push(routePath);
+        }
     };
 
     deleteRow = (e) => {
@@ -98,13 +123,25 @@ class WorkTray extends Component {
 
         let data = [...this.state.data];
         data.splice(index, 1);
-        this.setState({data});
+        this.setState({data}, () => {
+            this.state.onDataUpdateCallback(this.state.data, this.state.columns);
+        });
         //console.log(JSON.stringify(this.state.data));
 
         let stored = JSON.parse(sessionStorage.getItem("tray"+this.state.userId));
         stored.splice(index, 1);
         sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(stored));
         //console.log(JSON.stringify(stored));
+    };
+
+    getRecordsFromRowIds = (rowIds) => {
+        let records = [];
+        rowIds.forEach((rowId) => {
+            let record = Object.assign({}, this.state.data[rowId]);
+            delete record._id;
+            records.push(record);
+        });
+        return records;
     };
 
     toggleSelection = (key) => {
@@ -121,7 +158,7 @@ class WorkTray extends Component {
             selection.push(key);
         }
         // update the state
-        this.setState({ selection });
+        this.setState({selection}, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     toggleAll = () => {
@@ -137,7 +174,7 @@ class WorkTray extends Component {
                 selection.push(item._original._id);
             })
         }
-        this.setState({ selectAll, selection })
+        this.setState({selectAll, selection}, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     isSelected = (key) => {
