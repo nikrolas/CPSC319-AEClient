@@ -9,8 +9,3 @@ export function getRecordsByNumber(recordNumber, userId) {
 export function getRecordById(recordId, userId) {
     return fetch(serviceRoot + recordsPath + "/" + recordId + "?userId=" + userId);
 }
-
-
-
-
-

@@ -426,8 +426,9 @@ class SelectTable extends Component {
             tray: [],
             selectvalue: 'records',
             userId: '5',
-            searchStringOfData: ''
-            onItemSelectCallback: props.onItemSelect
+            searchStringOfData: '',
+            onItemSelectCallback: props.onItemSelect,
+            onDataUpdateCallback: props.onDataUpdate
         };
     }
 
@@ -475,6 +476,8 @@ class SelectTable extends Component {
         this.setState({
             data: data,
             columns: columns
+        }, () => {
+            this.state.onDataUpdateCallback(this.state.data, this.state.columns);
         });
     };
 
@@ -554,16 +557,6 @@ class SelectTable extends Component {
         //console.log("key: ", key, " val: ", val, " id: ", id);
     };
 
-    getRecordsFromRowIds = (rowIds) => {
-        let records = [];
-        rowIds.forEach((rowId) => {
-            let record = Object.assign({}, this.state.data[rowId]);
-            delete record._id;
-            records.push(record);
-        });
-        return records;
-    };
-
     toggleSelection = (key) => {
         // start off with the existing state
         let selection = [...this.state.selection];
@@ -577,9 +570,8 @@ class SelectTable extends Component {
         } else { // it does not exist so add it
             selection.push(key);
         }
-        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
         // update the state
-        this.setState({selection});
+        this.setState({ selection }, () => this.state.onItemSelectCallback(this.state.selection));
     };
 
     toggleAll = () => {
@@ -595,8 +587,8 @@ class SelectTable extends Component {
                 selection.push(item._original._id);
             })
         }
-        this.state.onItemSelectCallback(this.getRecordsFromRowIds(selection));
-        this.setState({ selectAll, selection })
+        // update the state
+        this.setState({ selectAll, selection }, () => this.state.onItemSelectCallback(this.state.selection))
     };
 
     isSelected = (key) => {

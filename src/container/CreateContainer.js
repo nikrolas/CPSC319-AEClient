@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl} from 'react-bootstrap'
+import {createContainer} from "../APIs/ContainersApi";
 
 class CreateContainer extends Component {
 
@@ -8,27 +9,51 @@ class CreateContainer extends Component {
         this.state =
             {
                 title: "",
-                locations: ["Burnaby", "Vancouver", "Richmond"],
-                destructionDate: "September 12, 2010 6:52PM", //TODO: Hardcoded date
+                locations: this.getUserLocations(),
+                destructionDate: this.getDestructionDate(),
                 notes: "",
-                records: props.selectedItems
+                selectedRecords: this.getSelectedRecords(props.resultsData, props.selectedItems),
+                columns: props.resultsColumns,
             };
-
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    getSelectedRecords = (records, selection) => {
+        let selectedRecords = [];
+        selection.forEach((index) => {
+            selectedRecords.push(records[index]);
+        });
+        return selectedRecords;
+    };
+
+    getUserLocations = () => {
+        //TODO: retreive user locations
+        return ["Burnaby", "Vancouver", "Richmond"];
+    };
+
+    getDestructionDate = () => {
+        //TODO: get destruction date of selected records
+        return "September 12, 2010 6:52PM";
+    };
+
     //TODO - Validationstate is working but will have to likely create many for different validations
     getValidationState() {
 
-    }
+    };
 
     handleChange(e) {
-    }
+    };
 
     handleSubmit(event) {
-        alert('Form has been submitted');
+        createContainer(event, 5).then(response => {
+            return response.json();
+        }).then(data => {
+            alert(data.statusCode);
+        }).catch(err => {
+            alert(err);
+        })
         event.preventDefault();
     }
 
