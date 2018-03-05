@@ -481,7 +481,7 @@ class SelectTable extends Component {
 
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
-        if (searchString != this.props.match.params.searchString) {
+        if (searchString !== this.props.match.params.searchString) {
             this.search(searchString);
         }
     };
