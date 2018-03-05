@@ -9,422 +9,158 @@ import Search from "./Search";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
-/*function getMockData() {
-        const testData = [
+function getMockData() {
+        return [
             {
-                "id": 31865,
-                "title": "Pfeffer, Haag and Kihn - Et commodi at - Voluptatem consequuntur et ut sapiente dolor",
-                "number": "20073454.00.P.01.00",
+                "title": "Marvin LLC - Dignissimos qui cumque qui omnis ut",
+                "number": "20125555.00.P.01.00",
                 "scheduleId": 638,
                 "typeId": 83,
-                "consignmentCode": "507202590",
+                "consignmentCode": "1R 936 1818",
+                "containerId": 183236,
+                "locationId": 50,
+                "classifications": "PROJECT MANAGEMENT/ENGINEERING AGREEMENTS",
+                "notes": null,
+                "id": 113802,
                 "stateId": 4,
-                "containerId": 45719,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1233100800000,
-                "closedAt": 1224460800000,
-                "location": "Edmonton",
+                "createdAt": 1352419200000,
+                "updatedAt": 1491177600000,
+                "closedAt": 1379030400000,
+                "location": "St. Catharines",
                 "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
                 "type": "Project",
                 "state": "Archived - Interim",
-                "container": "2008/259-EDM",
-                "scheduleYear": "15"
+                "container": "2015/070-STC",
+                "scheduleYear": 15
             },
             {
-                "id": 31866,
-                "title": "Frami Group - Sed soluta ut vitae quia omnis",
-                "number": "20073454.00.P.01.02",
+                "title": "Lindgren - Pollich - Cumque adipisci est incidunt - Fugit ipsa non",
+                "number": "20125555.00.P.02.00",
                 "scheduleId": 638,
                 "typeId": 83,
-                "consignmentCode": "507202590",
+                "consignmentCode": "1R 936 1818",
+                "containerId": 183236,
+                "locationId": 50,
+                "classifications": "PROJECT MANAGEMENT/PROJECT PLANNING",
+                "notes": null,
+                "id": 113803,
                 "stateId": 4,
-                "containerId": 45719,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1233100800000,
-                "closedAt": 1224460800000,
-                "location": "Edmonton",
+                "createdAt": 1352419200000,
+                "updatedAt": 1491177600000,
+                "closedAt": 1379030400000,
+                "location": "St. Catharines",
                 "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
                 "type": "Project",
                 "state": "Archived - Interim",
-                "container": "2008/259-EDM",
-                "scheduleYear": "15"
+                "container": "2015/070-STC",
+                "scheduleYear": 15
             },
             {
-                "id": 31867,
-                "title": "Block and Sons - Dolore et debitis - Ex quos ut quasi",
-                "number": "20073454.00.P.03.00",
+                "title": "Volkman, Wuckert and Hessel - Dolorum sit nobis sit labore",
+                "number": "20125555.00.A.01.00",
                 "scheduleId": 638,
                 "typeId": 83,
-                "consignmentCode": "507202590",
+                "consignmentCode": "1R 936 1818",
+                "containerId": 183236,
+                "locationId": 50,
+                "classifications": "ADVISORY SERVICES/ADVICE",
+                "notes": null,
+                "id": 113806,
                 "stateId": 4,
-                "containerId": 45719,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1233100800000,
-                "closedAt": 1224460800000,
-                "location": "Edmonton",
+                "createdAt": 1352419200000,
+                "updatedAt": 1491177600000,
+                "closedAt": 1379030400000,
+                "location": "St. Catharines",
                 "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
                 "type": "Project",
                 "state": "Archived - Interim",
-                "container": "2008/259-EDM",
-                "scheduleYear": "15"
+                "container": "2015/070-STC",
+                "scheduleYear": 15
             },
             {
-                "id": 31868,
-                "title": "Orn - Wuckert - Vitae nesciunt dolor ea ea quia",
-                "number": "20073454.00.C.05.00",
+                "title": "Hauck - Klocko - Numquam corrupti",
+                "number": "20125555.00.P.03.00",
                 "scheduleId": 638,
                 "typeId": 83,
-                "consignmentCode": "507202590",
+                "consignmentCode": "1R 936 1818",
+                "containerId": 183236,
+                "locationId": 50,
+                "classifications": "PROJECT MANAGEMENT/INVOICING AND REPORTING",
+                "notes": null,
+                "id": 113804,
                 "stateId": 4,
-                "containerId": 45719,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1233100800000,
-                "closedAt": 1224460800000,
-                "location": "Edmonton",
+                "createdAt": 1352419200000,
+                "updatedAt": 1491177600000,
+                "closedAt": 1379030400000,
+                "location": "St. Catharines",
                 "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
                 "type": "Project",
                 "state": "Archived - Interim",
-                "container": "2008/259-EDM",
-                "scheduleYear": "15"
+                "container": "2015/070-STC",
+                "scheduleYear": 15
             },
             {
-                "id": 31869,
-                "title": "Denesik - Orn - Rem ea - Rem quasi est temporibus quisquam ut corporis necessitatibus",
-                "number": "20073454.00.C.05.03",
+                "title": "Pouros LLC - Eos ea adipisci dolorem sit - Alias nesciunt id consequatur distinctio rerum ut praesentium",
+                "number": "20125555.00.P.04.00",
                 "scheduleId": 638,
                 "typeId": 83,
-                "consignmentCode": "507202590",
+                "consignmentCode": "1R 936 1818",
+                "containerId": 183236,
+                "locationId": 50,
+                "classifications": "PROJECT MANAGEMENT/MEETINGS (PROJECT)",
+                "notes": null,
+                "id": 113805,
                 "stateId": 4,
-                "containerId": 45719,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1233100800000,
-                "closedAt": 1224460800000,
-                "location": "Edmonton",
+                "createdAt": 1352419200000,
+                "updatedAt": 1491177600000,
+                "closedAt": 1379030400000,
+                "location": "St. Catharines",
                 "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
                 "type": "Project",
                 "state": "Archived - Interim",
-                "container": "2008/259-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 31870,
-                "title": "Klocko, Watsica and Collier - Officiis aut",
-                "number": "20073454.00.C.05.08",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507202590",
-                "stateId": 4,
-                "containerId": 45719,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1233100800000,
-                "closedAt": 1224460800000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2008/259-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 31859,
-                "title": "Cummings - Connelly - Consequatur totam - Ipsum ut",
-                "number": "20073453.00.P.01.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206324",
-                "stateId": 4,
-                "containerId": 71610,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1281484800000,
-                "closedAt": 1277251200000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/217-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 31860,
-                "title": "Hauck Group - Impedit eligendi est omnis quis",
-                "number": "20073453.00.P.01.01",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206324",
-                "stateId": 4,
-                "containerId": 71610,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1281484800000,
-                "closedAt": 1277251200000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/217-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 31861,
-                "title": "Kris, Schiller and Turcotte - Quis impedit quas et - Ut in facilis praesentium",
-                "number": "20073453.00.P.03.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206324",
-                "stateId": 4,
-                "containerId": 71610,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1281484800000,
-                "closedAt": 1277251200000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/217-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 31862,
-                "title": "Lind - Roberts - Quae omnis quos quidem ipsa fugiat",
-                "number": "20073453.00.A.01.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206324",
-                "stateId": 4,
-                "containerId": 71610,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1281484800000,
-                "closedAt": 1277251200000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/217-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 31863,
-                "title": "Littel, Lueilwitz and Reichert - Sint reprehenderit soluta in - Harum et eum officia et",
-                "number": "20073453.00.A.01.02",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206324",
-                "stateId": 4,
-                "containerId": 71610,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1281484800000,
-                "closedAt": 1277251200000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/217-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 31864,
-                "title": "Greenfelder - Cole - Voluptatem consequuntur",
-                "number": "20073453.00.E.01.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206324",
-                "stateId": 4,
-                "containerId": 71610,
-                "locationId": 5,
-                "createdAt": 1192147200000,
-                "updatedAt": 1281484800000,
-                "closedAt": 1277251200000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/217-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 32813,
-                "title": "Bahringer - Jakubowski - Eligendi alias - Laboriosam maiores ut",
-                "number": "20073452.00.A.02.00",
-                "scheduleId": 639,
-                "typeId": 83,
-                "consignmentCode": "507206384",
-                "stateId": 4,
-                "containerId": 75890,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1294617600000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 30 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/277-EDM",
-                "scheduleYear": "30"
-            },
-            {
-                "id": 32817,
-                "title": "Renner Inc - Minus rerum - Sint esse numquam quia et nihil",
-                "number": "20073452.00.E.05.00",
-                "scheduleId": 639,
-                "typeId": 83,
-                "consignmentCode": "507206384",
-                "stateId": 4,
-                "containerId": 75890,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1294617600000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 30 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2010/277-EDM",
-                "scheduleYear": "30"
-            },
-            {
-                "id": 32810,
-                "title": "Bergstrom Inc - Unde cupiditate deleniti et",
-                "number": "20073452.00.P.03.01",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206431",
-                "stateId": 4,
-                "containerId": 79995,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1295568000000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2011/002-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 32811,
-                "title": "Kihn - Crist - Alias voluptas veniam magnam mollitia - Doloremque sed",
-                "number": "20073452.00.P.04.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206431",
-                "stateId": 4,
-                "containerId": 79995,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1295568000000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2011/002-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 32812,
-                "title": "Rau - Reichel - Est distinctio ad ea molestiae",
-                "number": "20073452.00.A.01.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206431",
-                "stateId": 4,
-                "containerId": 79995,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1295568000000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2011/002-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 32815,
-                "title": "Carroll Inc - Deserunt nemo debitis ratione - Voluptatem eos adipisci natus ducimus accusamus eum et",
-                "number": "20073452.00.E.01.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206431",
-                "stateId": 4,
-                "containerId": 79995,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1295568000000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2011/002-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 32816,
-                "title": "Hansen Group - Itaque sunt rerum molestiae nihil consectetur",
-                "number": "20073452.00.E.02.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206431",
-                "stateId": 4,
-                "containerId": 79995,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1295568000000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2011/002-EDM",
-                "scheduleYear": "15"
-            },
-            {
-                "id": 32818,
-                "title": "Watsica - Kautzer - Incidunt aut ex id voluptas",
-                "number": "20073452.00.E.06.00",
-                "scheduleId": 638,
-                "typeId": 83,
-                "consignmentCode": "507206431",
-                "stateId": 4,
-                "containerId": 79995,
-                "locationId": 5,
-                "createdAt": 1193356800000,
-                "updatedAt": 1295568000000,
-                "closedAt": 1294617600000,
-                "location": "Edmonton",
-                "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-                "type": "Project",
-                "state": "Archived - Interim",
-                "container": "2011/002-EDM",
-                "scheduleYear": "15"
+                "container": "2015/070-STC",
+                "scheduleYear": 15
             }
         ];
-        return testData;
-}*/
+}
+
+function getMockContainers() {
+    return [
+        {
+            "containerId":10749,
+            "container":"2006.001-TES",
+            "title":"Sample Container",
+            "consignmentCode":"362817350",
+            "createdAt":1063677156,
+            "updatedAt":1063677156,
+            "notes":"This is a note!",
+            'Destruction Date': 1063677156
+        },
+        {
+            "containerId":99999,
+            "container":"2006.001-TES",
+            "title":"Sample Container 2",
+            "consignmentCode":"111111",
+            "createdAt":1063677156,
+            "updatedAt":1063677156,
+            "notes":"This is a note!",
+            'Destruction Date': 1063677156
+        }
+    ];
+}
 
 class SelectTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
             data: [],
+            rdata: [],
+            cdata: [],
             columns: [],
             selection: [],
             selectAll: false,
             tray: [],
-            selectvalue: 'records',
+            selectvalue: 'all',
             userId: '5',
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
@@ -453,6 +189,7 @@ class SelectTable extends Component {
     }
 
     search = (searchString) => {
+        /*let rdata = [];
         getRecordsByNumber(searchString, this.state.userId)
             .then(response => {
                 //console.log(response);
@@ -460,14 +197,20 @@ class SelectTable extends Component {
             })
             .then(data => {
                 if (data && data.length > 0) {
-                    this.setData(data);
+                    //this.setData(data);
+                    rdata = data;
                 } else {
                     this.setTableState([], []);
                 }
             })
             .catch(err => {
                 console.error("Error loading search results: " + err.message);
-            });
+            });*/
+
+        let rdata = getMockData();
+        let cdata = getMockContainers();
+        this.setState({rdata, cdata});
+        this.setData(rdata.concat(cdata));
     };
 
     setTableState = (data, columns) => {
@@ -626,6 +369,20 @@ class SelectTable extends Component {
         this.setState({
             'selectvalue': e.target.value
         });
+        switch (e.target.value) {
+            case 'all': {
+                this.setData(this.state.rdata.concat(this.state.cdata));
+                break;
+            }
+            case 'records': {
+                this.setData(this.state.rdata);
+                break;
+            }
+            case 'containers': {
+                this.setData(this.state.cdata);
+                break;
+            }
+        }
     };
 
     render() {
@@ -669,8 +426,8 @@ class SelectTable extends Component {
                 <div style={btncontainer}>
                     <button style={addbtn} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
                     <select onChange={this.handleSelectChange} style={sel}>
-                        <option value='all'>All</option>
-                        <option value='records' selected>Records</option>
+                        <option value='all' selected>All</option>
+                        <option value='records'>Records</option>
                         <option value='containers'>Containers</option>
                     </select>
                     <div style={{float: 'left', marginLeft: '1cm', display: 'inline-flex',}}>
