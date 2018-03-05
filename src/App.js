@@ -54,7 +54,7 @@ class App extends Component {
                 <Route exact path='/' component={Home}/>
                 <RouteWrapper path="/results/:searchString?" onItemSelect={this.setSelectedItems} onDataUpdate={this.setResultsStates} component={SelectTable}/>
                 <RouteWrapper path="/worktray" onItemSelect={this.setSelectedItems} component={WorkTray}/>
-                <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} resultsData={this.state.resultsData} resultsColumns={this.resultsColumns} component={CreateContainer}/>
+                <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
             </div>
         );
     }

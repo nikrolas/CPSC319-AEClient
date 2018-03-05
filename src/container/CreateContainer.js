@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl} from 'react-bootstrap'
 import {createContainer} from "../APIs/ContainersApi";
+import ReactTable from "react-table";
 
 class CreateContainer extends Component {
 
@@ -9,11 +10,12 @@ class CreateContainer extends Component {
         this.state =
             {
                 title: "",
+                location: this.getUserLocations()[0], //TODO://set user default location
                 locations: this.getUserLocations(),
                 destructionDate: this.getDestructionDate(),
                 notes: "",
                 selectedRecords: this.getSelectedRecords(props.resultsData, props.selectedItems),
-                columns: props.resultsColumns,
+                columns: props.resultsColumns
             };
 
         this.handleChange = this.handleChange.bind(this);
@@ -44,24 +46,48 @@ class CreateContainer extends Component {
     };
 
     handleChange(e) {
+        this.setState({[e.target.name]: e.target.value});
     };
 
     handleSubmit(event) {
-        createContainer(event, 5).then(response => {
+        const formData = (({title, location, notes, selectedRecords}) => ({
+            title,
+            location,
+            notes,
+            selectedRecords
+        }))(this.state);
+
+        let selectedRecordIds = [];
+        formData.selectedRecords.forEach(record => {
+            selectedRecordIds.push(record.id);
+        });
+        formData.selectedRecords = selectedRecordIds;
+
+        createContainer(formData, 5).then(response => {
             return response.json();
         }).then(data => {
             alert(data.statusCode);
         }).catch(err => {
-            alert(err);
+            alert("Endpoint not implemented yet.");
         })
-        event.preventDefault();
     }
+
 
     render() {
         const listLocationsJson = this.state.locations.map((item, i) =>
-            <option key={i} value={i}>{item}</option>);
+            <option key={i} value={item}>{item}</option>);
         const destructionDate = <div>{this.state.destructionDate}</div>;
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
+        const {selectedRecords, columns} = this.state;
+
+        const container = {
+            margin: "10px",
+        };
+
+        const recordsTable = {
+            height: "300px",
+            "overflow-y": "scroll"
+        };
 
         return (
             <div style={{margin: '0 5% 0 5%'}}>
@@ -86,17 +112,35 @@ class CreateContainer extends Component {
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
                         <FormControl name="location"
                                      componentClass="select"
-                                     placeholder="select">
+                                     placeholder="select"
+                                     value={this.state.location}>
                             {listLocationsJson}
                         </FormControl>
                     </FormGroup>
                     <FormGroup controlId="formControlsTextarea">
                         <ControlLabel>Notes</ControlLabel>
-                        <FormControl componentClass="textarea" placeholder="Enter notes"/>
+                        <FormControl name="notes"
+                                     componentClass="textarea"
+                                     placeholder="Enter notes"
+                                     value={this.state.notes}
+                                     onChange={this.handleChange}/>
                     </FormGroup>
                     <Button type="submit">Cancel</Button>
                     <Button type="submit">Submit</Button>
                 </form>
+                <div style={container}>
+                    <strong>Records to contain:</strong>
+                    <div style={recordsTable}>
+                        <ReactTable
+                            data={selectedRecords}
+                            columns={columns}
+                            className="-striped -highlight"
+                            showPagination={false}
+                            minRows={5}
+                            defaultPageSize={selectedRecords.length}
+                        />
+                    </div>
+                </div>
             </div>
         )
     }
