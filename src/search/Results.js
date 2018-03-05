@@ -9,7 +9,7 @@ import Search from "./Search";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
-function getMockData() {
+/*function getMockData() {
         return [
             {
                 "title": "Marvin LLC - Dignissimos qui cumque qui omnis ut",
@@ -122,7 +122,7 @@ function getMockData() {
                 "scheduleYear": 15
             }
         ];
-}
+}*/
 
 function getMockContainers() {
     return [
@@ -189,7 +189,7 @@ class SelectTable extends Component {
     }
 
     search = (searchString) => {
-        getRecordsByNumber(searchString, this.state.userId)
+        /*getRecordsByNumber(searchString, this.state.userId)
             .then(response => {
                 //console.log(response);
                 return response.json()
@@ -207,12 +207,12 @@ class SelectTable extends Component {
             })
             .catch(err => {
                 console.error("Error loading search results: " + err.message);
-            });
+            });*/
 
-        /*let rdata = getMockData();
+        let rdata = getMockData();
         let cdata = getMockContainers();
         this.setState({rdata, cdata});
-        this.setData(rdata.concat(cdata));*/
+        this.setData(rdata.concat(cdata));
     };
 
     setTableState = (data, columns) => {
