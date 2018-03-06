@@ -34,7 +34,7 @@ class WorkTray extends Component {
             });
             const columns = this.getColumns(data);
             this.setState({data, columns}, () => {
-                this.state.onDataUpdateCallback(this.state.data, this.state.columns);
+                this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
             });
         }
     }
@@ -103,6 +103,16 @@ class WorkTray extends Component {
         return columns;
     };
 
+    removeDeleteColumn = (columns) => {
+        let columnsCopy = JSON.parse(JSON.stringify(columns));
+        let index = columnsCopy.findIndex(column => {
+            column.id === 'xbutton';
+        });
+        columnsCopy.splice(index, 1);
+        return columnsCopy;
+    };
+
+
     handleClick = (key, id, type) => {
         let subPath = "";
         if (type === 'record') {
@@ -119,12 +129,20 @@ class WorkTray extends Component {
 
     deleteRow = (e) => {
         let index = e.row._index;
-        //console.log(e.row);
-
         let data = [...this.state.data];
+
+        //TODO: we may want to keep selection
+        this.setState({selection: [], selectAll: false}, () => {
+            this.state.onItemSelectCallback(this.state.selection);
+        });
+
         data.splice(index, 1);
+        data.forEach((item, index) => {
+           //recalculate index
+           item._id = index;
+        });
         this.setState({data}, () => {
-            this.state.onDataUpdateCallback(this.state.data, this.state.columns);
+            this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
         });
         //console.log(JSON.stringify(this.state.data));
 
