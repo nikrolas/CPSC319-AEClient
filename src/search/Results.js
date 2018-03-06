@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactTable from 'react-table';
-import {Link} from 'react-router-dom';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
@@ -321,9 +320,6 @@ class SelectTable extends Component {
                         <option value='records'>Records</option>
                         <option value='containers'>Containers</option>
                     </select>
-                    <div style={{float: 'left', marginLeft: '1cm', display: 'inline-flex',}}>
-                        <Link to='/worktray/'>Work Tray</Link>
-                    </div>
                 </div>
                 <div style={tablestyle}>
                     <CheckboxTable

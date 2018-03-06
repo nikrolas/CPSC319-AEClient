@@ -106,7 +106,7 @@ class WorkTray extends Component {
     removeDeleteColumn = (columns) => {
         let columnsCopy = JSON.parse(JSON.stringify(columns));
         let index = columnsCopy.findIndex(column => {
-            column.id === 'xbutton';
+            return column.id === 'xbutton';
         });
         columnsCopy.splice(index, 1);
         return columnsCopy;
