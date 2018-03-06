@@ -11,16 +11,16 @@ class CreateRecord extends Component {
                 alertMsg:"",
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
-                recordType: "",
+                recordType: null,
 
                 locationValidationMsg:"",
                 locationValidationState:"success",
-                location: "",
+                location: null,
 
                 //TODO Record Number
                 recordNumberValidationMsg:"",
                 recordNumberValidationState:"success",
-                recordNumber: "",
+                recordNumber: null,
 
                 titleValidationMsg:"",
                 titleValidationState:null,
@@ -29,24 +29,24 @@ class CreateRecord extends Component {
                 //TODO Classifications
                 classificationValidationMsg:"",
                 classificationValidationState:"success",
-                classification: "",
+                classification: null,
 
 
                 retentionValidationMsg:"",
                 retentionValidationState:null,
-                retentionSchedule:"",
+                retentionSchedule:null,
 
                 containerValidationMsg:"",
                 containerValidationState:"success",
-                container: "",
+                container: null,
 
                 consignmentCodeValidationMsg:"",
                 consignmentCodeValidationState:"success",
-                consignmentCode: "",
+                consignmentCode: null,
 
                 notesValidationMsg:"",
                 notesValidationState:"success",
-                notes:"",
+                notes:null,
 
                 classificationChildren: [],
                 locationJson: [{
@@ -163,11 +163,12 @@ class CreateRecord extends Component {
                     this.setState({containerValidationState:'error'});
                     this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
                 }
-                else if (regexNotNumbers.test(this.state.container)){
+                else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
                     this.setState({containerValidationState:'error'});
                     this.setState({containerValidationMsg:'Please enter numbers only'});
                 }
                 else {
+                    this.setState({container: null});
                     this.setState({containerValidationState:'success'});
                 }
             }
@@ -182,14 +183,16 @@ class CreateRecord extends Component {
                     this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
                 }
                 else {
+                    this.setState({consignmentCode: null});
                     this.setState({consignmentCodeValidationState:'success'});
                 }
             }
 
             if(e.target.name === "notes") {
                 const length = this.state.notes.length;
-                if (length >= 0) {
-                    this.setState({notesValidationState:'success'});
+                this.setState({notesValidationState:'success'});
+                if (length === 0) {
+                    this.setState({notes: null});
                 }
             }
 
