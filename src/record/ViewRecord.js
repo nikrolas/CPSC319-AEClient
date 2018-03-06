@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {getRecordById, deleteRecordById} from "../APIs/RecordsApi";
-import {Row, Col, Grid, Button, ButtonToolbar} from 'react-bootstrap'
-import {Link,Redirect} from 'react-router-dom';
+import {Row, Col, Grid, Button, ButtonToolbar,Alert} from 'react-bootstrap'
+import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
 
 
@@ -11,6 +11,7 @@ class ViewRecord extends Component {
         super(props, context);
         this.state =
             {
+                alertMsg:"",
                 recordJson: {
                     Id: "",
                     Number: "",
@@ -33,7 +34,6 @@ class ViewRecord extends Component {
                     scheduleYear: "",
                     Notes: ""
                 },
-                navdelete:false
             };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -69,15 +69,22 @@ class ViewRecord extends Component {
 
     handleSubmit() {
         deleteRecordById(this.props.match.params.recordId)
-            .then(result => {
-                console.log('success====:', result);
-                this.setState({navdelete: true});
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if(data.status === 500) {
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else {
+                    this.props.history.push("/results/");
+                }
             })
             .catch(error => console.log('error============:', error));
     }
 
     render() {
-        const { navdelete } = this.state;
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         let title = {
@@ -88,14 +95,12 @@ class ViewRecord extends Component {
             justifyContent:"center"
         };
 
-
-        // here is the important part
-        if (navdelete) {
-            return <Redirect to="/results" push={true} />
-        }
-
         return (
             <div>
+                {this.state.alertMsg.length !== 0
+                    ?<Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    :null
+                }
                 <h1>{this.state.recordJson["number"]}</h1>
                 <ButtonToolbar style = {btnStyle}>
                 <Link to={updateRecordLink}>

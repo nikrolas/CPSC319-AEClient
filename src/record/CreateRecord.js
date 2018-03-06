@@ -255,13 +255,11 @@ class CreateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    console.log(data);
                     if(data.status === 500) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }
                     else {
-                        this.setState({alertMsg: "Record Number: " + data.number + " has been created."});
                         this.props.history.push("/viewRecord/"+ data.id);
                     }
                 })
