@@ -48,10 +48,10 @@ export function updateRecord(recordId,state) {
             title: state.responseJson["title"],
             scheduleId: 10,
             classifications : "PROJECT MANAGEMENT/Budgets and Schedules",
-            consignmentCode: "RF011329724",
-            notes: "11",
+            consignmentCode: state.responseJson["consignmentCode"],
+            notes: state.responseJson["notes"],
             stateId : 1,
-            containerId : 24372
+            containerId : state.responseJson["containerId"]
         })
     })
 }
