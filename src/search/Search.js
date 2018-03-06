@@ -82,7 +82,7 @@ class Search extends Component {
                     <div style={searchwrap}>
                         <i className="fa fa-search" style={searchicon}/>
                         <input type="text" defaultValue={this.state.searchValue} value={this.state.value}
-                               onChange={this.handleInputChange} placeholder="Search..." style={searchbox}/>
+                               onChange={this.handleInputChange} placeholder="Search by record number. e.g. VAN" style={searchbox}/>
                         <Link to={this.state.searchPath}>
                             <button type="submit" value="Submit" className='btn' style={submitbtn}>
                                 <i className="fa fa-angle-right" style={submiticon}/>
