@@ -6,7 +6,7 @@ export function getRecordsByNumber(recordNumber) {
     return fetch(serviceRoot + recordsPath + "?num=" + recordNumber + "&userId=" + userId);
 }
 
-export function getRecordById(recordId, userId) {
+export function getRecordById(recordId) {
     return fetch(serviceRoot + recordsPath + "/" + recordId + "?userId=" + userId);
 }
 

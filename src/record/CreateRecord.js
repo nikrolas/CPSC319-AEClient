@@ -9,7 +9,6 @@ class CreateRecord extends Component {
         this.state =
             {
                 alertMsg:"",
-                success:false,
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
                 recordType: "",
@@ -258,18 +257,15 @@ class CreateRecord extends Component {
                 .then(data => {
                     console.log(data);
                     if(data.status === 500) {
-                        this.setState({success: false});
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }
                     else {
-                        this.setState({success: true});
                         this.setState({alertMsg: "Record Number: " + data.number + " has been created."});
-                        window.scrollTo(0, 0)
+                        this.props.history.push("/viewRecord/"+ data.id);
                     }
                 })
                 .catch(error => {
-                    this.setState({success: false});
                     this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
                     window.scrollTo(0, 0)
                 });
@@ -297,12 +293,8 @@ class CreateRecord extends Component {
 
         return (
             <div>
-                {this.state.alertMsg.length !== 0 && !this.state.success
+                {this.state.alertMsg.length !== 0
                     ?<Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
-                    :null
-                }
-                {this.state.alertMsg.length !== 0 && this.state.success
-                    ?<Alert bsStyle="success"><h4>{this.state.alertMsg}</h4></Alert>
                     :null
                 }
                 <h1>Create a New Record</h1>

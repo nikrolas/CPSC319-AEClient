@@ -73,7 +73,7 @@ class SelectTable extends Component {
     }
 
     search = (searchString) => {
-        getRecordsByNumber(searchString, this.state.userId)
+        getRecordsByNumber(searchString)
             .then(response => {
                 //console.log(response);
                 return response.json()
