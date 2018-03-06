@@ -32,12 +32,12 @@ class App extends Component {
         this.state = {
             resultsData: [],
             resultsColumns: [],
-            selectedItems: []
+            selectedItemIndexes: []
         };
     }
 
-    setSelectedItems = (items) => {
-        this.setState({selectedItems: items});
+    setselectedItemIndexes = (items) => {
+        this.setState({selectedItemIndexes: items});
     };
 
     setResultsStates = (data, columns) => {
@@ -47,14 +47,14 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <NavigationBar selectedItems={this.state.selectedItems} resultsData={this.state.resultsData}/>
+                <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData}/>
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                 <Route exact path='/' component={Home}/>
-                <RouteWrapper path="/results/:searchString?" onItemSelect={this.setSelectedItems} onDataUpdate={this.setResultsStates} component={SelectTable}/>
-                <RouteWrapper path="/worktray" onItemSelect={this.setSelectedItems} onDataUpdate={this.setResultsStates} component={WorkTray}/>
-                <RouteWrapper path='/createContainer/' selectedItems={this.state.selectedItems} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
+                <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={SelectTable}/>
+                <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
+                <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
             </div>
         );
     }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl} from 'react-bootstrap'
+import {Button, FormGroup, ControlLabel, FormControl, Alert} from 'react-bootstrap'
 import {createContainer} from "../APIs/ContainersApi";
 import ReactTable from "react-table";
 
@@ -9,12 +9,14 @@ class CreateContainer extends Component {
         super(props, context);
         this.state =
             {
+                success: false,
+                alertMsg: "",
                 title: "",
                 location: this.getUserLocations()[0], //TODO://set user default location
                 locations: this.getUserLocations(),
                 destructionDate: this.getDestructionDate(),
                 notes: "",
-                selectedRecords: this.getSelectedRecords(props.resultsData, props.selectedItems),
+                selectedRecords: this.getSelectedRecords(props.resultsData, props.selectedItemIndexes),
                 columns: props.resultsColumns
             };
 
@@ -23,6 +25,7 @@ class CreateContainer extends Component {
     }
 
     getSelectedRecords = (records, selection) => {
+        //TODO: handle case when a container is also selected This component only handles records
         let selectedRecords = [];
         selection.forEach((index) => {
             if (records[index].hasOwnProperty('number') && records[index].hasOwnProperty('id'))
@@ -67,10 +70,15 @@ class CreateContainer extends Component {
         createContainer(formData, 5).then(response => {
             return response.json();
         }).then(data => {
-            alert("Endpoint not implemented yet.");
+            this.setState({success: false});
+            this.setState({alertMsg: "Endpoint not implemented."});
+            window.scrollTo(0, 0)
         }).catch(err => {
-            alert("Endpoint not implemented yet.");
-        })
+            this.setState({success: false});
+            this.setState({alertMsg: "Endpoint not implemented."});
+            window.scrollTo(0, 0)
+        });
+        event.preventDefault();
     }
 
 
@@ -90,12 +98,27 @@ class CreateContainer extends Component {
             overflowY: "auto"
         };
 
+        const formStyle = {
+            margin: 'auto',
+            width: '50%',
+            padding: '10px',
+            textAlign: 'left'
+        };
+
         return (
-            <div style={{margin: '0 5% 0 5%'}}>
+            <div>
+                {this.state.alertMsg.length !== 0 && !this.state.success
+                    ? <Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    : null
+                }
+                {this.state.alertMsg.length !== 0 && this.state.success
+                    ? <Alert bsStyle="success"><h4>{this.state.alertMsg}</h4></Alert>
+                    : null
+                }
                 <h1>New Container</h1>
                 <b>Due for destruction</b>
                 <div>{destructionDate}</div>
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleSubmit} style={formStyle}>
                     <FormGroup
                         validationState={this.getValidationState()}
                     >
