@@ -209,9 +209,9 @@ class UpdateRecord extends Component {
                     this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
                 }
                 else {
-                    var tempObject = this.state.responseJson;
-                    tempObject['consignmentCode'] = null;
-                    console.log(tempObject);
+                    var tempObject1 = this.state.responseJson;
+                    tempObject1['consignmentCode'] = null;
+                    console.log(tempObject1);
                     this.setState({responseJson: tempObject});
                     this.setState({consignmentCodeValidationState:'success'});
                 }
