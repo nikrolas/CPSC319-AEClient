@@ -10,6 +10,23 @@ export function getRecordById(recordId) {
     return fetch(serviceRoot + recordsPath + "/" + recordId + "?userId=" + userId);
 }
 
+export function getRecordType() {
+    return fetch(serviceRoot + "/recordtypes");
+}
+
+export function getRetentionSchedule() {
+    return fetch(serviceRoot + "/retentionschedules");
+}
+
+export function getClassifications(parentId = "") {
+    if (parentId.length !== 0) {
+        return fetch(serviceRoot + "/classifications?parentId=" + parentId);
+    }
+    else {
+        return fetch(serviceRoot + "/classifications");
+    }
+}
+
 export function deleteRecordById(recordId) {
     return fetch(serviceRoot + '/record/' + recordId+ '?userId=' + userId, {
         method: 'DELETE',
