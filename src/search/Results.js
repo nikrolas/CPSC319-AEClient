@@ -233,7 +233,7 @@ class SelectTable extends Component {
         return this.state.selection.includes(key);
     };
 
-    updateTray = (e) => {
+    updateTray = () => {
         //console.log('selection: ', this.state.selection);
         //console.log("tray: "+JSON.stringify(this.state.tray));
         let tray = [...this.state.tray];
@@ -311,11 +311,7 @@ class SelectTable extends Component {
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
                 <div style={styles.btncontainer}>
-                    <button style={this.addStyle()}
-                            className='btn btn-s'
-                            onClick={(e) => {updateTray(e)}}>
-                        {this.state.addbtntext}
-                    </button>
+                    <button className='btn btn-s' style={this.addStyle()} onClick={updateTray}>{this.state.addbtntext}</button>
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>
                         <select onChange={this.handleSelectChange} style={styles.sel}>
