@@ -91,8 +91,11 @@ class WorkTray extends Component {
             }
         });
         columns.push({
-            Header: <button className="btn btn-xs" onClick={this.deleteAll} style={styles.clearbtn}>Clear All</button>,
-            //id: 'xbutton',
+            Header: <button className="btn btn-xs"
+                            onClick={this.deleteAll}
+                            onMouseOver={(e) => {e.target.style.backgroundColor = '#ff9c81'}}
+                            onMouseLeave={(e) => {e.target.style.backgroundColor = 'white'}}
+                            style={styles.clearbtn}>Clear All</button>,
             sortable: false,
             Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
         });
@@ -216,13 +219,7 @@ class WorkTray extends Component {
         return (
             <div style={styles.container}>
                 <h1>Work Tray</h1>
-                <div style={styles.btncontainer}>
-                    {/*<button style={styles.clearbtn}
-                            className='btn btn-s'
-                            onClick={this.clearAll}>
-                        Empty Tray
-                    </button>*/}
-                </div>
+                <div style={styles.btncontainer}></div>
                 <div style={styles.tablestyle}>
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}
@@ -251,7 +248,7 @@ let styles = {
     delbtn: {
         backgroundColor: '#ff6c60',
         borderColor: '#ff6c60',
-        color: '#FFFFFF'
+        color: 'white'
     },
     btncontainer: {
         //border: '2px solid blue',
@@ -259,10 +256,9 @@ let styles = {
         height: '1cm'
     },
     clearbtn: {
-        /*float: 'right',
-        marginRight: '2%',*/
-        backgroundColor: '#ff9c81',
-        borderColor: '#FFFFFF',
+        //backgroundColor: '#ff9c81',
+        backgroundColor: 'white',
+        borderColor: '#ff9c81',
     },
 };
 

@@ -43,7 +43,7 @@ class SelectTable extends Component {
             selection: [],
             selectAll: false,
             tray: [],
-            added: false,
+            addbtntext: 'Add to Tray',
             selectvalue: 'none',
             userId: '5',
             onItemSelectCallback: props.onItemSelect,
@@ -233,11 +233,11 @@ class SelectTable extends Component {
         return this.state.selection.includes(key);
     };
 
-    updateTray = () => {
+    updateTray = (e) => {
         //console.log('selection: ', this.state.selection);
         //console.log("tray: "+JSON.stringify(this.state.tray));
         let tray = [...this.state.tray];
-        let added = false;
+        let updated = false;
         this.state.selection.forEach((id) => {
             let selected = Object.assign({}, this.state.data[id]);
             delete selected._id;
@@ -246,15 +246,32 @@ class SelectTable extends Component {
             });
             if (!intray) {
                 tray.push(selected);
-                added = true;
+                updated = true;
             }
         });
-        if (added) {
-            this.setState({tray, added});
+        if (updated) {
+            this.setState({tray, addbtntext: 'Success'});
             //console.log("tray after: "+JSON.stringify(this.state.tray));
             sessionStorage.setItem("tray" + this.state.userId, JSON.stringify(tray));
             //console.log(sessionStorage.getItem("tray"+this.state.userId));
-            setTimeout(() => {this.setState({added: false});}, 700);
+            setTimeout(() => {this.setState({addbtntext: 'Add to Tray'});}, 700);
+        }
+        else {
+            this.setState({addbtntext: 'Added'});
+            setTimeout(() => {this.setState({addbtntext: 'Add to Tray'});}, 700);
+        }
+    };
+    addStyle = () => {
+        switch (this.state.addbtntext) {
+            default: {
+                return styles.addbtn;
+            }
+            case 'Success': {
+                return styles.addbtn2;
+            }
+            case 'Added': {
+                return styles.addbtn3;
+            }
         }
     };
 
@@ -294,10 +311,10 @@ class SelectTable extends Component {
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
                 <div style={styles.btncontainer}>
-                    <button style={this.state.added ? styles.addbtn2 : styles.addbtn}
+                    <button style={this.addStyle()}
                             className='btn btn-s'
-                            onClick={updateTray}>
-                        {this.state.added ? "Added" : "Add to Tray"}
+                            onClick={(e) => {updateTray(e)}}>
+                        {this.state.addbtntext}
                     </button>
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>
@@ -344,6 +361,11 @@ let styles = {
         borderColor: '#FFFFFF',
     },
     addbtn2: {
+        float: 'left',
+        width: '2.5cm',
+        backgroundColor: '#8bffec',
+    },
+    addbtn3: {
         float: 'left',
         width: '2.5cm',
         backgroundColor: '#ff9c81',
