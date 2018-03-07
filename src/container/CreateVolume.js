@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Alert} from 'react-bootstrap'
-import {createContainer} from "../APIs/ContainersApi";
-import ReactTable from "react-table";
+import {Button, Alert} from 'react-bootstrap';
 
 class CreateVolume extends Component {
 
@@ -89,10 +87,10 @@ class CreateVolume extends Component {
     };
 
     render() {
-        const listLocationsJson = this.state.locations.map((item, i) =>
+        /*const listLocationsJson = this.state.locations.map((item, i) =>
             <option key={i} value={item}>{item}</option>);
         const destructionDate = <div>{this.state.destructionDate}</div>;
-        const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
+        const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;*/
         const {selectedRecord} = this.state;
 
         return (
@@ -159,6 +157,7 @@ let styles = {
         overflowY: 'auto',
         minWidth: '50%',
         maxWidth: '100%',
+        minHeight: '1cm',
     },
     checkwrap: {
         //border: '2px solid blue',
