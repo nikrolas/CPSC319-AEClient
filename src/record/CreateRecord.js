@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, Checkbox, HelpBlock, Alert} from 'react-bootstrap'
 import {createRecord, getClassifications, getRecordType,getRetentionSchedule} from "../APIs/RecordsApi";
+import {Typeahead} from 'react-bootstrap-typeahead';
 
 class CreateRecord extends Component {
 
@@ -266,7 +267,7 @@ class CreateRecord extends Component {
     render() {
         var listRecordTypeJson = null;
         var listClassificationJson = null;
-        var listRetentionScheduleJson = null;
+        var retentionForm = null;
         if (this.state.recordTypeResponse !== null) {
             listRecordTypeJson = this.state.recordTypeResponse.map((item, i) => <option key={i} value={item.typeId}>{item.typeName}</option>);
         }
@@ -275,8 +276,11 @@ class CreateRecord extends Component {
                 <option key={i} value={item.id}>{item.name}</option>);
         }
         if (this.state.retentionScheduleResponse !== null) {
-            listRetentionScheduleJson = this.state.retentionScheduleResponse.map((item, i) =>
-                <option key={i} value={item.id}>{item.name}</option>);
+            retentionForm =
+                <Typeahead
+                labelKey="name"
+                options={this.state.retentionScheduleResponse}
+                placeholder="Choose a state..."/>
         }
 
 
@@ -397,19 +401,13 @@ class CreateRecord extends Component {
                                onChange={this.handleChange}
                                validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
-                        <FormControl name="retentionSchedule"
-                                     componentClass="select"
-                                     placeholder="select">
-                            <option value="" disabled selected>(Select a record type)</option>
-                            {listRetentionScheduleJson}
-                        </FormControl>
+                            {retentionForm}
                         <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
                             :null
                         }
                     </FormGroup>
-
                     <FormGroup
                         validationState={this.state.containerValidationState}
                     >
