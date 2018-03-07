@@ -43,7 +43,8 @@ class SelectTable extends Component {
             selection: [],
             selectAll: false,
             tray: [],
-            selectvalue: 'all',
+            added: false,
+            selectvalue: 'none',
             userId: '5',
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
@@ -236,7 +237,7 @@ class SelectTable extends Component {
         //console.log('selection: ', this.state.selection);
         //console.log("tray: "+JSON.stringify(this.state.tray));
         let tray = [...this.state.tray];
-        let updated = false;
+        let added = false;
         this.state.selection.forEach((id) => {
             let selected = Object.assign({}, this.state.data[id]);
             delete selected._id;
@@ -245,14 +246,15 @@ class SelectTable extends Component {
             });
             if (!intray) {
                 tray.push(selected);
-                updated = true;
+                added = true;
             }
         });
-        if (updated) {
-            this.setState({tray});
+        if (added) {
+            this.setState({tray, added});
             //console.log("tray after: "+JSON.stringify(this.state.tray));
             sessionStorage.setItem("tray" + this.state.userId, JSON.stringify(tray));
             //console.log(sessionStorage.getItem("tray"+this.state.userId));
+            setTimeout(() => {this.setState({added: false});}, 700);
         }
     };
 
@@ -286,42 +288,27 @@ class SelectTable extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        let container = {
-            padding: '5%'
-        };
-        let tablestyle = {
-            //border: '5px solid gray'
-            marginTop: '10px',
-        };
-        let btncontainer = {
-            //border: '2px solid blue',
-            alignItems: 'center',
-            height: '1cm'
-        };
-        let addbtn = {
-            float: 'left',
-            backgroundColor: '#b5ff87',
-            borderColor: '#FFFFFF',
-        };
-        let sel = {
-            marginLeft: '1cm',
-            float: 'left',
-            height: '85%',
-        };
         return (
-            <div style={container}>
+            <div style={styles.container}>
                 <div style={{marginBottom: '1cm'}}>
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
-                <div style={btncontainer}>
-                    <button style={addbtn} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
-                    <select onChange={this.handleSelectChange} style={sel}>
-                        <option value='all' selected>All</option>
-                        <option value='records'>Records</option>
-                        <option value='containers'>Containers</option>
-                    </select>
+                <div style={styles.btncontainer}>
+                    <button style={this.state.added ? styles.addbtn2 : styles.addbtn}
+                            className='btn btn-s'
+                            onClick={updateTray}>
+                        {this.state.added ? "Added" : "Add to Tray"}
+                    </button>
+                    <div style={styles.filter}>
+                        <h4 style={{float: 'left'}}>Filter:</h4>
+                        <select onChange={this.handleSelectChange} style={styles.sel}>
+                            <option value='none' selected>None</option>
+                            <option value='records'>Records</option>
+                            <option value='containers'>Containers</option>
+                        </select>
+                    </div>
                 </div>
-                <div style={tablestyle}>
+                <div style={styles.tablestyle}>
                     <CheckboxTable
                         ref={(r) => this.checkboxTable = r}
                         data={data}
@@ -336,5 +323,42 @@ class SelectTable extends Component {
         );
     }
 }
+
+let styles = {
+    container: {
+        padding: '5%'
+    },
+    tablestyle: {
+        //border: '5px solid gray'
+        marginTop: '5px',
+    },
+    btncontainer: {
+        //border: '2px solid blue',
+        alignItems: 'center',
+        height: '1cm'
+    },
+    addbtn: {
+        float: 'left',
+        width: '2.5cm',
+        backgroundColor: '#b5ff87',
+        borderColor: '#FFFFFF',
+    },
+    addbtn2: {
+        float: 'left',
+        width: '2.5cm',
+        backgroundColor: '#ff9c81',
+    },
+    filter: {
+        marginLeft: '0.5cm',
+        float: 'left',
+        height: '100%',
+    },
+    sel: {
+        marginLeft: '5px',
+        marginTop: '3px',
+        float: 'left',
+        height: '85%',
+    },
+};
 
 export default SelectTable;

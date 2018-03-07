@@ -90,15 +90,11 @@ class WorkTray extends Component {
                 }
             }
         });
-        let delbtn = {
-            backgroundColor: '#ff6c60',
-            borderColor: '#ff6c60',
-            color: '#FFFFFF'
-        };
         columns.push({
-            Header: '',
-            id: 'xbutton',
-            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={delbtn}><i className="fa fa-trash-o"/></button>
+            Header: <button className="btn btn-xs" onClick={this.deleteAll} style={styles.clearbtn}>Clear All</button>,
+            //id: 'xbutton',
+            sortable: false,
+            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
         });
         return columns;
     };
@@ -150,6 +146,14 @@ class WorkTray extends Component {
         stored.splice(index, 1);
         sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(stored));
         //console.log(JSON.stringify(stored));
+    };
+
+    deleteAll = () => {
+        sessionStorage.removeItem("tray"+this.state.userId);
+        this.setState({data: [], columns: [], selection: [], selectAll: false}, () => {
+            this.state.onItemSelectCallback(this.state.selection);
+            this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
+        });
     };
 
     getRecordsFromRowIds = (rowIds) => {
@@ -209,17 +213,17 @@ class WorkTray extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        let container = {
-            padding: '5%'
-        };
-        let tablestyle = {
-            //border: '5px solid gray'
-            marginTop: '5%',
-        };
         return (
-            <div style={container}>
+            <div style={styles.container}>
                 <h1>Work Tray</h1>
-                <div style={tablestyle}>
+                <div style={styles.btncontainer}>
+                    {/*<button style={styles.clearbtn}
+                            className='btn btn-s'
+                            onClick={this.clearAll}>
+                        Empty Tray
+                    </button>*/}
+                </div>
+                <div style={styles.tablestyle}>
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}
                         data={data}
@@ -234,5 +238,32 @@ class WorkTray extends Component {
         );
     }
 }
+
+let styles = {
+    container: {
+        padding: '5%'
+    },
+    tablestyle: {
+        //border: '5px solid gray'
+        marginTop: '5px',
+    },
+
+    delbtn: {
+        backgroundColor: '#ff6c60',
+        borderColor: '#ff6c60',
+        color: '#FFFFFF'
+    },
+    btncontainer: {
+        //border: '2px solid blue',
+        alignItems: 'center',
+        height: '1cm'
+    },
+    clearbtn: {
+        /*float: 'right',
+        marginRight: '2%',*/
+        backgroundColor: '#ff9c81',
+        borderColor: '#FFFFFF',
+    },
+};
 
 export default WorkTray;
