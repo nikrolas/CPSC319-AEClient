@@ -43,8 +43,8 @@ export function createRecord(state) {
         body:JSON.stringify({
             title: state.title,
             number: state.recordNumber,
-            scheduleId: "10",
-            typeId:"3",
+            scheduleId: state.retentionSchedule[0].id,
+            typeId:state.recordType,
             consignmentCode: state.consignmentCode,
             containerId: state.container,
             locationId: "5",

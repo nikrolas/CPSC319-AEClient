@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Checkbox, HelpBlock, Alert} from 'react-bootstrap'
+import {Button, FormGroup, ControlLabel, FormControl, ButtonGroup, HelpBlock, Alert} from 'react-bootstrap'
 import {createRecord, getClassifications, getRecordType,getRetentionSchedule} from "../APIs/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
 
@@ -29,9 +29,9 @@ class CreateRecord extends Component {
 
                 //TODO Classifications
                 classificationValidationMsg:"",
-                classificationValidationState:"success",
+                classificationValidationState:null,
                 classification: null,
-
+                classificationBack:[],
 
                 retentionValidationMsg:"",
                 retentionValidationState:null,
@@ -49,7 +49,6 @@ class CreateRecord extends Component {
                 notesValidationState:"success",
                 notes:null,
 
-                classificationChildren: [],
                 locationJson: [{
                     "id": "1",
                     "location": "Burnaby",
@@ -61,12 +60,14 @@ class CreateRecord extends Component {
                 recordTypeResponse: null,
                 classificationResponse: null,
                 retentionScheduleResponse:null,
-                checked: false
             };
 
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.backClassification = this.backClassification.bind(this);
+        this.resetClassification = this.resetClassification.bind(this);
+
     }
     componentWillMount() {
         getRecordType()
@@ -76,6 +77,7 @@ class CreateRecord extends Component {
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
         getClassifications()
             .then(response => response.json())
@@ -84,6 +86,7 @@ class CreateRecord extends Component {
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
         getRetentionSchedule()
             .then(response => response.json())
@@ -92,133 +95,152 @@ class CreateRecord extends Component {
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
     }
     handleChange(e) {
-        e.persist();
-        this.setState({[e.target.name]: e.target.value}, ()=> {
-            //Validation handling here
-            if(e.target.name === "recordType") {
-                const length = this.state.recordType.length;
-                if (length >= 1) {
-                    this.setState({recordTypeValidationState: 'success'});
-                }
-                else {
-                    this.setState({titleValidationState: null});
-                }
-            }
-            if(e.target.name === "location") {
-                const length = this.state.location.length;
-                if (length >= 1) {
-                    this.setState({locationValidationState: 'success'});
-                }
-                else {
-                    this.setState({locationValidationState: null});
-                }
-            }
-            //TODO Record Number
-
-            if(e.target.name === "title") {
-                const length = this.state.title.length;
-                if (length >= 1 && length < 256) {
-                    this.setState({titleValidationState:'success'});
-                }
-                else if (length >=50){
-                    this.setState({titleValidationMsg:"Please enter less than 256 characters"})
-                    this.setState({titleValidationState:'error'});
-                }
-                else {
-                    this.setState({titleValidationState:null});
-                }
-            }
-            //TODO Classification
-            if(e.target.name === "retentionSchedule") {
-                const length = this.state.retentionSchedule.length;
-                if (length >= 1) {
-                    this.setState({retentionValidationState:'success'});
-                }
-                else {
-                    this.setState({retentionValidationState:null});
-                }
-            }
-            if(e.target.name === "container") {
-                const regexNumbers = /^[0-9\b]{1,11}$/;
-                const regexNumbersExceed = /^[0-9\b]{12,}$/;
-                const regexNotNumbers = /[^0-9]+/;
-
-                if (regexNumbers.test(this.state.container)) {
-                    this.setState({containerValidationState:'success'});
-                }
-                else if (regexNumbersExceed.test(this.state.container)) {
-                    this.setState({containerValidationState:'error'});
-                    this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
-                }
-                else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
-                    this.setState({containerValidationState:'error'});
-                    this.setState({containerValidationMsg:'Please enter numbers only'});
-                }
-                else {
-                    this.setState({container: null});
-                    this.setState({containerValidationState:'success'});
-                }
-            }
-
-            if(e.target.name === "consignmentCode") {
-                const length = this.state.consignmentCode.length;
-                if (length >= 1 && length <= 50) {
-                    this.setState({consignmentCodeValidationState:'success'});
-                }
-                else if (length > 50) {
-                    this.setState({consignmentCodeValidationState:'error'});
-                    this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
-                }
-                else {
-                    this.setState({consignmentCode: null});
-                    this.setState({consignmentCodeValidationState:'success'});
-                }
-            }
-
-            if(e.target.name === "notes") {
-                const length = this.state.notes.length;
-                this.setState({notesValidationState:'success'});
-                if (length === 0) {
-                    this.setState({notes: null});
-                }
-            }
-
-        });
-        //When RecordType is changed, adjust record number
-        if (e.target.name === "recordType") {
-            for (var k in this.state.recordTypeResponse) {
-                if (k === e.target.value) {
-                    this.setState({recordNumber: this.state.recordTypeResponse[k]["numberPattern"]});
-                    break;
-                }
-            }
+        if(Array.isArray(e)){
+            this.setState({retentionSchedule: e}, ()=> {
+               if(this.state.retentionSchedule.length > 0) {
+                   this.setState({retentionValidationState: 'success'});
+               }
+               else {
+                   this.setState({retentionValidationState: 'error'});
+                   this.setState({retentionValidationMsg:'Please select a retention schedule from the dropdown'});
+               }
+            });
         }
-        //When Classification is changed, populate clickbox with proper children
-        //TODO - Need to see how far the children information goes
-        if (e.target.name === "classification") {
-            for (k in this.state.classificationJson) {
-                if (k === e.target.value) {
-                    this.setState({classificationChildren: this.state.classificationJson[k]["children"]});
-                    console.log(this.state.classificationChildren);
-                    break;
+        else {
+            e.persist();
+            this.setState({[e.target.name]: e.target.value}, ()=> {
+                //Validation handling here
+                if(e.target.name === "recordType") {
+                    const length = this.state.recordType.length;
+                    if (length >= 1) {
+                        this.setState({recordTypeValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({titleValidationState: null});
+                    }
+                }
+                if(e.target.name === "location") {
+                    const length = this.state.location.length;
+                    if (length >= 1) {
+                        this.setState({locationValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({locationValidationState: null});
+                    }
+                }
+                //TODO Record Number
+
+                if(e.target.name === "title") {
+                    const length = this.state.title.length;
+                    if (length >= 1 && length < 256) {
+                        this.setState({titleValidationState:'success'});
+                    }
+                    else if (length >=50){
+                        this.setState({titleValidationMsg:"Please enter less than 256 characters"})
+                        this.setState({titleValidationState:'error'});
+                    }
+                    else {
+                        this.setState({titleValidationState:null});
+                    }
+                }
+                //TODO Classification
+
+                if(e.target.name === "classification") {
+                    getClassifications(this.state.classification)
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.length >0) {
+                                this.state.classificationBack.push(this.state.classification);
+                                this.setState({classificationResponse: data});
+                            }
+                            else {
+                                console.log(this.state.classificationBack);
+                                this.setState({classificationValidationState:"success"});
+                            }
+                        })
+                }
+
+                if(e.target.name === "retentionSchedule") {
+                    const length = this.state.retentionSchedule.length;
+                    if (length >= 1) {
+                        this.setState({retentionValidationState:'success'});
+                    }
+                    else {
+                        this.setState({retentionValidationState:null});
+                    }
+                }
+                if(e.target.name === "container") {
+                    const regexNumbers = /^[0-9\b]{1,11}$/;
+                    const regexNumbersExceed = /^[0-9\b]{12,}$/;
+                    const regexNotNumbers = /[^0-9]+/;
+
+                    if (regexNumbers.test(this.state.container)) {
+                        this.setState({containerValidationState:'success'});
+                    }
+                    else if (regexNumbersExceed.test(this.state.container)) {
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
+                    }
+                    else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter numbers only'});
+                    }
+                    else {
+                        this.setState({container: null});
+                        this.setState({containerValidationState:'success'});
+                    }
+                }
+
+                if(e.target.name === "consignmentCode") {
+                    const length = this.state.consignmentCode.length;
+                    if (length >= 1 && length <= 50) {
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
+                    else if (length > 50) {
+                        this.setState({consignmentCodeValidationState:'error'});
+                        this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
+                    }
+                    else {
+                        this.setState({consignmentCode: null});
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
+                }
+
+                if(e.target.name === "notes") {
+                    const length = this.state.notes.length;
+                    this.setState({notesValidationState:'success'});
+                    if (length === 0) {
+                        this.setState({notes: null});
+                    }
+                }
+            });
+
+            //When RecordType is changed, adjust record number
+            if (e.target.name === "recordType") {
+                for (var k in this.state.recordTypeResponse) {
+                    if (k === e.target.value) {
+                        this.setState({recordNumber: this.state.recordTypeResponse[k]["numberPattern"]});
+                        break;
+                    }
+                }
+            }
+            //When Classification is changed, populate clickbox with proper children
+            //TODO - Need to see how far the children information goes
+            if (e.target.name === "classification") {
+                for (k in this.state.classificationJson) {
+                    if (k === e.target.value) {
+                        this.setState({classificationChildren: this.state.classificationJson[k]["children"]});
+                        console.log(this.state.classificationChildren);
+                        break;
+                    }
                 }
             }
         }
     }
-
-    //TODO Might have to go further into children field to display all possible options
-    returnCheckboxes() {
-        if (this.state.classificationChildren.length > 0) {
-            return this.state.classificationChildren.map((item, i) =>
-                <Checkbox inline key={i} value={i}>{item}</Checkbox>);
-        }
-        else {
-            return null;
-        }
-    };
 
     handleSubmit(event) {
         const regexValidationState = /^.*ValidationState$/;
@@ -264,6 +286,22 @@ class CreateRecord extends Component {
         event.preventDefault();
     }
 
+    backClassification() {
+            getClassifications(this.state.classificationBack.pop())
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({classificationResponse: data});
+                    this.setState({classificationValidationState: null});
+                })
+                .catch(error => {
+
+                });
+    }
+
+    resetClassification(){
+
+    }
+
     render() {
         var listRecordTypeJson = null;
         var listClassificationJson = null;
@@ -278,7 +316,8 @@ class CreateRecord extends Component {
         if (this.state.retentionScheduleResponse !== null) {
             retentionForm =
                 <Typeahead
-                labelKey="name"
+                    onChange={this.handleChange}
+                    labelKey={option => `${option.name} ${option.code.trim()}`}
                 options={this.state.retentionScheduleResponse}
                 placeholder="Choose a state..."/>
         }
@@ -393,12 +432,12 @@ class CreateRecord extends Component {
                             ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
                             :null
                         }
-                    </FormGroup>
-                    <FormGroup>
-                        {this.returnCheckboxes()}
+                        <ButtonGroup>
+                        <Button onClick={this.backClassification}>Back</Button>
+                        <Button onClick={this.resetClassification}>Reset</Button>
+                        </ButtonGroup>
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect"
-                               onChange={this.handleChange}
                                validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
                             {retentionForm}
