@@ -39,10 +39,6 @@ class NavigationBar extends Component {
         return this.state.records > 0; //&& this.state.containers <= 1;
     };
 
-    enableCreateVolume = () => {
-        return this.state.records === 1;
-    };
-
     render() {
         return (
             <Navbar inverse fluid>
@@ -62,10 +58,6 @@ class NavigationBar extends Component {
                     <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
                              to="/createContainer">
                         Contain Records
-                    </NavItem>;
-                    <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
-                             to="/createVolume">
-                        Create Volume
                     </NavItem>;
                 </Nav>
             </Navbar>

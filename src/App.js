@@ -5,7 +5,6 @@ import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
 import UpdateRecord from './record/UpdateRecord';
 import CreateContainer from "./container/CreateContainer";
-import CreateVolume from "./container/CreateVolume";
 import SelectTable from "./search/Results";
 import WorkTray from "./search/WorkTray";
 import Home from "./search/Home";
@@ -56,7 +55,6 @@ class App extends Component {
                 <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={SelectTable}/>
                 <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
                 <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
-                <RouteWrapper path='/createVolume/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateVolume}/>
             </div>
         );
     }
