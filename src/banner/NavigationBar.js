@@ -58,7 +58,7 @@ class NavigationBar extends Component {
                     <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
                              to="/createContainer">
                         Contain Records
-                    </NavItem>;
+                    </NavItem>
                 </Nav>
             </Navbar>
         );
