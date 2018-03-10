@@ -9,6 +9,7 @@ import SelectTable from "./search/Results";
 import WorkTray from "./search/WorkTray";
 import Home from "./search/Home";
 import NavigationBar from "./banner/NavigationBar";
+import ViewContainer from "./container/ViewContainer";
 
 const renderMergedProps = (component, ...rest) => {
     const finalProps = Object.assign({}, ...rest);
@@ -48,10 +49,12 @@ class App extends Component {
         return (
             <div className="App">
                 <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData}/>
+                <Route exact path='/' component={Home}/>
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
-                <Route exact path='/' component={Home}/>
+                <Route path='/viewContainer/:containerId?' component={ViewContainer}/>
+
                 <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={SelectTable}/>
                 <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
                 <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>

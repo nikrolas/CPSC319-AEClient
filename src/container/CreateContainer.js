@@ -143,9 +143,9 @@ class CreateContainer extends Component {
                             data={selectedRecords}
                             columns={columns}
                             className="-striped -highlight"
-                            showPagination={false}
+                            showPagination={true}
                             minRows={5}
-                            defaultPageSize={selectedRecords.length}
+                            defaultPageSize={5}
                         />
                     </div>
                 </div>

@@ -36,7 +36,7 @@ class NavigationBar extends Component {
 
 
     enableContainRecords = () => {
-        return this.state.records > 0; //&& this.state.containers <= 1;
+        return this.state.records > 0 && this.state.containers <= 1;
     };
 
     render() {
