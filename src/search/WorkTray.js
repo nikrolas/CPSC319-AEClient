@@ -3,6 +3,8 @@ import ReactTable from 'react-table';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
+import {getColumns} from "../Utilities/ReactTable";
+import {resultsAccessors} from "./Results";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class WorkTray extends Component {
@@ -32,7 +34,7 @@ class WorkTray extends Component {
                     ...item,
                 }
             });
-            const columns = this.getColumns(data);
+            const columns = this.getWorkTrayColumns();
             this.setState({data, columns}, () => {
                 this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
             });
@@ -42,54 +44,8 @@ class WorkTray extends Component {
         this.state.onItemSelectCallback([]);
     }
 
-    getColumns = (data) => {
-        const columns = [];
-        if (!data || data.length < 1) {
-            return columns;
-        }
-        let first = data[0];
-        let last = data.slice(-1)[0];
-        let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
-        Array.from(keyset).forEach((key) => {
-            if (key !== '_id') {
-                switch (key) {
-                    case 'number': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.row._original.id, 'record')
-                            }}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'container': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.row._original.containerId, 'container')
-                            }}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'title':
-                    case 'type':
-                    case 'state':
-                    case 'location':
-                    case 'scheduleYear':
-                    case 'consignmentCode': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                        });
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-        });
+    getWorkTrayColumns = () => {
+        const columns = getColumns(this, resultsAccessors);
         columns.push({
             Header: <button className="btn btn-xs"
                             onClick={this.deleteAll}

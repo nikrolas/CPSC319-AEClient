@@ -34,6 +34,8 @@ function getMockContainers() {
     ];
 }
 
+export const resultsAccessors = ["number", "title", "type", "state", "location", "container", "consignmentCode", "schedule"];
+
 class SelectTable extends Component {
     constructor(props) {
         super(props);
@@ -79,6 +81,8 @@ class SelectTable extends Component {
         this.state.onDataUpdateCallback(this.state.data, this.state.columns);
     };
 
+
+
     search = (searchString) => {
         getRecordsByNumber(searchString)
             .then(response => {
@@ -91,7 +95,7 @@ class SelectTable extends Component {
                     let rdata = data;
                     let cdata = getMockContainers();
                     this.setState({rdata, cdata});
-                    let columns = getColumns(this, ["number", "title", "type", "state", "location", "container", "consignmentCode", "schedule"]);
+                    let columns = getColumns(this, resultsAccessors);
                     setData(this, rdata.concat(cdata), columns, this.tableDataAndSelectionCallback);
                 } else {
                     setTableState(this, [], [], this.tableDataAndSelectionCallback);
