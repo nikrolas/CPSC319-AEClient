@@ -93,31 +93,38 @@ class CreateVolume extends Component {
     handleSubmit(event) {
         let {volumes, numbers, copy} = this.state;
 
-        let last = volumes[volumes.length - 1];
-        let latest = Object.assign({}, last);
-        if (!this.state.copy) {
-            latest.notes = "";
-        }
-        latest.number = this.newVolNum(numbers.length);
-        latest['copyNotes'] = copy;
+        let latest = volumes[volumes.length - 1];
+        let form = Object.assign({}, latest);
+        form.number = this.newVolNum(numbers.length);
+        form['copyNotes'] = copy;
 
-        createVolume(latest)
-            .then(response => {
-                return response.json();
-            })
+        createVolume(form)
             .then(data => {
-                if(data.status === 500) {
-                    this.setState({alertMsg: data.message});
-                    window.scrollTo(0, 0)
-                }
-                else {
-                    this.props.history.push("/viewRecord/"+ data.id);
-                }
-            })
-            .catch(error => {
-                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                this.setState({success: false});
+                this.setState({alertMsg: "Endpoint not implemented."});
                 window.scrollTo(0, 0)
-            });
+            }).catch(err => {
+            this.setState({success: false});
+            this.setState({alertMsg: "Endpoint not implemented."});
+            window.scrollTo(0, 0)
+        });
+
+        /*.then(response => {
+            return response.json();
+        })
+        .then(data => {
+            if(data.status === 500) {
+                this.setState({alertMsg: data.message});
+                window.scrollTo(0, 0)
+            }
+            else {
+                this.props.history.push("/viewRecord/"+ data.id);
+            }
+        })
+        .catch(error => {
+            this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+            window.scrollTo(0, 0)
+        });*/
         event.preventDefault();
     }
 
