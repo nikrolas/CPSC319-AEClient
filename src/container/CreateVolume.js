@@ -217,14 +217,16 @@ let styles = {
     form: {
         border: '1px solid gray',
         margin: 'auto',
+        padding: '5%',
         width: '70%',
-        padding: '10px',
         alignItems: 'center',
         boxShadow: '-5px 5px 10px gray',
     },
     list: {
         fontSize: '25px',
         listStyle: 'none',
+        maxHeight: '10cm',
+        overflowY: 'auto',
     },
     arrow: {
         fontSize: '25px',
