@@ -10,10 +10,8 @@ class CreateVolume extends Component {
             {
                 success: false,
                 alertMsg: "",
-                title: "",
                 location: this.getUserLocations()[0], //TODO://set user default location
                 locations: this.getUserLocations(),
-                destructionDate: this.getDestructionDate(),
                 notes: "",
                 copy: false,
                 selectedRecord: this.getSelectedRecord(props.resultsData, props.selectedItemIndexes),
@@ -21,7 +19,6 @@ class CreateVolume extends Component {
                 numbers: [],
             };
 
-        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -75,14 +72,7 @@ class CreateVolume extends Component {
         return ["Burnaby", "Vancouver", "Richmond"];
     };
 
-    getDestructionDate = () => {
-        //TODO: get destruction date of selected records
-        return "September 12, 2010 6:52PM";
-    };
-
     getValidationState() {};
-
-    handleChange() {};
 
     handleSubmit(event) {
         let {volumes, numbers, copy} = this.state;
