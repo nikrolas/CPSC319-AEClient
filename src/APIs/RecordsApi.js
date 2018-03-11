@@ -56,6 +56,19 @@ export function updateRecord(recordId,state) {
     })
 }
 
+export function createVolume(state) {
+    return fetch(serviceRoot + '/volume/' + state.id + '?userId=' + userId, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body:JSON.stringify({
+            number: state.number,
+            copyNotes: state.copy,
+        })
+    })
+}
 
 
 

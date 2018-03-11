@@ -256,7 +256,7 @@ class SelectTable extends Component {
             //console.log(sessionStorage.getItem("tray"+this.state.userId));
             setTimeout(() => {this.setState({addbtntext: 'Add to Tray'});}, 700);
         }
-        else {
+        else if (this.state.selection.length > 0) {
             this.setState({addbtntext: 'Added'});
             setTimeout(() => {this.setState({addbtntext: 'Add to Tray'});}, 700);
         }
