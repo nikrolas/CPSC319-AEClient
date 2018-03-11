@@ -33,6 +33,8 @@ class CreateRecord extends Component {
                 classificationBack:[],
                 classificationParentHistory:["(Select Record Type)"],
                 classificationParent:"(Select Record Type)",
+                classificationAtLeaf: false,
+
 
                 retentionValidationMsg:"",
                 retentionValidationState:null,
@@ -116,6 +118,7 @@ class CreateRecord extends Component {
             this.setState({[e.target.name]: e.target.value}, ()=> {
                 //Validation handling here
                 if(e.target.name === "recordType") {
+                    this.setState({recordNumber: this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]});
                     const length = this.state.recordType.length;
                     if (length >= 1) {
                         this.setState({recordTypeValidationState: 'success'});
@@ -165,10 +168,22 @@ class CreateRecord extends Component {
                                 this.state.classificationBack.push(this.state.classification);
                                 document.getElementById("formClassification").value = "0";
                                 this.setState({classificationResponse: data});
+                                this.setState({classificationAtLeaf:false});
                             }
                             else {
-                                this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
-                                this.state.classificationBack.push(this.state.classification);
+                                if(!this.state.classificationAtLeaf) {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.state.classificationBack.push(this.state.classification);
+                                }
+                                else {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                }
+                                this.setState({classificationAtLeaf:true});
                                 this.setState({classificationValidationState:"success"});
                             }
                         });
@@ -228,27 +243,6 @@ class CreateRecord extends Component {
                     }
                 }
             });
-
-            //When RecordType is changed, adjust record number
-            if (e.target.name === "recordType") {
-                for (var k in this.state.recordTypeResponse) {
-                    if (k === e.target.value) {
-                        this.setState({recordNumber: this.state.recordTypeResponse[k]["numberPattern"]});
-                        break;
-                    }
-                }
-            }
-            //When Classification is changed, populate clickbox with proper children
-            //TODO - Need to see how far the children information goes
-            if (e.target.name === "classification") {
-                for (k in this.state.classificationJson) {
-                    if (k === e.target.value) {
-                        this.setState({classificationChildren: this.state.classificationJson[k]["children"]});
-                        console.log(this.state.classificationChildren);
-                        break;
-                    }
-                }
-            }
         }
     }
 
@@ -297,7 +291,7 @@ class CreateRecord extends Component {
     }
 
     backClassification() {
-            this.state.classificationBack.pop();
+        this.state.classificationBack.pop();
         if (this.state.classificationParentHistory.length > 1) {
             this.state.classificationParentHistory.pop();
         }
@@ -309,8 +303,10 @@ class CreateRecord extends Component {
                 if(data.length > 0) {
                     this.setState({classificationResponse: data});
                     this.setState({classificationValidationState: null});
+                    this.setState({classificationAtLeaf:false});
                 }
                 else {
+                    this.setState({classificationAtLeaf:true});
                     this.setState({classificationValidationState: "success"});
                 }
             })
@@ -331,9 +327,7 @@ class CreateRecord extends Component {
                     this.setState({classificationResponse: data});
                 }
             });
-        console.log(this.state.classificationBack);
-        console.log(this.state.classification);
-        console.log(this.state.classificationParentHistory);
+        document.getElementById("formClassification").value = "0";
     }
 
     render() {
@@ -341,7 +335,7 @@ class CreateRecord extends Component {
         var listClassificationJson = null;
         var retentionForm = null;
         if (this.state.recordTypeResponse !== null) {
-            listRecordTypeJson = this.state.recordTypeResponse.map((item, i) => <option key={i} value={item.typeId}>{item.typeName}</option>);
+            listRecordTypeJson = this.state.recordTypeResponse.map((item, i) => <option data-order={i} value={item.typeId}>{item.typeName}</option>);
         }
         if (this.state.classificationResponse !== null) {
             listClassificationJson = this.state.classificationResponse.map((item, i) =>

@@ -34,6 +34,18 @@ export function deleteRecordById(recordId) {
 }
 
 export function createRecord(state) {
+    let classpath = "";
+    if(state.classificationParentHistory.length >= 1) {
+        for(let i = 1; state.classificationParentHistory.length > i; i++) {
+            if(i===1) {
+                classpath += state.classificationParentHistory[i];
+
+            }
+            else {
+                classpath += "/" + state.classificationParentHistory[i];
+            }
+        }
+    }
     return fetch(serviceRoot + '/record?userId=' + userId, {
         method: 'POST',
         headers: {
@@ -48,7 +60,7 @@ export function createRecord(state) {
             consignmentCode: state.consignmentCode,
             containerId: state.container,
             locationId: "5",
-            classifications: "PROJECT MANAGEMENT/Budgets and Schedules",
+            classifications: classpath,
             notes: state.notes,
         })
     })
