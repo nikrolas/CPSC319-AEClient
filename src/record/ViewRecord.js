@@ -11,28 +11,29 @@ class ViewRecord extends Component {
         super(props, context);
         this.state =
             {
+
                 alertMsg:"",
                 recordJson: {
-                    Id: "",
-                    Number: "",
-                    title: "",
-                    ScheduleId: "",
-                    TypeId: "",
-                    ConsignmentCode: "",
-                    StateId: "",
-                    ContainerId: "",
-                    LocationId: "",
-                    createdAt: "",
-                    updatedAt: "",
-                    closedAt: "",
-                    ClassificationIds: "",
-                    state: "",
-                    location: "",
-                    type: "",
-                    consignmentCode: "",
-                    schedule: "",
-                    scheduleYear: "",
-                    Notes: ""
+                    title:"",
+                    number:"",
+                    scheduleId:"",
+                    typeId:"",
+                    consignmentCode:"",
+                    containerId:"",
+                    locationId:"",
+                    classifications:"",
+                    notes:"",
+                    id:"",
+                    stateId:"",
+                    createdAt:"",
+                    updatedAt:"",
+                    closedAt:"",
+                    location:"",
+                    schedule:"",
+                    type:"",
+                    state:"",
+                    container:"",
+                    scheduleYear:""
                 },
             };
         this.handleChange = this.handleChange.bind(this);
@@ -141,8 +142,8 @@ class ViewRecord extends Component {
                             <p style ={title}>
                                 <b>Classification</b>
                                 <br/>
-                                {/*TODO*/}
-                                To Be Completed
+                                {this.state.recordJson["classifications"]}
+
                             </p>
                             <p style ={title}>
                                 <b>Consignment Code</b>
