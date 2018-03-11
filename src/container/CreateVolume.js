@@ -245,7 +245,7 @@ let styles = {
     },
 };
 
-let mockData = [
+/*let mockData = [
     {
         "title": "Pfeffer, Haag and Kihn - Et commodi at - Voluptatem consequuntur et ut sapiente dolor",
         "number": "20073454.00.P.01.00:01",
@@ -359,6 +359,6 @@ let mockData2 = [
         "container": "2008/259-EDM",
         "scheduleYear": 15
     },
-    ];
+    ];*/
 
 export default CreateVolume;
