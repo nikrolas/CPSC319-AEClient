@@ -47,7 +47,16 @@ class NavigationBar extends Component {
                 return volume.startsWith("0");
             else return true;
         }
-        return false
+        else if (this.state.records > 1){
+            let first = this.props.resultsData[this.props.selectedItemIndexes[0]].number.split(":")[0];
+            for (let i of this.props.selectedItemIndexes) {
+                if (this.props.resultsData[i].number &&
+                    this.props.resultsData[i].number.split(":")[0] !== first)
+                    return false;
+            }
+            return true;
+        }
+        else return false;
     };
 
     render() {
