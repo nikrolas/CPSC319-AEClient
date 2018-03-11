@@ -93,7 +93,7 @@ class ViewRecord extends Component {
         };
         let btnStyle = {
             display:"flex",
-            justifyContent:"center"
+            justifyContent:"left"
         };
 
         return (
@@ -102,23 +102,14 @@ class ViewRecord extends Component {
                     ?<Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
                     :null
                 }
-                <h1>{this.state.recordJson["number"]}</h1>
-                <ButtonToolbar style = {btnStyle}>
-                <Link to={updateRecordLink}>
-                    <Button  bsStyle="primary"> Edit Record </Button>
-                </Link>
-                    <Confirm
-                        onConfirm={this.handleSubmit}
-                        body="Are you sure you want to delete this?"
-                        confirmText="Confirm Delete"
-                        title="Deleting Record">
-                        <Button bsStyle="danger">Delete Record</Button>
-                    </Confirm>
-                </ButtonToolbar>
-                <br/><br/>
                 <Grid>
                     <Row>
-                        <Col md={4} mdOffset={3}>
+                        <Col md={10} mdOffset={2}>
+                        <h1 style = {title}>{this.state.recordJson["number"]}</h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={4} mdOffset={2}>
                             <p style ={title}>
                                 <b>Title</b>
                                 <br/>
@@ -173,12 +164,28 @@ class ViewRecord extends Component {
                                 {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
                             </p>
                         </Col>
-                        <Col md={9} mdOffset={3}>
+                        <Col md={9} mdOffset={2}>
                             <p style ={title}>
                                 <b>Note</b>
                                 <br/>
                                 {this.state.recordJson["Notes"]}
                             </p>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={10} mdOffset={2}>
+                        <ButtonToolbar style = {btnStyle}>
+                            <Link to={updateRecordLink}>
+                                <Button  bsStyle="primary"> Edit Record </Button>
+                            </Link>
+                            <Confirm
+                                onConfirm={this.handleSubmit}
+                                body="Are you sure you want to delete this?"
+                                confirmText="Confirm Delete"
+                                title="Deleting Record">
+                                <Button bsStyle="danger">Delete Record</Button>
+                            </Confirm>
+                        </ButtonToolbar>
                         </Col>
                     </Row>
                 </Grid>
