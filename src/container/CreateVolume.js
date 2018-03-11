@@ -35,7 +35,7 @@ class CreateVolume extends Component {
             .then(data => {
                 //console.log(JSON.stringify(data));
                 if (data && data.length > 0) {
-                    data.sort((a,b) => a.number > b.number);
+                    data.sort((a,b) => this.naturalCompare(a.number,b.number));
                     let numbers = [];
                     data.forEach((volume) => {
                         numbers.push(volume.number);
@@ -58,6 +58,22 @@ class CreateVolume extends Component {
         let notes = data[data.length-1].notes;
         this.setState({volumes: data, numbers, notes});*/
 
+    };
+
+    naturalCompare = (a, b) => {
+        let ax = [], bx = [];
+
+        a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) });
+        b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) });
+
+        while(ax.length && bx.length) {
+            let an = ax.shift();
+            let bn = bx.shift();
+            let nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
+            if(nn) return nn;
+        }
+
+        return ax.length - bx.length;
     };
 
     getSelectedRecord = (record, selection) => {
