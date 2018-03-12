@@ -67,7 +67,7 @@ class CreateContainer extends Component {
         });
         formData.selectedRecords = selectedRecordIds;
 
-        createContainer(formData, 5).then(response => {
+        createContainer(formData).then(response => {
             return response.json();
         }).then(data => {
             this.setState({success: false});

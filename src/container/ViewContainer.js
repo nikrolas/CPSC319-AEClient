@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import {Confirm} from 'react-confirm-bootstrap'
-import {getContainerById} from "../APIs/ContainersApi";
+import {deleteContainers, getContainerById} from "../APIs/ContainersApi";
 import {getRecordById} from "../APIs/RecordsApi";
 import ReactTable from "react-table";
 import {getColumns, setData} from "../Utilities/ReactTable";
@@ -117,6 +117,17 @@ class ViewContainer extends Component {
     }
 
     handleSubmit() {
+        deleteContainers(this.props.match.params.containerId)
+            .then(response => {
+                if(response.status !== 200) {
+                    this.setState({alertMsg: response.message});
+                    window.scrollTo(0, 0)
+                }
+                else {
+                    this.props.history.goBack();
+                }
+            })
+            .catch(error => console.log('error============:', error));
     }
 
     render() {
