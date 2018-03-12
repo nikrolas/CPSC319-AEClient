@@ -16,7 +16,7 @@ export function createContainer(data) {
 }
 
 export function deleteContainers(ids) {
-    let path = serviceRoot + containersPath + "?ids=" + ids + "&" + "userId=" + userId;
+    let path = serviceRoot + containersPath + "?ids=" + ids + "&userId=" + userId;
     return fetch(path, {
         method: 'delete'
     });
