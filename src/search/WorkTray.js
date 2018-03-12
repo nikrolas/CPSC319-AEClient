@@ -3,6 +3,8 @@ import ReactTable from 'react-table';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
+import {getColumns} from "../Utilities/ReactTable";
+import {resultsAccessors} from "./Results";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class WorkTray extends Component {
@@ -32,7 +34,7 @@ class WorkTray extends Component {
                     ...item,
                 }
             });
-            const columns = this.getColumns(data);
+            const columns = this.getWorkTrayColumns();
             this.setState({data, columns}, () => {
                 this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
             });
@@ -42,63 +44,16 @@ class WorkTray extends Component {
         this.state.onItemSelectCallback([]);
     }
 
-    getColumns = (data) => {
-        const columns = [];
-        if (!data || data.length < 1) {
-            return columns;
-        }
-        let first = data[0];
-        let last = data.slice(-1)[0];
-        let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
-        Array.from(keyset).forEach((key) => {
-            if (key !== '_id') {
-                switch (key) {
-                    case 'number': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.row._original.id, 'record')
-                            }}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'container': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.row._original.containerId, 'container')
-                            }}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'title':
-                    case 'type':
-                    case 'state':
-                    case 'location':
-                    case 'scheduleYear':
-                    case 'consignmentCode': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                        });
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-        });
-        let delbtn = {
-            backgroundColor: '#ff6c60',
-            borderColor: '#ff6c60',
-            color: '#FFFFFF'
-        };
+    getWorkTrayColumns = () => {
+        const columns = getColumns(this, resultsAccessors);
         columns.push({
-            Header: '',
-            id: 'xbutton',
-            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={delbtn}><i className="fa fa-trash-o"/></button>
+            Header: <button className="btn btn-xs"
+                            onClick={this.deleteAll}
+                            onMouseOver={(e) => {e.target.style.backgroundColor = '#ff9c81'}}
+                            onMouseLeave={(e) => {e.target.style.backgroundColor = 'white'}}
+                            style={styles.clearbtn}>Clear All</button>,
+            sortable: false,
+            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
         });
         return columns;
     };
@@ -150,6 +105,14 @@ class WorkTray extends Component {
         stored.splice(index, 1);
         sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(stored));
         //console.log(JSON.stringify(stored));
+    };
+
+    deleteAll = () => {
+        sessionStorage.removeItem("tray"+this.state.userId);
+        this.setState({data: [], columns: [], selection: [], selectAll: false}, () => {
+            this.state.onItemSelectCallback(this.state.selection);
+            this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
+        });
     };
 
     getRecordsFromRowIds = (rowIds) => {
@@ -209,17 +172,11 @@ class WorkTray extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        let container = {
-            padding: '5%'
-        };
-        let tablestyle = {
-            //border: '5px solid gray'
-            marginTop: '5%',
-        };
         return (
-            <div style={container}>
+            <div style={styles.container}>
                 <h1>Work Tray</h1>
-                <div style={tablestyle}>
+                <div style={styles.btncontainer}></div>
+                <div style={styles.tablestyle}>
                     <CheckboxTable
                         ref={(r)=>this.checkboxTable=r}
                         data={data}
@@ -234,5 +191,31 @@ class WorkTray extends Component {
         );
     }
 }
+
+let styles = {
+    container: {
+        padding: '5%'
+    },
+    tablestyle: {
+        //border: '5px solid gray'
+        marginTop: '5px',
+    },
+
+    delbtn: {
+        backgroundColor: '#ff6c60',
+        borderColor: '#ff6c60',
+        color: 'white'
+    },
+    btncontainer: {
+        //border: '2px solid blue',
+        alignItems: 'center',
+        height: '1cm'
+    },
+    clearbtn: {
+        //backgroundColor: '#ff9c81',
+        backgroundColor: 'white',
+        borderColor: '#ff9c81',
+    },
+};
 
 export default WorkTray;

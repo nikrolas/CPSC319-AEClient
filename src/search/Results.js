@@ -5,8 +5,10 @@ import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getRecordsByNumber} from "../APIs/RecordsApi";
 import Search from "./Search";
+import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
 
 const CheckboxTable = checkboxHOC(ReactTable);
+
 function getMockContainers() {
     return [
         {
@@ -32,6 +34,8 @@ function getMockContainers() {
     ];
 }
 
+export const resultsAccessors = ["number", "title", "type", "state", "location", "container", "consignmentCode", "schedule"];
+
 class SelectTable extends Component {
     constructor(props) {
         super(props);
@@ -43,7 +47,8 @@ class SelectTable extends Component {
             selection: [],
             selectAll: false,
             tray: [],
-            selectvalue: 'all',
+            addbtntext: 'Add to Tray',
+            selectvalue: 'none',
             userId: '5',
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
@@ -71,6 +76,13 @@ class SelectTable extends Component {
         this.state.onItemSelectCallback([]);
     }
 
+    tableDataAndSelectionCallback = () => {
+        this.state.onItemSelectCallback(this.state.selection);
+        this.state.onDataUpdateCallback(this.state.data, this.state.columns);
+    };
+
+
+
     search = (searchString) => {
         getRecordsByNumber(searchString)
             .then(response => {
@@ -83,9 +95,10 @@ class SelectTable extends Component {
                     let rdata = data;
                     let cdata = getMockContainers();
                     this.setState({rdata, cdata});
-                    this.setData(rdata.concat(cdata));
+                    let columns = getColumns(this, resultsAccessors);
+                    setData(this, rdata.concat(cdata), columns, this.tableDataAndSelectionCallback);
                 } else {
-                    this.setTableState([], []);
+                    setTableState(this, [], [], this.tableDataAndSelectionCallback);
                 }
             })
             .catch(err => {
@@ -93,104 +106,10 @@ class SelectTable extends Component {
             });
     };
 
-    setTableState = (data, columns) => {
-        this.setState({
-            data: data,
-            columns: columns,
-            selectAll: false,
-            selection: []
-        }, () => {
-            this.state.onItemSelectCallback(this.state.selection);
-            this.state.onDataUpdateCallback(this.state.data, this.state.columns);
-        });
-    };
-
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
         if (searchString !== this.props.match.params.searchString) {
             this.search(searchString);
-        }
-    };
-
-
-    setData = (data) => {
-        const rowdata = data.map((item, index) => {
-            /*let keys = Object.keys(item);
-            keys.forEach(key => {
-                if (key.endsWith("At")) {
-                    item[key] = new Date(item[key]).toTimeString();
-                }
-            });*/
-
-            const _id = index;
-            return {
-                _id,
-                ...item,
-            }
-        });
-        const columns = this.getColumns(rowdata);
-        this.setTableState(rowdata, columns);
-    };
-
-    getColumns = (data) => {
-        const columns = [];
-        let first = data[0];
-        let last = data.slice(-1)[0];
-        let keyset = new Set(Object.keys(first).concat(Object.keys(last))); //removes duplicates
-        Array.from(keyset).forEach((key) => {
-            if (key !== '_id') {
-                switch (key) {
-                    case 'number': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.row._original.id, 'record')
-                            }}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'container': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                            Cell: e => <a onClick={() => {
-                                this.handleClick(key, e.row._original.containerId, 'container')
-                            }}> {e.value} </a>
-                        });
-                        break;
-                    }
-                    case 'title':
-                    case 'type':
-                    case 'state':
-                    case 'location':
-                    case 'scheduleYear':
-                    case 'consignmentCode': {
-                        columns.push({
-                            accessor: key,
-                            Header: key,
-                        });
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-        });
-        return columns;
-    };
-
-    handleClick = (key, id, type) => {
-        let subPath = "";
-        if (type === 'record') {
-            subPath = "/viewRecord/";
-        } else if (type === 'container') {
-            subPath = "/viewContainer/";
-        }
-
-        if (subPath.length > 0) {
-            let routePath = subPath + id;
-            this.props.history.push(routePath);
         }
     };
 
@@ -249,10 +168,32 @@ class SelectTable extends Component {
             }
         });
         if (updated) {
-            this.setState({tray});
+            this.setState({tray, addbtntext: 'Success'});
             //console.log("tray after: "+JSON.stringify(this.state.tray));
             sessionStorage.setItem("tray" + this.state.userId, JSON.stringify(tray));
             //console.log(sessionStorage.getItem("tray"+this.state.userId));
+            setTimeout(() => {
+                this.setState({addbtntext: 'Add to Tray'});
+            }, 700);
+        }
+        else {
+            this.setState({addbtntext: 'Added'});
+            setTimeout(() => {
+                this.setState({addbtntext: 'Add to Tray'});
+            }, 700);
+        }
+    };
+    addStyle = () => {
+        switch (this.state.addbtntext) {
+            default: {
+                return styles.addbtn;
+            }
+            case 'Success': {
+                return styles.addbtn2;
+            }
+            case 'Added': {
+                return styles.addbtn3;
+            }
         }
     };
 
@@ -262,15 +203,15 @@ class SelectTable extends Component {
         });
         switch (e.target.value) {
             case 'records': {
-                this.setData(this.state.rdata);
+                setData(this, this.state.rdata, this.state.columns);
                 break;
             }
             case 'containers': {
-                this.setData(this.state.cdata);
+                setData(this, this.state.cdata, this.state.columns);
                 break;
             }
             default: {
-                this.setData(this.state.rdata.concat(this.state.cdata));
+                setData(this, this.state.rdata.concat(this.state.cdata), this.state.columns);
                 break;
             }
         }
@@ -286,42 +227,24 @@ class SelectTable extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        let container = {
-            padding: '5%'
-        };
-        let tablestyle = {
-            //border: '5px solid gray'
-            marginTop: '10px',
-        };
-        let btncontainer = {
-            //border: '2px solid blue',
-            alignItems: 'center',
-            height: '1cm'
-        };
-        let addbtn = {
-            float: 'left',
-            backgroundColor: '#b5ff87',
-            borderColor: '#FFFFFF',
-        };
-        let sel = {
-            marginLeft: '1cm',
-            float: 'left',
-            height: '85%',
-        };
         return (
-            <div style={container}>
+            <div style={styles.container}>
                 <div style={{marginBottom: '1cm'}}>
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
-                <div style={btncontainer}>
-                    <button style={addbtn} className='btn btn-s' onClick={updateTray}>Add to Tray</button>
-                    <select onChange={this.handleSelectChange} style={sel}>
-                        <option value='all' selected>All</option>
-                        <option value='records'>Records</option>
-                        <option value='containers'>Containers</option>
-                    </select>
+                <div style={styles.btncontainer}>
+                    <button className='btn btn-s' style={this.addStyle()}
+                            onClick={updateTray}>{this.state.addbtntext}</button>
+                    <div style={styles.filter}>
+                        <h4 style={{float: 'left'}}>Filter:</h4>
+                        <select onChange={this.handleSelectChange} style={styles.sel}>
+                            <option value='none' selected>None</option>
+                            <option value='records'>Records</option>
+                            <option value='containers'>Containers</option>
+                        </select>
+                    </div>
                 </div>
-                <div style={tablestyle}>
+                <div style={styles.tablestyle}>
                     <CheckboxTable
                         ref={(r) => this.checkboxTable = r}
                         data={data}
@@ -336,5 +259,47 @@ class SelectTable extends Component {
         );
     }
 }
+
+let styles = {
+    container: {
+        padding: '5%'
+    },
+    tablestyle: {
+        //border: '5px solid gray'
+        marginTop: '5px',
+    },
+    btncontainer: {
+        //border: '2px solid blue',
+        alignItems: 'center',
+        height: '1cm'
+    },
+    addbtn: {
+        float: 'left',
+        width: '2.5cm',
+        backgroundColor: '#b5ff87',
+        borderColor: '#FFFFFF',
+    },
+    addbtn2: {
+        float: 'left',
+        width: '2.5cm',
+        backgroundColor: '#8bffec',
+    },
+    addbtn3: {
+        float: 'left',
+        width: '2.5cm',
+        backgroundColor: '#ff9c81',
+    },
+    filter: {
+        marginLeft: '0.5cm',
+        float: 'left',
+        height: '100%',
+    },
+    sel: {
+        marginLeft: '5px',
+        marginTop: '3px',
+        float: 'left',
+        height: '85%',
+    },
+};
 
 export default SelectTable;

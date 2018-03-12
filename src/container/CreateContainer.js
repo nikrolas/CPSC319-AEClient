@@ -28,7 +28,7 @@ class CreateContainer extends Component {
         //TODO: handle case when a container is also selected This component only handles records
         let selectedRecords = [];
         selection.forEach((index) => {
-            if (records[index].hasOwnProperty('number') && records[index].hasOwnProperty('id'))
+            if (records[index].hasOwnProperty('number'))
                 selectedRecords.push(records[index]);
         });
         return selectedRecords;
@@ -67,7 +67,7 @@ class CreateContainer extends Component {
         });
         formData.selectedRecords = selectedRecordIds;
 
-        createContainer(formData, 5).then(response => {
+        createContainer(formData).then(response => {
             return response.json();
         }).then(data => {
             this.setState({success: false});
@@ -89,22 +89,6 @@ class CreateContainer extends Component {
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
         const {selectedRecords, columns} = this.state;
 
-        const container = {
-            margin: "10px",
-        };
-
-        const recordsTable = {
-            height: "300px",
-            overflowY: "auto"
-        };
-
-        const formStyle = {
-            margin: 'auto',
-            width: '50%',
-            padding: '10px',
-            textAlign: 'left'
-        };
-
         return (
             <div>
                 {this.state.alertMsg.length !== 0 && !this.state.success
@@ -118,7 +102,7 @@ class CreateContainer extends Component {
                 <h1>New Container</h1>
                 <b>Due for destruction</b>
                 <div>{destructionDate}</div>
-                <form onSubmit={this.handleSubmit} style={formStyle}>
+                <form onSubmit={this.handleSubmit} style={styles.formStyle}>
                     <FormGroup
                         validationState={this.getValidationState()}
                     >
@@ -152,16 +136,16 @@ class CreateContainer extends Component {
                     <Button type="submit">Cancel</Button>
                     <Button type="submit">Submit</Button>
                 </form>
-                <div style={container}>
+                <div style={styles.container}>
                     <strong>Records to contain:</strong>
-                    <div style={recordsTable}>
+                    <div style={styles.recordsTable}>
                         <ReactTable
                             data={selectedRecords}
                             columns={columns}
                             className="-striped -highlight"
-                            showPagination={false}
+                            showPagination={true}
                             minRows={5}
-                            defaultPageSize={selectedRecords.length}
+                            defaultPageSize={5}
                         />
                     </div>
                 </div>
@@ -169,5 +153,23 @@ class CreateContainer extends Component {
         )
     }
 }
+
+let styles = {
+    container: {
+        margin: "10px",
+    },
+
+    recordsTable: {
+        height: "300px",
+        overflowY: "auto"
+    },
+
+    formStyle: {
+        margin: 'auto',
+        width: '50%',
+        padding: '10px',
+        textAlign: 'left'
+    },
+};
 
 export default CreateContainer;

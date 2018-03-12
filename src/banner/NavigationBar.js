@@ -49,15 +49,15 @@ class NavigationBar extends Component {
                     <NavItem componentClass={Link} href="/results" to="/results">
                         Search
                     </NavItem>
+                    <NavItem componentClass={Link} href="/worktray" to="/worktray">
+                        Work Tray
+                    </NavItem>
                     <NavItem componentClass={Link} href="/createRecord" to="/createRecord">
                         New Record
                     </NavItem>
                     <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
                              to="/createContainer">
                         Contain Records
-                    </NavItem>;
-                    <NavItem componentClass={Link} href="/worktray" to="/worktray">
-                        Work Tray
                     </NavItem>
                 </Nav>
             </Navbar>
