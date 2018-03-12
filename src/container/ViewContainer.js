@@ -120,7 +120,8 @@ class ViewContainer extends Component {
         deleteContainers(this.props.match.params.containerId)
             .then(response => {
                 if(response.status !== 200) {
-                    this.setState({alertMsg: response.message});
+                    console.log(response);
+                    this.setState({alertMsg: response.statusText + ": Container must be empty."});
                     window.scrollTo(0, 0)
                 }
                 else {
