@@ -84,8 +84,8 @@ let styles = {
         padding: '6px',
         backgroundColor: 'white',
         border: 'white',
-        'background-image': 'none',
-        'box-shadow': 'none'
+        backgroundImage: 'none',
+        boxShadow: 'none'
     },
     submiticon: {
         fontSize: '25px',
