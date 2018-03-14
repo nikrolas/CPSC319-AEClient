@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, ButtonGroup, HelpBlock, Alert} from 'react-bootstrap'
-import {createRecord, getClassifications, getRecordType,getRetentionSchedule} from "../APIs/RecordsApi";
+import {createRecord, getClassifications, getRecordType,getRetentionSchedule, getUser} from "../APIs/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
 
 class CreateRecord extends Component {
@@ -10,6 +10,9 @@ class CreateRecord extends Component {
         this.state =
             {
                 alertMsg:"",
+
+                userLocations:null,
+
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
                 recordType: null,
@@ -95,6 +98,15 @@ class CreateRecord extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({retentionScheduleResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getUser(500)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({userLocations: data.locations});
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
@@ -349,6 +361,7 @@ class CreateRecord extends Component {
         let listRecordTypeJson = null;
         let listClassificationJson = null;
         let retentionForm = null;
+        let listLocationJson = null;
         let classificationPath = "";
         if (this.state.recordTypeResponse !== null) {
             listRecordTypeJson = this.state.recordTypeResponse.map((item, i) => <option data-order={i} value={item.typeId}>{item.typeName}</option>);
@@ -356,6 +369,10 @@ class CreateRecord extends Component {
         if (this.state.classificationResponse !== null) {
             listClassificationJson = this.state.classificationResponse.map((item, i) =>
                 <option key={i} value={item.id}>{item.name}</option>);
+        }
+        if (this.state.userLocations !== null) {
+            listLocationJson = this.state.userLocations.map((item, i) =>
+                <option key={i} value={item.id}>{item.locationName}</option>);
         }
         if (this.state.retentionScheduleResponse !== null) {
             retentionForm =
@@ -377,9 +394,6 @@ class CreateRecord extends Component {
             }
         }
 
-
-        const listLocationJson = this.state.locationJson.map((item, i) => <option key={i}
-                                                                                  value={i}>{item.location}</option>);
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
 
         let formStyle = {
