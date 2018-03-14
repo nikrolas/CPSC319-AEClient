@@ -163,12 +163,27 @@ class CreateRecord extends Component {
                         .then(response => response.json())
                         .then(data => {
                             if(data.length >0) {
-                                this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
-                                this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
-                                this.state.classificationBack.push(this.state.classification);
-                                document.getElementById("formClassification").value = "0";
-                                this.setState({classificationResponse: data});
+                                if (this.state.classificationAtLeaf) {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                else {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.state.classificationBack.push(this.state.classification);
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                this.setState({classificationValidationState:null});
                                 this.setState({classificationAtLeaf:false});
+
                             }
                             else {
                                 if(!this.state.classificationAtLeaf) {
@@ -331,9 +346,10 @@ class CreateRecord extends Component {
     }
 
     render() {
-        var listRecordTypeJson = null;
-        var listClassificationJson = null;
-        var retentionForm = null;
+        let listRecordTypeJson = null;
+        let listClassificationJson = null;
+        let retentionForm = null;
+        let classificationPath = "";
         if (this.state.recordTypeResponse !== null) {
             listRecordTypeJson = this.state.recordTypeResponse.map((item, i) => <option data-order={i} value={item.typeId}>{item.typeName}</option>);
         }
@@ -348,6 +364,17 @@ class CreateRecord extends Component {
                     labelKey={option => `${option.name} ${option.code.trim()}`}
                 options={this.state.retentionScheduleResponse}
                 placeholder="Choose a state..."/>
+        }
+        if (this.state.classificationParentHistory.length > 1) {
+            for(let i = 1; this.state.classificationParentHistory.length > i; i++) {
+                if(i===1) {
+                    classificationPath += this.state.classificationParentHistory[i];
+
+                }
+                else {
+                    classificationPath += "/" + this.state.classificationParentHistory[i];
+                }
+            }
         }
 
 
@@ -449,7 +476,7 @@ class CreateRecord extends Component {
                         onChange={this.handleChange}
                         validationState={this.state.classificationValidationState}
                     >
-                        <ControlLabel>Classification {requiredLabel}</ControlLabel>
+                        <ControlLabel>Classification {requiredLabel} <br/> {classificationPath} </ControlLabel>
                         <FormControl name="classification"
                                      componentClass="select"
                                      placeholder="select"
