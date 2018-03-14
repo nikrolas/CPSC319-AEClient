@@ -65,7 +65,7 @@ let styles = {
         marginTop: '8px',
         marginLeft: '10px',
         fontSize: '20px',
-        color: '#00569c',
+        color: '#2f8bff',
         opacity: '0.7',
     },
     searchbox: {
@@ -74,7 +74,6 @@ let styles = {
         paddingLeft: '1cm',
         paddingRight: '0.5cm',
         fontSize: '15px',
-        border: '1px solid grey'
     },
     submitbtn: {
         float: 'right',
@@ -82,16 +81,15 @@ let styles = {
         width: '1.2cm',
         height: '100%',
         padding: '6px',
-        backgroundColor: 'white',
+        //backgroundColor: 'white',
         border: 'white',
-        backgroundImage: 'none',
-        boxShadow: 'none'
+        //backgroundImage: 'none',
     },
     submiticon: {
         fontSize: '25px',
         transform: 'scale(1.5, 1.5)',
         fill: 'rgba(87,180,49, 0)',
-        color: '#57b431'
+        color: '#79ff46'
     },
 };
 

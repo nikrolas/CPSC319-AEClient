@@ -5,7 +5,7 @@ import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
 import UpdateRecord from './record/UpdateRecord';
 import CreateContainer from "./container/CreateContainer";
-import CreateVolume from "./container/CreateVolume";
+import CreateVolume from "./volume/CreateVolume";
 import SelectTable from "./search/Results";
 import WorkTray from "./search/WorkTray";
 import Home from "./search/Home";

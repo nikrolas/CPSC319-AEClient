@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {Button, Alert} from 'react-bootstrap';
 import {createVolume, getRecordsByNumber} from "../APIs/RecordsApi";
+import {MdCreateNewFolder} from 'react-icons/lib/md';
 
 class CreateVolume extends Component {
 
-    constructor(props, context) {
-        super(props, context);
+    constructor(props) {
+        super(props);
         this.state =
             {
                 success: false,
@@ -18,9 +19,12 @@ class CreateVolume extends Component {
                 volumes: [],
                 numbers: [],
             };
-
+        this.handleCancel = this.handleCancel.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
+    static contextTypes = {
+        router: () => true,
+    };
 
     componentWillMount() {
         if (this.state.selectedRecord)
@@ -48,16 +52,6 @@ class CreateVolume extends Component {
             .catch(err => {
                 console.error("Error loading search results: " + err.message);
             });
-
-        /*let data = mockData2;
-        data.sort((a,b) => a.number > b.number);
-        let numbers = [];
-        data.forEach((volume) => {
-            numbers.push(volume.number);
-        });
-        let notes = data[data.length-1].notes;
-        this.setState({volumes: data, numbers, notes});*/
-
     };
 
     naturalCompare = (a, b) => {
@@ -88,32 +82,44 @@ class CreateVolume extends Component {
         return ["Burnaby", "Vancouver", "Richmond"];
     };
 
-    getValidationState() {};
+    handleCancel(event) {
+        this.setState({
+            success: false,
+            alertMsg: "Cancelled",
+            notes: "",
+            copy: false,
+            selectedRecord: null,
+            volumes: [],
+            numbers: [],
+        });
+        setTimeout(() => {
+            this.context.router.history.goBack();
+        }, 3000);
+
+        event.preventDefault();
+    }
 
     handleSubmit(event) {
-        let {volumes, numbers, copy} = this.state;
+        let {volumes, copy} = this.state;
 
         let latest = volumes[volumes.length - 1];
-        let form = Object.assign({}, latest);
-        form.number = this.newVolNum(numbers.length);
-        form['copyNotes'] = copy;
-
-        createVolume(form)
-            .then(data => {
-                this.setState({success: false});
-                this.setState({alertMsg: "Endpoint not implemented."});
-                window.scrollTo(0, 0)
-            }).catch(err => {
-            this.setState({success: false});
-            this.setState({alertMsg: "Endpoint not implemented."});
-            window.scrollTo(0, 0)
-        });
-
-        /*.then(response => {
+        let id = null;
+        if (latest) {
+            id = latest.id;
+        }
+        createVolume(id, copy)
+        .then(response => {
+            //console.log(response);
             return response.json();
         })
         .then(data => {
-            if(data.status === 500) {
+            if (data.error) {
+                let msg = data.status + ": " + data.error;
+                this.setState({alertMsg: msg});
+                window.scrollTo(0, 0)
+            }
+            else if(data.status !== 200) {
+                //console.log(JSON.stringify(data));
                 this.setState({alertMsg: data.message});
                 window.scrollTo(0, 0)
             }
@@ -124,17 +130,17 @@ class CreateVolume extends Component {
         .catch(error => {
             this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
             window.scrollTo(0, 0)
-        });*/
+        });
+
         event.preventDefault();
     }
 
     displayVolumes = () => {
-        if (this.state.volumes.length < 1)
-            return;
-
-        let display = this.state.numbers.map((number, index) => {
+        if (this.state.volumes.length > 0)
+        return this.state.numbers.map((number, index) => {
             if (index === 0 && !number.includes(":")) {
-                return <li style={{fontSize: '25px'}}>
+                return <li key={index} style={{fontSize: '25px'}}>
+                    <span style={{color: '#79ff46'}}>UPDATE:&ensp;</span>
                     {number}
                     <i className="fa fa-long-arrow-right" style={styles.arrow}/>
                     {this.newVolNum(0)}
@@ -142,16 +148,17 @@ class CreateVolume extends Component {
             }
             else return <li style={{fontSize: '25px'}}> {number} </li>
         });
-        display.push(
-            <li style={{fontSize: '25px'}}>
-                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-                <i className="material-icons" style={styles.add}>create_new_folder</i>
-                {this.newVolNum(this.state.numbers.length)}
-            </li>
-        );
-        return display;
     };
-
+    displayNew = () => {
+        if (this.state.volumes.length > 0)
+            return <li style={{fontSize: '25px', listStyle: 'none'}}>
+                <MdCreateNewFolder style={styles.add}/>
+                    <span style={{color: '#2f8bff'}}>
+                        NEW:&ensp;
+                    </span>
+                    {this.newVolNum(this.state.numbers.length)}
+                </li>
+    };
     newVolNum = (i) => {
         let numbers = this.state.numbers;
         let arr = [];
@@ -171,16 +178,12 @@ class CreateVolume extends Component {
     };
 
     render() {
-        /*const listLocationsJson = this.state.locations.map((item, i) =>
-            <option key={i} value={item}>{item}</option>);
-        const destructionDate = <div>{this.state.destructionDate}</div>;
-        const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;*/
         const {notes} = this.state;
 
         return (
             <div style={styles.container}>
                 {this.state.alertMsg.length !== 0 && !this.state.success
-                    ? <Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    ? <Alert bsStyle="danger"><h4 style={{fontSize: '25px'}}>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
                 {this.state.alertMsg.length !== 0 && this.state.success
@@ -188,30 +191,30 @@ class CreateVolume extends Component {
                     : null
                 }
 
-                <h2>New Volume</h2>
-                <form onSubmit={this.handleSubmit} style={styles.form}>
+                <h1>New Volume</h1>
+                <div style={styles.form}>
                     <ul className="list-group" style={styles.list}>
                         {this.displayVolumes()}
                     </ul>
+                    {this.displayNew()}
                     <div className="checkbox" style={styles.checkwrap}>
                         <div>
                             <label style={{fontSize: '15px'}}>
                                 <input type="checkbox" style={{transform: 'scale(1.2,1.2)'}}
                                        checked={this.state.copy}
                                        onChange={(e) => this.setState({copy: e.target.checked})}/>
-                                Copy Notes to New Volume:
+                                Copy notes from last volume:
                             </label>
                         </div>
                         <textarea readonly="true" style={styles.notes}>{notes !== "" ? notes : null}</textarea>
                     </div>
                     <div>
-                        <Button type="submit">Cancel</Button>
-                        <Button type="submit">Submit</Button>
+                        <Button className='btn btn-danger' onClick={this.handleCancel}>Cancel</Button>
+                        &ensp;
+                        <Button className='btn btn-primary' onClick={this.handleSubmit}>Submit</Button>
                     </div>
-                </form>
-                {/*<h6>{JSON.stringify(this.state.copy)}</h6>
-                <h6>{JSON.stringify(this.state.numbers)}</h6>
-                <h6>{JSON.stringify(this.newVolNum(this.state.numbers.length))}</h6>*/}
+                </div>
+                {JSON.stringify(this.props.prevPath)}
             </div>
         )
     }
@@ -232,7 +235,7 @@ let styles = {
     list: {
         fontSize: '25px',
         listStyle: 'none',
-        maxHeight: '10cm',
+        maxHeight: '8cm',
         overflowY: 'auto',
     },
     arrow: {
@@ -244,8 +247,9 @@ let styles = {
     },
     add: {
         fontSize: '20px',
-        transform: 'scale(1.5, 1.5)',
-        marginRight: '0.5cm',
+        transform: 'scale(1.55, 1.45)',
+        verticalAlign: 'baseline',
+        marginRight: '10px',
         color: '#2f8bff',
     },
     notes: {
@@ -259,121 +263,5 @@ let styles = {
         //border: '2px solid blue',
     },
 };
-
-/*let mockData = [
-    {
-        "title": "Pfeffer, Haag and Kihn - Et commodi at - Voluptatem consequuntur et ut sapiente dolor",
-        "number": "20073454.00.P.01.00:01",
-        "scheduleId": 638,
-        "typeId": 83,
-        "consignmentCode": "507202590",
-        "containerId": 45719,
-        "locationId": 5,
-        "classifications": "PROJECT MANAGEMENT/ENGINEERING AGREEMENTS",
-        "notes": "",
-        "id": 31865,
-        "stateId": 4,
-        "createdAt": 1192147200000,
-        "updatedAt": 1233100800000,
-        "closedAt": 1224460800000,
-        "location": "Edmonton",
-        "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-        "type": "Project",
-        "state": "Archived - Interim",
-        "container": "2008/259-EDM",
-        "scheduleYear": 15
-    },
-    {
-        "title": "Frami Group - Sed soluta ut vitae quia omnis",
-        "number": "20073454.00.P.01.00:02",
-        "scheduleId": 638,
-        "typeId": 83,
-        "consignmentCode": "507202590",
-        "containerId": 45719,
-        "locationId": 5,
-        "classifications": "PROJECT MANAGEMENT/ENGINEERING AGREEMENTS/Project Initiation and Closure",
-        "notes": "",
-        "id": 31866,
-        "stateId": 4,
-        "createdAt": 1192147200000,
-        "updatedAt": 1233100800000,
-        "closedAt": 1224460800000,
-        "location": "Edmonton",
-        "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-        "type": "Project",
-        "state": "Archived - Interim",
-        "container": "2008/259-EDM",
-        "scheduleYear": 15
-    },
-    {
-        "title": "Orn - Wuckert - Vitae nesciunt dolor ea ea quia",
-        "number": "20073454.00.P.01.00:04",
-        "scheduleId": 638,
-        "typeId": 83,
-        "consignmentCode": "507202590",
-        "containerId": 45719,
-        "locationId": 5,
-        "classifications": "CONSTRUCTION SERVICES/CONSTRUCTION INSPECTION",
-        "notes": "notes from 20073454.00.P.01.00:04",
-        "id": 31868,
-        "stateId": 4,
-        "createdAt": 1192147200000,
-        "updatedAt": 1233100800000,
-        "closedAt": 1224460800000,
-        "location": "Edmonton",
-        "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-        "type": "Project",
-        "state": "Archived - Interim",
-        "container": "2008/259-EDM",
-        "scheduleYear": 15
-    },
-    {
-        "title": "Block and Sons - Dolore et debitis - Ex quos ut quasi",
-        "number": "20073454.00.P.01.00:03",
-        "scheduleId": 638,
-        "typeId": 83,
-        "consignmentCode": "507202590",
-        "containerId": 45719,
-        "locationId": 5,
-        "classifications": "PROJECT MANAGEMENT/INVOICING AND REPORTING",
-        "notes": "",
-        "id": 31867,
-        "stateId": 4,
-        "createdAt": 1192147200000,
-        "updatedAt": 1233100800000,
-        "closedAt": 1224460800000,
-        "location": "Edmonton",
-        "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-        "type": "Project",
-        "state": "Archived - Interim",
-        "container": "2008/259-EDM",
-        "scheduleYear": 15
-    },
-];
-
-let mockData2 = [
-    {
-        "title": "Pfeffer, Haag and Kihn - Et commodi at - Voluptatem consequuntur et ut sapiente dolor",
-        "number": "20073454.00.P.01.00",
-        "scheduleId": 638,
-        "typeId": 83,
-        "consignmentCode": "507202590",
-        "containerId": 45719,
-        "locationId": 5,
-        "classifications": "PROJECT MANAGEMENT/ENGINEERING AGREEMENTS",
-        "notes": "notes from 20073454.00.P.01.00",
-        "id": 31865,
-        "stateId": 4,
-        "createdAt": 1192147200000,
-        "updatedAt": 1233100800000,
-        "closedAt": 1224460800000,
-        "location": "Edmonton",
-        "schedule": "PROJECT RECORDS WITH 15 YEAR RETENTION",
-        "type": "Project",
-        "state": "Archived - Interim",
-        "container": "2008/259-EDM",
-        "scheduleYear": 15
-    },
-    ];*/
 
 export default CreateVolume;

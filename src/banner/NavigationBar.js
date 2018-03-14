@@ -40,21 +40,26 @@ class NavigationBar extends Component {
     };
 
     enableCreateVolume = () => {
-        if (this.state.records === 1) {
-            let record = this.props.resultsData[this.props.selectedItemIndexes[0]];
-            let volume = record.number.split(":")[1];
-            if (volume)
-                return volume.startsWith("0");
-            else return true;
-        }
-        else if (this.state.records > 1){
-            let first = this.props.resultsData[this.props.selectedItemIndexes[0]].number.split(":")[0];
+        if (this.state.records >= 1 && this.state.containers === 0){
+            let i = 0;
+            for (let index of this.props.selectedItemIndexes) {
+                if (Number(this.props.resultsData[index].number.split(":")[1]) >= 10) {
+                    i = index;
+                    break;
+                }
+            }
+            let record = this.props.resultsData[i];
+            let arr = record.number.split(":");
+            let first = arr[0];
+            let volume = arr[1];
             for (let i of this.props.selectedItemIndexes) {
                 if (this.props.resultsData[i].number &&
                     this.props.resultsData[i].number.split(":")[0] !== first)
                     return false;
             }
-            return true;
+            if (volume)
+                return volume.startsWith("0") || (Number(volume) >= 10);
+            else return true;
         }
         else return false;
     };
