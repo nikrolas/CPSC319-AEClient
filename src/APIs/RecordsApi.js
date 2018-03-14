@@ -28,7 +28,7 @@ export function getClassifications(parentId = "") {
 }
 
 export function getUser(userId) {
-    return fetch(serviceRoot + "users/"+userId);
+    return fetch(serviceRoot + "/users/"+userId);
 }
 
 export function deleteRecordById(recordId) {
