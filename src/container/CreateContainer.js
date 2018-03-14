@@ -67,7 +67,7 @@ class CreateContainer extends Component {
         });
         formData.selectedRecords = selectedRecordIds;
 
-        createContainer(formData, 5).then(response => {
+        createContainer(formData).then(response => {
             return response.json();
         }).then(data => {
             this.setState({success: false});
@@ -143,9 +143,9 @@ class CreateContainer extends Component {
                             data={selectedRecords}
                             columns={columns}
                             className="-striped -highlight"
-                            showPagination={false}
+                            showPagination={true}
                             minRows={5}
-                            defaultPageSize={selectedRecords.length}
+                            defaultPageSize={5}
                         />
                     </div>
                 </div>

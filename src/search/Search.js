@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import 'font-awesome/css/font-awesome.min.css';
 import {Link} from 'react-router-dom';
 
 class Search extends Component {
@@ -38,7 +37,8 @@ class Search extends Component {
                     <div style={styles.searchwrap}>
                         <i className="fa fa-search" style={styles.searchicon}/>
                         <input type="text" defaultValue={this.state.searchValue} value={this.state.value}
-                               onChange={this.handleInputChange} placeholder="Search by record number. e.g. VAN" style={styles.searchbox}/>
+                               onChange={this.handleInputChange} placeholder="Search by record number. e.g. VAN"
+                               style={styles.searchbox}/>
                         <Link to={this.state.searchPath}>
                             <button type="submit" value="Submit" className='btn btn-default' style={styles.submitbtn}>
                                 <i className="fa fa-angle-right" style={styles.submiticon}/>
@@ -53,7 +53,6 @@ class Search extends Component {
 
 let styles = {
     searchwrap: {
-        //border: '2px solid blue',
         display: 'inline-flex',
         position: 'relative',
         margin: '0px 10px 0px',
@@ -66,8 +65,8 @@ let styles = {
         marginTop: '8px',
         marginLeft: '10px',
         fontSize: '20px',
-        color: 'grey',
-        opacity: '0.4',
+        color: '#00569c',
+        opacity: '0.7',
     },
     searchbox: {
         width: '100%',
@@ -75,21 +74,24 @@ let styles = {
         paddingLeft: '1cm',
         paddingRight: '0.5cm',
         fontSize: '15px',
+        border: '1px solid grey'
     },
     submitbtn: {
         float: 'right',
         marginLeft: '0',
         width: '1.2cm',
         height: '100%',
-        fill: 'white',
         padding: '6px',
-
+        backgroundColor: 'white',
+        border: 'white',
+        backgroundImage: 'none',
+        boxShadow: 'none'
     },
     submiticon: {
-        fontSize: '22.5px',
+        fontSize: '25px',
         transform: 'scale(1.5, 1.5)',
-        //color: '#79ff46',
-        color: 'white',
+        fill: 'rgba(87,180,49, 0)',
+        color: '#57b431'
     },
 };
 

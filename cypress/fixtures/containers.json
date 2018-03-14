@@ -1,0 +1,22 @@
+[
+  {
+    "containerId": 10749,
+    "container": "2006.001-TES",
+    "title": "TEST Container",
+    "consignmentCode": "362817350",
+    "createdAt": 1063677156,
+    "updatedAt": 1063677156,
+    "notes": "This is a note!",
+    "Destruction Date": 1063677156
+  },
+  {
+    "containerId": 99999,
+    "container": "2006.001-TES",
+    "title": "TEST Container 2",
+    "consignmentCode": "111111",
+    "createdAt": 1063677156,
+    "updatedAt": 1063677156,
+    "notes": "This is a note!",
+    "Destruction Date": 1063677156
+  }
+]
