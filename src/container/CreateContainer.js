@@ -67,16 +67,22 @@ class CreateContainer extends Component {
         });
         formData.selectedRecords = selectedRecordIds;
 
+        //TODO: workaround - remove!
+        formData.containerNumber = "9999/999-ZZZ";
+
         createContainer(formData).then(response => {
-            return response.json();
+            if (response.status !== 201) {
+                throw new Error(response.message);
+            } else {
+                return response.json();
+            }
         }).then(data => {
-            this.setState({success: false});
-            this.setState({alertMsg: "Endpoint not implemented."});
-            window.scrollTo(0, 0)
+            this.setState({success: true});
+            this.props.history.push("/viewContainer/" + data.containerId);
         }).catch(err => {
             this.setState({success: false});
-            this.setState({alertMsg: "Endpoint not implemented."});
-            window.scrollTo(0, 0)
+            this.setState({alertMsg: "Unable to create container: " + err.message});
+            window.scrollTo(0, 0);
         });
         event.preventDefault();
     }

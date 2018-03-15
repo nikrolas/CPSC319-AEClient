@@ -1,6 +1,7 @@
 import {serviceRoot} from "./ServiceRoot";
 
 let containersPath = "/containers";
+let containerPath = "/container";
 let userId = "500";
 
 export function getContainerById(containerId) {
@@ -8,9 +9,13 @@ export function getContainerById(containerId) {
 }
 
 export function createContainer(data) {
-    let path = serviceRoot + containersPath + "?userId=" + userId;
+    let path = serviceRoot + containerPath + "?userId=" + userId;
     return fetch(path, {
         method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data)
     });
 }
