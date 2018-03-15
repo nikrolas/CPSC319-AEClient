@@ -68,6 +68,9 @@ export function setTableState(context, data, columns, callback) {
         selectAll: false,
         selection: []
     }, callback);
+    if (!callback) {
+        console.warn("You are likely missing a callback to update the navigation bar context!");
+    }
 }
 
 export function setData(context, data, columns, callback) {

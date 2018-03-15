@@ -75,7 +75,8 @@ class SelectTable extends Component {
                 if (data && data.length === 2) {
                     let rdata = data[0];
                     let cdata = data[1];
-                    this.setState({rdata, cdata});
+                    let selectvalue = 'none';
+                    this.setState({rdata, cdata, selectvalue});
                     let columns = getColumns(this, recordsResultsAccessors);
                     setData(this, rdata.concat(cdata), columns, this.tableDataAndSelectionCallback);
                 } else {
@@ -183,16 +184,17 @@ class SelectTable extends Component {
         switch (e.target.value) {
             case 'records': {
                 let columns = getColumns(this, recordsResultsAccessors);
-                setData(this, this.state.rdata, columns);
+                setData(this, this.state.rdata, columns, this.tableDataAndSelectionCallback);
                 break;
             }
             case 'containers': {
                 let columns = getColumns(this, containersResultsAccessors);
-                setData(this, this.state.cdata, columns);
+                setData(this, this.state.cdata, columns, this.tableDataAndSelectionCallback);
                 break;
             }
             default: {
-                setData(this, this.state.rdata.concat(this.state.cdata), this.state.columns);
+                let columns = getColumns(this, recordsResultsAccessors);
+                setData(this, this.state.rdata.concat(this.state.cdata), columns, this.tableDataAndSelectionCallback);
                 break;
             }
         }
@@ -218,7 +220,7 @@ class SelectTable extends Component {
                             onClick={updateTray}>{this.state.addbtntext}</button>
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>
-                        <select onChange={this.handleSelectChange} style={styles.sel}>
+                        <select style={styles.sel} onChange={this.handleSelectChange} value={this.state.selectvalue}>
                             <option value='none' selected>None</option>
                             <option value='records'>Records</option>
                             <option value='containers'>Containers</option>
