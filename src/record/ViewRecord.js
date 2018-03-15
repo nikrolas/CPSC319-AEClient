@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getRecordById, deleteRecordById} from "../APIs/RecordsApi";
+import {getRecordById, deleteRecordByIds} from "../APIs/RecordsApi";
 import {Row, Col, Grid, Button, ButtonToolbar,Alert} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
@@ -69,7 +69,7 @@ class ViewRecord extends Component {
     }
 
     handleSubmit() {
-        deleteRecordById(this.props.match.params.recordId)
+        deleteRecordByIds(this.props.match.params.recordId)
             .then(response => {
                 return response.json();
             })
