@@ -56,14 +56,6 @@ class CreateRecord extends Component {
                 notesValidationState:"success",
                 notes:null,
 
-                locationJson: [{
-                    "id": "1",
-                    "location": "Burnaby",
-                }, {
-                    "id": "2",
-                    "location": "Richmond",
-                }],
-
                 recordTypeResponse: null,
                 classificationResponse: null,
                 retentionScheduleResponse:null,

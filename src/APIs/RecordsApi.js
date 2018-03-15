@@ -31,6 +31,10 @@ export function getUser(userId) {
     return fetch(serviceRoot + "/users/"+userId);
 }
 
+export function getRecordStates() {
+    return fetch(serviceRoot + "/recordstates/");
+}
+
 export function deleteRecordById(recordId) {
     return fetch(serviceRoot + '/record/' + recordId+ '?userId=' + userId, {
         method: 'DELETE',
@@ -78,13 +82,14 @@ export function updateRecord(recordId,state) {
             'Content-Type': 'application/json',
         },
         body:JSON.stringify({
-            title: state.responseJson["title"],
-            scheduleId: 10,
-            classifications : "PROJECT MANAGEMENT/Budgets and Schedules",
-            consignmentCode: state.responseJson["consignmentCode"],
-            notes: state.responseJson["notes"],
-            stateId : 1,
-            containerId : state.responseJson["containerId"]
+            title: state.title,
+            scheduleId: state.retentionSchedule,
+            //TODO temporary state b/c end point not complete
+            classifications : state.responseJson.classifications,
+            consignmentCode: state.consignmentCode,
+            notes: state.notes,
+            stateId : state.stateId,
+            containerId : state.container
         })
     })
 }

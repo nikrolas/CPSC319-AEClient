@@ -168,7 +168,7 @@ class ViewRecord extends Component {
                             <p style ={title}>
                                 <b>Note</b>
                                 <br/>
-                                {this.state.recordJson["Notes"]}
+                                {this.state.recordJson["notes"]}
                             </p>
                         </Col>
                     </Row>
