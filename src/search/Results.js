@@ -10,31 +10,6 @@ import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
-function getMockContainers() {
-    return [
-        {
-            "containerId": 10749,
-            "container": "2006.001-TES",
-            "title": "Sample Container",
-            "consignmentCode": "362817350",
-            "createdAt": 1063677156,
-            "updatedAt": 1063677156,
-            "notes": "This is a note!",
-            'Destruction Date': 1063677156
-        },
-        {
-            "containerId": 99999,
-            "container": "2006.001-TES",
-            "title": "Sample Container 2",
-            "consignmentCode": "111111",
-            "createdAt": 1063677156,
-            "updatedAt": 1063677156,
-            "notes": "This is a note!",
-            'Destruction Date': 1063677156
-        }
-    ];
-}
-
 export const resultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode", "schedule"];
 
 class SelectTable extends Component {
