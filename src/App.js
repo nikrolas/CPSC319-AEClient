@@ -12,6 +12,7 @@ import Home from "./search/Home";
 import NavigationBar from "./banner/NavigationBar";
 import ViewContainer from "./container/ViewContainer";
 import UpdateContainer from "./container/UpdateContainer";
+import {getUser} from "./APIs/UserApi";
 
 const renderMergedProps = (component, ...rest) => {
     const finalProps = Object.assign({}, ...rest);
@@ -35,8 +36,22 @@ class App extends Component {
         this.state = {
             resultsData: [],
             resultsColumns: [],
-            selectedItemIndexes: []
+            selectedItemIndexes: [],
+            userData:null
         };
+    }
+
+    componentWillMount(){
+        getUser()
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                this.setState({userData: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
     }
 
     setselectedItemIndexes = (items) => {
