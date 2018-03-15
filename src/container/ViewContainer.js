@@ -12,15 +12,17 @@ class ViewContainer extends Component {
 
     constructor(props) {
         super(props);
+        let accessors = ["number", "title", "type", "classifications", "createdAt", "updatedAt"];
+        let columns = getColumns(this, accessors);
         this.state =
             {
                 alertMsg: "",
-                location: "",
-                state: "",
-                schedule: "",
-                closedAt: "",
+                location: "Mock",
+                state: "Mock",
+                schedule: "Mock",
+                closedAt: "N/A",
                 data: [],
-                columns: [],
+                columns: columns,
                 records: [],
                 note: "Container Note",
                 containerJson: {
@@ -101,9 +103,7 @@ class ViewContainer extends Component {
             .then((results) => {
                 if (results.length > 0) {
                     this.setRecordsState(results);
-                    let accessors = ["number", "title", "type", "classifications", "createdAt", "updatedAt"];
-                    let columns = getColumns(that, accessors);
-                    setData(that, results, columns);
+                    setData(that, results, this.state.columns);
                 }
             })
             .catch((err) => {

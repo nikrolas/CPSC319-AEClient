@@ -94,39 +94,61 @@ class CreateContainer extends Component {
     };
 
     handleSubmit(event) {
-        const formData = (({title, location, notes, selectedRecords}) => ({
-            title,
-            location,
-            notes,
-            selectedRecords
-        }))(this.state);
-
-        let selectedRecordIds = [];
-        formData.selectedRecords.forEach(record => {
-            selectedRecordIds.push(record.id);
-        });
-        formData.selectedRecords = selectedRecordIds;
-
-        //TODO: workaround - remove!
-        formData.containerNumber = "9999/999-ZZZ";
-
-        createContainer(formData).then(response => {
-            if (response.status !== 201) {
-                throw new Error(response.message);
-            } else {
-                return response.json();
+        const regexValidationState = /^.*ValidationState$/;
+        let keys = Object.keys(this.state);
+        let failValidation = false;
+        for (let i = 0; i < keys.length; i++) {
+            let key = keys[i];
+            if (regexValidationState.test(key)) {
+                if (this.state[key] === null || this.state[key].length === 0) {
+                    failValidation = true;
+                    let returnObj = {};
+                    returnObj[key] = "error";
+                    this.setState(returnObj);
+                    let returnObjMsg = {};
+                    let keyValidationMsg = key.replace("ValidationState", "ValidationMsg");
+                    returnObjMsg[keyValidationMsg] = "Please fill out the required field.";
+                    this.setState(returnObjMsg);
+                }
+                if (this.state[key] === "error") {
+                    failValidation = true;
+                }
             }
-        }).then(data => {
-            this.setState({success: true});
-            this.props.history.push("/viewContainer/" + data.containerId);
-        }).catch(err => {
-            this.setState({success: false});
-            this.setState({alertMsg: "Unable to create container: " + err.message});
-            window.scrollTo(0, 0);
-        });
+        }
+        if (!failValidation) {
+            const formData = (({title, location, notes, selectedRecords}) => ({
+                title,
+                location,
+                notes,
+                selectedRecords
+            }))(this.state);
+
+            let selectedRecordIds = [];
+            formData.selectedRecords.forEach(record => {
+                selectedRecordIds.push(record.id);
+            });
+            formData.selectedRecords = selectedRecordIds;
+
+            //TODO: workaround - remove!
+            formData.containerNumber = "9999/999-ZZZ";
+
+            createContainer(formData).then(response => {
+                if (response.status !== 201) {
+                    throw new Error(response.message);
+                } else {
+                    return response.json();
+                }
+            }).then(data => {
+                this.setState({success: true});
+                this.props.history.push("/viewContainer/" + data.containerId);
+            }).catch(err => {
+                this.setState({success: false});
+                this.setState({alertMsg: "Unable to create container: " + err.message});
+                window.scrollTo(0, 0);
+            });
+        }
         event.preventDefault();
     }
-
 
     render() {
         const listLocationsJson = this.state.locations.map((item, i) =>
