@@ -56,6 +56,15 @@ export function updateRecord(recordId,state) {
     })
 }
 
+export function createVolume(id, copy) {
+    return fetch(serviceRoot + '/volume/' + id + '?copyNotes=' + copy + '&userId=' + userId, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+}
 
 
 

@@ -179,7 +179,7 @@ class SelectTable extends Component {
                 this.setState({addbtntext: 'Add to Tray'});
             }, 700);
         }
-        else {
+        else if (this.state.selection.length > 0) {
             this.setState({addbtntext: 'Added'});
             setTimeout(() => {
                 this.setState({addbtntext: 'Add to Tray'});
