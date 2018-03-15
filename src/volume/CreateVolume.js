@@ -118,7 +118,7 @@ class CreateVolume extends Component {
                 this.setState({alertMsg: msg});
                 window.scrollTo(0, 0)
             }
-            else if(data.status !== 200) {
+            else if(data.status && data.status !== 200) {
                 //console.log(JSON.stringify(data));
                 this.setState({alertMsg: data.message});
                 window.scrollTo(0, 0)
@@ -128,7 +128,7 @@ class CreateVolume extends Component {
             }
         })
         .catch(error => {
-            this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+            this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."});
             window.scrollTo(0, 0)
         });
 
