@@ -63,7 +63,7 @@ export function createRecord(state) {
             typeId:state.recordType,
             consignmentCode: state.consignmentCode,
             containerId: state.container,
-            locationId: "5",
+            locationId: state.location,
             classifications: classpath,
             notes: state.notes,
         })
