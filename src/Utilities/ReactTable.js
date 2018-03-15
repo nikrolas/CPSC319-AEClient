@@ -5,7 +5,7 @@ export const accessorHeaderMapping = {
     title: "Title",
     type: "Type",
     state: "State",
-    container: "Container",
+    containerNumber: "Container",
     classifications: "Classifications",
     location: "Location",
     createdAt: "Created",
@@ -28,7 +28,7 @@ export function getColumns(context, accessors) {
                         context.handleClick(accessor, e.row._original.id, 'record')
                     }}> {e.value} </a>
                 });
-            } else if (accessor === "container") {
+            } else if (accessor === "containerNumber") {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],

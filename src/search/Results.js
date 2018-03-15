@@ -4,6 +4,7 @@ import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getRecordsByNumber} from "../APIs/RecordsApi";
+import {getContainersByNumber} from "../APIs/ContainersApi";
 import Search from "./Search";
 import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
 
@@ -34,7 +35,7 @@ function getMockContainers() {
     ];
 }
 
-export const resultsAccessors = ["number", "title", "type", "state", "location", "container", "consignmentCode", "schedule"];
+export const resultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode", "schedule"];
 
 class SelectTable extends Component {
     constructor(props) {
@@ -82,36 +83,38 @@ class SelectTable extends Component {
     };
 
 
-
     search = (searchString) => {
-        getRecordsByNumber(searchString)
+        let recordsPromise = getRecordsByNumber(searchString)
+            .then(response => {
+                return response.json()
+            });
+        let containersPromise = getContainersByNumber(searchString)
             .then(response => {
                 //console.log(response);
                 return response.json()
-            })
+            });
+        let recordsAndContainers = [recordsPromise, containersPromise];
+        Promise.all(recordsAndContainers)
             .then(data => {
-                if (data && data.length > 0) {
-                    //this.setData(data);
-                    let rdata = data;
-                    let cdata = getMockContainers();
+                if (data && data.length === 2) {
+                    let rdata = data[0];
+                    let cdata = data[1];
                     this.setState({rdata, cdata});
                     let columns = getColumns(this, resultsAccessors);
                     setData(this, rdata.concat(cdata), columns, this.tableDataAndSelectionCallback);
                 } else {
                     setTableState(this, [], [], this.tableDataAndSelectionCallback);
                 }
-            })
-            .catch(err => {
-                console.error("Error loading search results: " + err.message);
             });
-    };
+    }
 
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
         if (searchString !== this.props.match.params.searchString) {
             this.search(searchString);
         }
-    };
+    }
+    ;
 
     toggleSelection = (key) => {
         // start off with the existing state
@@ -260,46 +263,47 @@ class SelectTable extends Component {
     }
 }
 
-let styles = {
-    container: {
-        padding: '5%'
-    },
-    tablestyle: {
-        //border: '5px solid gray'
-        marginTop: '5px',
-    },
-    btncontainer: {
-        //border: '2px solid blue',
-        alignItems: 'center',
-        height: '1cm'
-    },
-    addbtn: {
-        float: 'left',
-        width: '2.5cm',
-        backgroundColor: '#b5ff87',
-        borderColor: '#FFFFFF',
-    },
-    addbtn2: {
-        float: 'left',
-        width: '2.5cm',
-        backgroundColor: '#8bffec',
-    },
-    addbtn3: {
-        float: 'left',
-        width: '2.5cm',
-        backgroundColor: '#ff9c81',
-    },
-    filter: {
-        marginLeft: '0.5cm',
-        float: 'left',
-        height: '100%',
-    },
-    sel: {
-        marginLeft: '5px',
-        marginTop: '3px',
-        float: 'left',
-        height: '85%',
-    },
-};
+let
+    styles = {
+        container: {
+            padding: '5%'
+        },
+        tablestyle: {
+            //border: '5px solid gray'
+            marginTop: '5px',
+        },
+        btncontainer: {
+            //border: '2px solid blue',
+            alignItems: 'center',
+            height: '1cm'
+        },
+        addbtn: {
+            float: 'left',
+            width: '2.5cm',
+            backgroundColor: '#b5ff87',
+            borderColor: '#FFFFFF',
+        },
+        addbtn2: {
+            float: 'left',
+            width: '2.5cm',
+            backgroundColor: '#8bffec',
+        },
+        addbtn3: {
+            float: 'left',
+            width: '2.5cm',
+            backgroundColor: '#ff9c81',
+        },
+        filter: {
+            marginLeft: '0.5cm',
+            float: 'left',
+            height: '100%',
+        },
+        sel: {
+            marginLeft: '5px',
+            marginTop: '3px',
+            float: 'left',
+            height: '85%',
+        },
+    };
 
 export default SelectTable;
