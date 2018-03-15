@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Alert} from 'react-bootstrap'
+import {Button, FormGroup, ControlLabel, FormControl, Alert, HelpBlock} from 'react-bootstrap'
 import {createContainer} from "../APIs/ContainersApi";
 import ReactTable from "react-table";
 
@@ -17,7 +17,14 @@ class CreateContainer extends Component {
                 destructionDate: this.getDestructionDate(),
                 notes: "",
                 selectedRecords: this.getSelectedRecords(props.resultsData, props.selectedItemIndexes),
-                columns: props.resultsColumns
+                columns: props.resultsColumns,
+
+                titleValidationMsg: "",
+                titleValidationState: null,
+                locationValidationMsg: "",
+                locationValidationState: "success",
+                notesValidationMsg: "",
+                notesValidationState: "success"
             };
 
         this.handleChange = this.handleChange.bind(this);
@@ -50,37 +57,98 @@ class CreateContainer extends Component {
     };
 
     handleChange(e) {
-        this.setState({[e.target.name]: e.target.value});
+        e.persist();
+        this.setState({[e.target.name]: e.target.value}, () => {
+            if (e.target.name === "title") {
+                const length = this.state.title.length;
+                if (length >= 1 && length < 256) {
+                    this.setState({titleValidationState: 'success'});
+                }
+                else if (length >= 256) {
+                    this.setState({titleValidationMsg: "Please enter less than 256 characters"});
+                    this.setState({titleValidationState: 'error'});
+                }
+                else {
+                    this.setState({titleValidationState: null});
+                }
+            }
+
+            if (e.target.name === "location") {
+                const length = this.state.location.length;
+                if (length >= 1) {
+                    this.setState({locationValidationState: 'success'});
+                }
+                else {
+                    this.setState({locationValidationState: null});
+                }
+            }
+
+            if (e.target.name === "notes") {
+                const length = this.state.notes.length;
+                this.setState({notesValidationState: 'success'});
+                if (length === 0) {
+                    this.setState({notes: null});
+                }
+            }
+        });
     };
 
     handleSubmit(event) {
-        const formData = (({title, location, notes, selectedRecords}) => ({
-            title,
-            location,
-            notes,
-            selectedRecords
-        }))(this.state);
+        const regexValidationState = /^.*ValidationState$/;
+        let keys = Object.keys(this.state);
+        let failValidation = false;
+        for (let i = 0; i < keys.length; i++) {
+            let key = keys[i];
+            if (regexValidationState.test(key)) {
+                if (this.state[key] === null || this.state[key].length === 0) {
+                    failValidation = true;
+                    let returnObj = {};
+                    returnObj[key] = "error";
+                    this.setState(returnObj);
+                    let returnObjMsg = {};
+                    let keyValidationMsg = key.replace("ValidationState", "ValidationMsg");
+                    returnObjMsg[keyValidationMsg] = "Please fill out the required field.";
+                    this.setState(returnObjMsg);
+                }
+                if (this.state[key] === "error") {
+                    failValidation = true;
+                }
+            }
+        }
+        if (!failValidation) {
+            const formData = (({title, location, notes, selectedRecords}) => ({
+                title,
+                location,
+                notes,
+                selectedRecords
+            }))(this.state);
 
-        let selectedRecordIds = [];
-        formData.selectedRecords.forEach(record => {
-            selectedRecordIds.push(record.id);
-        });
-        formData.selectedRecords = selectedRecordIds;
+            let selectedRecordIds = [];
+            formData.selectedRecords.forEach(record => {
+                selectedRecordIds.push(record.id);
+            });
+            formData.selectedRecords = selectedRecordIds;
 
-        createContainer(formData).then(response => {
-            return response.json();
-        }).then(data => {
-            this.setState({success: false});
-            this.setState({alertMsg: "Endpoint not implemented."});
-            window.scrollTo(0, 0)
-        }).catch(err => {
-            this.setState({success: false});
-            this.setState({alertMsg: "Endpoint not implemented."});
-            window.scrollTo(0, 0)
-        });
+            //TODO: workaround - remove!
+            formData.containerNumber = "9999/999-ZZZ";
+
+            createContainer(formData).then(response => {
+                if (response.status !== 201) {
+                    throw new Error(response.message);
+                } else {
+                    return response.json();
+                }
+            }).then(data => {
+                this.setState({success: true});
+                this.props.history.push("/viewContainer/" + data.containerId);
+            }).catch(err => {
+                this.setState({success: false});
+                this.setState({alertMsg: "Unable to create container: " + err.message});
+                window.scrollTo(0, 0);
+            });
+        }
         event.preventDefault();
     }
-
 
     render() {
         const listLocationsJson = this.state.locations.map((item, i) =>
@@ -104,7 +172,7 @@ class CreateContainer extends Component {
                 <div>{destructionDate}</div>
                 <form onSubmit={this.handleSubmit} style={styles.formStyle}>
                     <FormGroup
-                        validationState={this.getValidationState()}
+                        validationState={this.state.titleValidationState}
                     >
                         <ControlLabel>Title {requiredLabel}</ControlLabel>
                         <FormControl
@@ -115,23 +183,44 @@ class CreateContainer extends Component {
                             onChange={this.handleChange}
                         />
                         <FormControl.Feedback/>
+                        {this.state.titleValidationState === "error"
+                            ? <HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
+                            : null
+                        }
                     </FormGroup>
-                    <FormGroup controlId="formControlsSelect " onChange={this.handleChange}>
+                    <FormGroup
+                        controlId="formLocation"
+                        validationState={this.state.locationValidationState}
+                    >
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
-                        <FormControl name="location"
-                                     componentClass="select"
-                                     placeholder="select"
-                                     value={this.state.location}>
+                        <FormControl
+                            name="location"
+                            componentClass="select"
+                            value = {this.state.location}
+                            onChange={this.handleChange}
+                        >
                             {listLocationsJson}
                         </FormControl>
+                        <FormControl.Feedback/>
+                        { this.state.locationValidationState === "error"
+                            ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
-                    <FormGroup controlId="formControlsTextarea">
+                    <FormGroup
+                        validationState={this.state.notesValidationState}
+                    >
                         <ControlLabel>Notes</ControlLabel>
                         <FormControl name="notes"
                                      componentClass="textarea"
-                                     placeholder="Enter notes"
+                                     placeholder="Enter text"
                                      value={this.state.notes}
                                      onChange={this.handleChange}/>
+                        <FormControl.Feedback/>
+                        {this.state.notesValidationState === "error"
+                            ? <HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
+                            : null
+                        }
                     </FormGroup>
                     <Button type="submit">Cancel</Button>
                     <Button type="submit">Submit</Button>

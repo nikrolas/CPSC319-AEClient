@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Checkbox, HelpBlock, Alert} from 'react-bootstrap'
-import {getRecordById, updateRecord} from "../APIs/RecordsApi";
+import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
+import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
+import {Typeahead} from 'react-bootstrap-typeahead';
 
 class UpdateRecord extends Component {
 
@@ -10,37 +11,58 @@ class UpdateRecord extends Component {
             {
                 alertMsg:"",
 
+                userLocations:null,
+
                 recordNumberValidationMsg:"",
                 recordNumberValidationState:"success",
+                recordNumber: null,
+                recordNumberPattern: null,
 
                 titleValidationMsg:"",
                 titleValidationState:"success",
+                title: "",
+
 
                 locationValidationMsg:"",
                 locationValidationState:"success",
+                location: null,
+
 
                 //TODO Classifications
                 classificationValidationMsg:"",
                 classificationValidationState:"success",
+                classification: null,
+                classificationBack:[],
+                classificationParentHistory:["(Select Record Type)"],
+                classificationParent:"(Select Record Type)",
+                classificationAtLeaf: false,
 
                 //TODO RetentionSechdule
                 retentionValidationMsg:"",
                 retentionValidationState:"success",
+                retentionSchedule:null,
+                retentionScheduleName:"",
+
 
                 //TODO State
                 stateValidationMsg:"",
                 stateValidationState:"success",
+                stateId:null,
 
                 containerValidationMsg:"",
                 containerValidationState:"success",
+                container: null,
+
 
                 consignmentCodeValidationMsg:"",
                 consignmentCodeValidationState:"success",
+                consignmentCode: null,
 
                 notesValidationMsg:"",
                 notesValidationState:"success",
+                notes:null,
 
-                classificationChildren: [],
+
                 responseJson:{
                     title:null,
                     number:null,
@@ -63,39 +85,17 @@ class UpdateRecord extends Component {
                     container:null,
                     scheduleYear:null
                 },
-                classificationJson: [{
-                    "id": "2",
-                    "name": "COMPLIANCE",
-                    "keyword": "F",
-                    "updatedAt": "2003-10-10 19:00:48.000000",
-                    "parent": "",
-                    "children": [3, 4, 5]
-                }, {
-                    "id": "3",
-                    "name": "SAMPLE",
-                    "keyword": "G",
-                    "updatedAt": "2003-10-10 19:00:52.000000",
-                    "parent": 2,
-                    "children": ""
-                }]
-                ,
-                retentionScheduleJson: [{
-                    "id": "2",
-                    "name": "INFORMATION MANAGEMENT - ACQUISITION",
-                    "code": "I1.A1.01",
-                    "years": "3"
-                }, {
-                    "id": "4",
-                    "name": "BUSINESS DEVELOPMENT - COMMITTEES",
-                    "code": "B1.C2.00",
-                    "years": "1"
-                }],
-                checked: false
+
+                classificationResponse: null,
+                retentionScheduleResponse:null,
+                recordStateResponse:null,
             };
 
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.backClassification = this.backClassification.bind(this);
+        this.resetClassification = this.resetClassification.bind(this);
     }
     componentWillMount() {
         let setData = this.setData;
@@ -103,15 +103,63 @@ class UpdateRecord extends Component {
         getRecordById(this.props.match.params.recordId)
             .then(response => response.json())
             .then(data => {
+                this.setState({recordNumber: data.number});
+                this.setState({title: data.title});
+                this.setState({location: data.locationId});
+                //Classification
+                this.setState({retentionSchedule: data.scheduleId});
+                this.setState({retentionScheduleName:data.schedule});
+                this.setState({stateId: data.stateId});
+                this.setState({container:data.container});
+                this.setState({consignmentCode:data.consignmentCode});
+                this.setState({notes:data.notes});
                 if (data && !data.exception) {
                     setData(that, data);
                 }
                 console.log(this.state);
             })
             .catch(err => {
+            console.error("Error loading record: " + err.message);
+        });
+        getClassifications()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({classificationResponse: data});
+            })
+            .catch(err => {
                 console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getRetentionSchedule()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({retentionScheduleResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getUser(500)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({userLocations: data.locations});
+                this.setState({location:data.locations[0].locationId})
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getRecordStates()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({recordStateResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
     }
+
     setData = (context, data) => {
         let keys = Object.keys(data);
         keys.forEach( key => {
@@ -123,132 +171,152 @@ class UpdateRecord extends Component {
     };
 
     handleChange(e) {
-        e.persist();
-        let responseCopy = JSON.parse(JSON.stringify(this.state.responseJson));
-        responseCopy[e.target.name] = e.target.value;
-        this.setState({responseJson:responseCopy}, ()=> {
-            //Validation handling here
-            if(e.target.name === "recordNumber") {
-                const length = this.state.responseJson["number"];
-                if (length >= 1) {
-                    this.setState({recordNumberValidationState: 'success'});
-                }
-                else {
-                    this.setState({recordNumberValidationState: 'error'});
-                    this.setState({recordNumberValidationMsg: 'Record Number should be pre-filled. Please notify the developers.'});
-                }
+        if(Array.isArray(e)){
+            if(e.length > 0) {
+                this.setState({retentionSchedule: e[0].id}, ()=> {
+                    this.setState({retentionValidationState: 'success'});
+                });
             }
-            if(e.target.name === "title") {
-                const length = this.state.responseJson["title"].length;
-                if (length >= 1 && length < 256) {
-                    this.setState({titleValidationState:'success'});
-                }
-                else if (length >=50){
-                    this.setState({titleValidationMsg:"Please enter less than 256 characters"})
-                    this.setState({titleValidationState:'error'});
-                }
-                else {
-                    this.setState({titleValidationState:null});
-                }
+            else {
+                this.setState({retentionValidationState: 'error'});
+                this.setState({retentionValidationMsg:'Please select a retention schedule from the dropdown'});
             }
+        }
+        else {
+            e.persist();
+            this.setState({[e.target.name]: e.target.value}, ()=> {
+                //Validation handling here
+                if(e.target.name === "recordNumber") {
+                    const length = this.state.responseJson["number"];
+                    if (length >= 1) {
+                        this.setState({recordNumberValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({recordNumberValidationState: 'error'});
+                        this.setState({recordNumberValidationMsg: 'Record Number should be pre-filled. Please notify the developers.'});
+                    }
+                }
+                if(e.target.name === "title") {
+                    const length = this.state.responseJson["title"].length;
+                    if (length >= 1 && length < 256) {
+                        this.setState({titleValidationState:'success'});
+                    }
+                    else if (length >=50){
+                        this.setState({titleValidationMsg:"Please enter less than 256 characters"})
+                        this.setState({titleValidationState:'error'});
+                    }
+                    else {
+                        this.setState({titleValidationState:null});
+                    }
+                }
 
-            if(e.target.name === "location") {
-                const length = this.state.responseJson["location"].length;
-                if (length >= 1) {
-                    this.setState({locationValidationState: 'success'});
+                if(e.target.name === "location") {
+                    const length = this.state.responseJson["location"].length;
+                    if (length >= 1) {
+                        this.setState({locationValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({locationValidationState: 'error'});
+                        this.setState({locationValidationMsg: 'Record Number should be pre-filled. Please notify the developers.'});
+                    }
                 }
-                else {
-                    this.setState({locationValidationState: 'error'});
-                    this.setState({locationValidationMsg: 'Record Number should be pre-filled. Please notify the developers.'});
-                }
-            }
-            //TODO Classification
-            //TODO RetentionScehdule
-            if(e.target.name === "retentionSchedule") {
-                const length = this.state.responseJson["retentionSchedule"].length;
-                if (length >= 1) {
-                    this.setState({retentionValidationState:'success'});
-                }
-                else {
-                    this.setState({retentionValidationState:null});
-                }
-            }
-            //TODO State
-            if(e.target.name === "containerId") {
-                const regexNumbers = /^[0-9\b]{1,11}$/;
-                const regexNumbersExceed = /^[0-9\b]{12,}$/;
-                const regexNotNumbers = /[^0-9]+/;
+                if(e.target.name === "classification") {
+                    getClassifications(this.state.classification)
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.length >0) {
+                                if (this.state.classificationAtLeaf) {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                else {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.state.classificationBack.push(this.state.classification);
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                this.setState({classificationValidationState:null});
+                                this.setState({classificationAtLeaf:false});
 
-                if (regexNumbers.test(this.state.responseJson["containerId"])) {
-                    this.setState({containerValidationState:'success'});
+                            }
+                            else {
+                                if(!this.state.classificationAtLeaf) {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.state.classificationBack.push(this.state.classification);
+                                }
+                                else {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                }
+                                this.setState({classificationAtLeaf:true});
+                                this.setState({classificationValidationState:"success"});
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Error loading record: " + err.message);
+                            this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+                        });
                 }
-                else if (regexNumbersExceed.test(this.state.container)) {
-                    this.setState({containerValidationState:'error'});
-                    this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
-                }
-                else if (regexNotNumbers.test(this.state.container) && this.state.responseJson["containerId"].length !== 0){
-                    this.setState({containerValidationState:'error'});
-                    this.setState({containerValidationMsg:'Please enter numbers only'});
-                }
-                else {
-                    var tempObject = this.state.responseJson;
-                    tempObject['containerId'] = null;
-                    console.log(tempObject);
-                    this.setState({responseJson: tempObject});
-                    this.setState({containerValidationState:'success'});
-                }
-            }
+                if(e.target.name === "container") {
+                    const regexNumbers = /^[0-9\b]{1,11}$/;
+                    const regexNumbersExceed = /^[0-9\b]{12,}$/;
+                    const regexNotNumbers = /[^0-9]+/;
 
-            if(e.target.name === "consignmentCode") {
-                const length = this.state.responseJson['consignmentCode'].length;
-                if (length >= 1 && length <= 50) {
-                    this.setState({consignmentCodeValidationState:'success'});
+                    if (regexNumbers.test(this.state.container)) {
+                        this.setState({containerValidationState:'success'});
+                    }
+                    else if (regexNumbersExceed.test(this.state.container)) {
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
+                    }
+                    else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter numbers only'});
+                    }
+                    else {
+                        this.setState({container: null});
+                        this.setState({containerValidationState:'success'});
+                    }
                 }
-                else if (length > 50) {
-                    this.setState({consignmentCodeValidationState:'error'});
-                    this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
-                }
-                else {
-                    var tempObject1 = this.state.responseJson;
-                    tempObject1['consignmentCode'] = null;
-                    console.log(tempObject1);
-                    this.setState({responseJson: tempObject});
-                    this.setState({consignmentCodeValidationState:'success'});
-                }
-            }
 
-            if(e.target.name === "notes") {
-                const length = this.state.responseJson['notes'].length;
-                if (length >= 0) {
-                    this.setState({notesValidationState:'success'});
+                if(e.target.name === "consignmentCode") {
+                    const length = this.state.consignmentCode.length;
+                    if (length >= 1 && length <= 50) {
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
+                    else if (length > 50) {
+                        this.setState({consignmentCodeValidationState:'error'});
+                        this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
+                    }
+                    else {
+                        this.setState({consignmentCode:null});
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
                 }
-            }
 
-        });
-
-        //When Classification is changed, populate clickbox with proper children
-        //TODO - Need to see how far the children information goes
-        if (e.target.name === "classification") {
-            for (var k in this.state.classificationJson) {
-                if (k === e.target.value) {
-                    this.setState({classificationChildren: this.state.classificationJson[k]["children"]});
-                    console.log(this.state.classificationChildren);
-                    break;
+                if(e.target.name === "notes") {
+                    const length = this.state.notes.length;
+                    if (length >= 0) {
+                        this.setState({notesValidationState:'success'});
+                    }
                 }
-            }
+
+            });
         }
     }
 
-    //TODO Might have to go further into children field to display all possible options
-    returnCheckboxes() {
-        if (this.state.classificationChildren.length > 0) {
-            return this.state.classificationChildren.map((item, i) =>
-                <Checkbox inline key={i} value={i}>{item}</Checkbox>);
-        }
-        else {
-            return null;
-        }
-    };
     handleSubmit(event) {
         const regexValidationState = /^.*ValidationState$/;
         var keys = Object.keys(this.state);
@@ -292,20 +360,88 @@ class UpdateRecord extends Component {
         }
         event.preventDefault();
     }
+    backClassification() {
+        this.state.classificationBack.pop();
+        if (this.state.classificationParentHistory.length > 1) {
+            this.state.classificationParentHistory.pop();
+        }
+        this.setState({classificationParent: this.state.classificationParentHistory[this.state.classificationParentHistory.length-1]});
+        document.getElementById("formClassification").value = "0";
+        getClassifications(this.state.classificationBack[this.state.classificationBack.length - 1])
+            .then(response => response.json())
+            .then(data => {
+                if(data.length > 0) {
+                    this.setState({classificationResponse: data});
+                    this.setState({classificationValidationState: null});
+                    this.setState({classificationAtLeaf:false});
+                }
+                else {
+                    this.setState({classificationAtLeaf:true});
+                    this.setState({classificationValidationState: "success"});
+                }
+            })
+            .catch(error => {
+
+            })
+    }
+
+    resetClassification(){
+/*        getClassifications()
+            .then(response => response.json())
+            .then(data => {
+                if(data.length >0) {
+                    this.setState({classificationBack:[]});
+                    this.setState({classificationParentHistory:["(Select Record Type)"]})
+                    this.setState({classificationParent:"(Select Record Type)"});
+                    this.setState({classificationValidationState:null});
+                    this.setState({classificationResponse: data});
+                }
+            });
+        document.getElementById("formClassification").value = "0";*/
+        console.log(this.state);
+    }
 
     render() {
-        var listLocationJson = null;
-        if(typeof this.state.responseJson["location"] === "string") {
-            listLocationJson = <option value={this.state.responseJson["locationId"]}>{this.state.responseJson["location"]}</option>
+        let listClassificationJson = null;
+        let listLocationJson = null;
+        let listRecordStatesJson = null;
+        let retentionForm = null;
+        let classificationPath = "";
+        if (this.state.classificationResponse !== null) {
+            listClassificationJson = this.state.classificationResponse.map((item, i) =>
+                <option key={i} value={item.id}>{item.name}</option>);
         }
-        else {
-            listLocationJson =this.state.responseJson["location"].map((item, i) => <option key={i}
-                                                                                           value={i}>{item.location}</option>);
+        if (this.state.recordStateResponse !== null) {
+            listRecordStatesJson = this.state.recordStateResponse.map((item, i) =>
+                <option key={i} value={item.id}>{item.name}</option>);
         }
-        const listClassificationJson = this.state.classificationJson.map((item, i) =>
-            <option key={i} value={i}>{item.name}</option>);
-        const listRetentionScheduleJson = this.state.retentionScheduleJson.map((item, i) =>
-            <option key={i} value={i}>{item.name}</option>);
+        if (this.state.retentionScheduleResponse !== null) {
+            if(this.state.retentionSchedule != null) {
+                retentionForm =
+                    <Typeahead
+                        onChange={this.handleChange}
+                        defaultInputValue = {this.state.retentionScheduleName}
+                        labelKey={option => `${option.name} ${option.code.trim()}`}
+                        options={this.state.retentionScheduleResponse}
+                        placeholder="Choose a state..."/>
+            }
+        }
+        if (this.state.classificationParentHistory.length > 1) {
+            for(let i = 1; this.state.classificationParentHistory.length > i; i++) {
+                if(i===1) {
+                    classificationPath += this.state.classificationParentHistory[i];
+
+                }
+                else {
+                    classificationPath += "/" + this.state.classificationParentHistory[i];
+                }
+            }
+        }
+        if (this.state.userLocations !== null) {
+            listLocationJson = this.state.userLocations.map((item, i) =>
+                <option key={i} value={item.locationId}>{item.locationName}</option>);
+        }
+
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
 
         let formStyle = {
@@ -313,6 +449,9 @@ class UpdateRecord extends Component {
             width: '50%',
             padding: '10px',
             textAlign:'left'
+        }
+        let classificationDefault = {
+            color:'red',
         }
 
         return (
@@ -322,7 +461,7 @@ class UpdateRecord extends Component {
                     :null
                 }
                 <h1>Update Record</h1>
-                <h2>{this.state.responseJson["number"]}</h2>
+                <h2>{this.state.recordNumber}</h2>
                 <form onSubmit={this.handleSubmit}  style = {formStyle}>
                     <FormGroup
                         controlId="formBasicText"
@@ -333,7 +472,7 @@ class UpdateRecord extends Component {
                             disabled
                             name="number"
                             type="text"
-                            value={this.state.responseJson["number"]}
+                            value={this.state.recordNumber}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
@@ -350,7 +489,7 @@ class UpdateRecord extends Component {
                         <FormControl
                             name="title"
                             type="text"
-                            value={this.state.responseJson["title"]}
+                            value={this.state.title}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
@@ -381,14 +520,16 @@ class UpdateRecord extends Component {
                     </FormGroup>
                     {/* TODO Classifications */}
                     <FormGroup
-                        controlId="formControlsSelect "
+                        controlId="formClassification"
                         onChange={this.handleChange}
                         validationState={this.state.classificationValidationState}
                     >
-                        <ControlLabel>Classification {requiredLabel} TODO</ControlLabel>
+                        <ControlLabel>Classification {requiredLabel} <br/> {classificationPath} </ControlLabel>
                         <FormControl name="classification"
                                      componentClass="select"
-                                     placeholder="select">
+                                     placeholder="select"
+                        >
+                            <option style={classificationDefault} value="0" disabled selected>{this.state.classificationParent}</option>
                             {listClassificationJson}
                         </FormControl>
                         <FormControl.Feedback/>
@@ -396,20 +537,15 @@ class UpdateRecord extends Component {
                             ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
                             :null
                         }
+                        <ButtonGroup>
+                            <Button onClick={this.backClassification}>Back</Button>
+                            <Button onClick={this.resetClassification}>Reset</Button>
+                        </ButtonGroup>
                     </FormGroup>
-                    <FormGroup>
-                        {this.returnCheckboxes()}
-                    </FormGroup>
-                    <FormGroup
-                        controlId="formControlsSelect "
-                        validationState={this.state.retentionValidationState}
-                    >
-                        <ControlLabel>Retention Schedule {requiredLabel} TODO</ControlLabel>
-                        <FormControl name="retentionSchedule"
-                                     componentClass="select"
-                                     placeholder="select">
-                            {listRetentionScheduleJson}
-                        </FormControl>
+                    <FormGroup controlId="formControlsSelect"
+                               validationState={this.state.retentionValidationState}>
+                        <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
+                        {retentionForm}
                         <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
@@ -422,15 +558,13 @@ class UpdateRecord extends Component {
                         validationState={this.state.stateValidationState}
 
                     >
-                        <ControlLabel>State {requiredLabel} TODO</ControlLabel>
-                        <FormControl name="state"
+                        <ControlLabel>State {requiredLabel}</ControlLabel>
+                        <FormControl name="stateId"
                                      componentClass="select"
-                                     placeholder="select">
-                            <option>Active</option>
-                            <option>Inactive</option>
-                            <option>Archived - Local</option>
-                            <option>Archived - Interim</option>
-                            <option>Destroyed</option>
+                                     placeholder="select"
+                                     value = {this.state.stateId}
+                        >
+                            {listRecordStatesJson}
                         </FormControl>
                         <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
@@ -441,11 +575,11 @@ class UpdateRecord extends Component {
                     <FormGroup
                         validationState={this.state.containerValidationState}
                     >
-                        <ControlLabel>Container Number TODO</ControlLabel>
+                        <ControlLabel>Container Number</ControlLabel>
                         <FormControl
-                            name="containerId"
+                            name="container"
                             type="text"
-                            value={this.state.responseJson["container"]}
+                            value={this.state.container}
                             placeholder="Enter digits"
                             onChange={this.handleChange}
                         />
@@ -462,7 +596,7 @@ class UpdateRecord extends Component {
                         <FormControl
                             name="consignmentCode"
                             type="text"
-                            value={this.state.responseJson['consignmentCode']}
+                            value={this.state.consignmentCode}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
@@ -479,7 +613,7 @@ class UpdateRecord extends Component {
                         <FormControl
                             name="notes"
                             componentClass="textarea"
-                            value={this.state.responseJson['notes']}
+                            value={this.state.notes}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
