@@ -3,6 +3,7 @@ import {getRecordById, deleteRecordByIds} from "../APIs/RecordsApi";
 import {Row, Col, Grid, Button, ButtonToolbar,Alert} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
+import {getDateTimeString} from "../Utilities/DateTime";
 
 
 class ViewRecord extends Component {
@@ -59,7 +60,7 @@ class ViewRecord extends Component {
         let keys = Object.keys(data);
         keys.forEach( key => {
             if (key.endsWith("At")) {
-                data[key] = new Date(data[key]).toTimeString();
+                data[key] = getDateTimeString(new Date(data[key]));
             }
         });
         context.setState({"recordJson": data});

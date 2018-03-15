@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
 import {getRecordStates, getUser} from "../APIs/RecordsApi";
 import {getContainerById, updateContainer} from "../APIs/ContainersApi";
+import {getDateTimeString} from "../Utilities/DateTime";
 
 class UpdateContainer extends Component {
 
@@ -101,7 +102,7 @@ class UpdateContainer extends Component {
         let keys = Object.keys(data);
         keys.forEach(key => {
             if (key.endsWith("At")) {
-                data[key] = new Date(data[key]).toTimeString();
+                data[key] = getDateTimeString(new Date(data[key]));
             }
         });
         context.setState({"responseJson": data});

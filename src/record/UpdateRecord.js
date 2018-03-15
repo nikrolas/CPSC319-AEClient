@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
 import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
+import {getDateTimeString} from "../Utilities/DateTime";
 
 class UpdateRecord extends Component {
 
@@ -164,7 +165,7 @@ class UpdateRecord extends Component {
         let keys = Object.keys(data);
         keys.forEach( key => {
             if (key.endsWith("At")) {
-                data[key] = new Date(data[key]).toTimeString();
+                data[key] = getDateTimeString(new Date(data[key]).toTimeString());
             }
         });
         context.setState({"responseJson": data});
