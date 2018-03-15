@@ -4,7 +4,7 @@ import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getColumns} from "../Utilities/ReactTable";
-import {resultsAccessors} from "./Results";
+import {recordsResultsAccessors} from "./Results";
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class WorkTray extends Component {
@@ -45,7 +45,7 @@ class WorkTray extends Component {
     }
 
     getWorkTrayColumns = () => {
-        const columns = getColumns(this, resultsAccessors);
+        const columns = getColumns(this, recordsResultsAccessors);
         columns.push({
             Header: <button className="btn btn-xs"
                             onClick={this.deleteAll}

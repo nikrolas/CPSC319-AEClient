@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getRecordById, deleteRecordById} from "../APIs/RecordsApi";
+import {getRecordById, deleteRecordByIds} from "../APIs/RecordsApi";
 import {Row, Col, Grid, Button, ButtonToolbar,Alert} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
@@ -11,28 +11,29 @@ class ViewRecord extends Component {
         super(props, context);
         this.state =
             {
+
                 alertMsg:"",
                 recordJson: {
-                    Id: "",
-                    Number: "",
-                    title: "",
-                    ScheduleId: "",
-                    TypeId: "",
-                    ConsignmentCode: "",
-                    StateId: "",
-                    ContainerId: "",
-                    LocationId: "",
-                    createdAt: "",
-                    updatedAt: "",
-                    closedAt: "",
-                    ClassificationIds: "",
-                    state: "",
-                    location: "",
-                    type: "",
-                    consignmentCode: "",
-                    schedule: "",
-                    scheduleYear: "",
-                    Notes: ""
+                    title:"",
+                    number:"",
+                    scheduleId:"",
+                    typeId:"",
+                    consignmentCode:"",
+                    containerId:"",
+                    locationId:"",
+                    classifications:"",
+                    notes:"",
+                    id:"",
+                    stateId:"",
+                    createdAt:"",
+                    updatedAt:"",
+                    closedAt:"",
+                    location:"",
+                    schedule:"",
+                    type:"",
+                    state:"",
+                    container:"",
+                    scheduleYear:""
                 },
             };
         this.handleChange = this.handleChange.bind(this);
@@ -68,7 +69,7 @@ class ViewRecord extends Component {
     }
 
     handleSubmit() {
-        deleteRecordById(this.props.match.params.recordId)
+        deleteRecordByIds(this.props.match.params.recordId)
             .then(response => {
                 return response.json();
             })
@@ -92,7 +93,7 @@ class ViewRecord extends Component {
         };
         let btnStyle = {
             display:"flex",
-            justifyContent:"center"
+            justifyContent:"left"
         };
 
         return (
@@ -101,23 +102,14 @@ class ViewRecord extends Component {
                     ?<Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
                     :null
                 }
-                <h1>{this.state.recordJson["number"]}</h1>
-                <ButtonToolbar style = {btnStyle}>
-                <Link to={updateRecordLink}>
-                    <Button  bsStyle="primary"> Edit Record </Button>
-                </Link>
-                    <Confirm
-                        onConfirm={this.handleSubmit}
-                        body="Are you sure you want to delete this?"
-                        confirmText="Confirm Delete"
-                        title="Deleting Record">
-                        <Button bsStyle="danger">Delete Record</Button>
-                    </Confirm>
-                </ButtonToolbar>
-                <br/><br/>
                 <Grid>
                     <Row>
-                        <Col md={4} mdOffset={3}>
+                        <Col md={10} mdOffset={2}>
+                        <h1 style = {title}>{this.state.recordJson["number"]}</h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={4} mdOffset={2}>
                             <p style ={title}>
                                 <b>Title</b>
                                 <br/>
@@ -141,8 +133,8 @@ class ViewRecord extends Component {
                             <p style ={title}>
                                 <b>Classification</b>
                                 <br/>
-                                {/*TODO*/}
-                                To Be Completed
+                                {this.state.recordJson["classifications"]}
+
                             </p>
                             <p style ={title}>
                                 <b>Consignment Code</b>
@@ -172,12 +164,28 @@ class ViewRecord extends Component {
                                 {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
                             </p>
                         </Col>
-                        <Col md={9} mdOffset={3}>
+                        <Col md={9} mdOffset={2}>
                             <p style ={title}>
                                 <b>Note</b>
                                 <br/>
-                                {this.state.recordJson["Notes"]}
+                                {this.state.recordJson["notes"]}
                             </p>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={10} mdOffset={2}>
+                        <ButtonToolbar style = {btnStyle}>
+                            <Link to={updateRecordLink}>
+                                <Button  bsStyle="primary"> Edit Record </Button>
+                            </Link>
+                            <Confirm
+                                onConfirm={this.handleSubmit}
+                                body="Are you sure you want to delete this?"
+                                confirmText="Confirm Delete"
+                                title="Deleting Record">
+                                <Button bsStyle="danger">Delete Record</Button>
+                            </Confirm>
+                        </ButtonToolbar>
                         </Col>
                     </Row>
                 </Grid>

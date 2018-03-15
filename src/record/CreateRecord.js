@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Checkbox, HelpBlock, Alert} from 'react-bootstrap'
-import {createRecord} from "../APIs/RecordsApi";
+import {Button, FormGroup, ControlLabel, FormControl, ButtonGroup, HelpBlock, Alert} from 'react-bootstrap'
+import {createRecord, getClassifications, getRecordType,getRetentionSchedule, getUser} from "../APIs/RecordsApi";
+import {Typeahead} from 'react-bootstrap-typeahead';
 
 class CreateRecord extends Component {
 
@@ -9,6 +10,9 @@ class CreateRecord extends Component {
         this.state =
             {
                 alertMsg:"",
+
+                userLocations:null,
+
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
                 recordType: null,
@@ -17,10 +21,10 @@ class CreateRecord extends Component {
                 locationValidationState:"success",
                 location: null,
 
-                //TODO Record Number
                 recordNumberValidationMsg:"",
-                recordNumberValidationState:"success",
+                recordNumberValidationState:null,
                 recordNumber: null,
+                recordNumberPattern: null,
 
                 titleValidationMsg:"",
                 titleValidationState:null,
@@ -28,8 +32,12 @@ class CreateRecord extends Component {
 
                 //TODO Classifications
                 classificationValidationMsg:"",
-                classificationValidationState:"success",
+                classificationValidationState:null,
                 classification: null,
+                classificationBack:[],
+                classificationParentHistory:["(Select Record Type)"],
+                classificationParent:"(Select Record Type)",
+                classificationAtLeaf: false,
 
 
                 retentionValidationMsg:"",
@@ -48,189 +56,239 @@ class CreateRecord extends Component {
                 notesValidationState:"success",
                 notes:null,
 
-                classificationChildren: [],
-                locationJson: [{
-                    "id": "1",
-                    "location": "Burnaby",
-                }, {
-                    "id": "2",
-                    "location": "Richmond",
-                }],
-
-                recordJson: [{
-                    "id": "10",
-                    "name": "CASE RECORDS",
-                    "numberPattern": "XXX-ZZZ/NN",
-                    "defaultScheduleId": "322"
-                }, {
-                    "id": "3",
-                    "name": "subject",
-                    "numberPattern": "KKK-yyyy/ggg",
-                    "defaultScheduleId": ""
-                }]
-                ,
-                classificationJson: [{
-                    "id": "2",
-                    "name": "COMPLIANCE",
-                    "keyword": "F",
-                    "updatedAt": "2003-10-10 19:00:48.000000",
-                    "parent": "",
-                    "children": [3, 4, 5]
-                }, {
-                    "id": "3",
-                    "name": "SAMPLE",
-                    "keyword": "G",
-                    "updatedAt": "2003-10-10 19:00:52.000000",
-                    "parent": 2,
-                    "children": ""
-                }]
-                ,
-                retentionScheduleJson: [{
-                    "id": "2",
-                    "name": "INFORMATION MANAGEMENT - ACQUISITION",
-                    "code": "I1.A1.01",
-                    "years": "3"
-                }, {
-                    "id": "4",
-                    "name": "BUSINESS DEVELOPMENT - COMMITTEES",
-                    "code": "B1.C2.00",
-                    "years": "1"
-                }],
-                checked: false
+                recordTypeResponse: null,
+                classificationResponse: null,
+                retentionScheduleResponse:null,
             };
 
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-    }
+        this.backClassification = this.backClassification.bind(this);
+        this.resetClassification = this.resetClassification.bind(this);
 
+    }
+    componentWillMount() {
+        getRecordType()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({recordTypeResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getClassifications()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({classificationResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getRetentionSchedule()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({retentionScheduleResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getUser(500)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({userLocations: data.locations});
+                this.setState({location:data.locations[0].locationId})
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+    }
     handleChange(e) {
-        e.persist();
-        this.setState({[e.target.name]: e.target.value}, ()=> {
-            //Validation handling here
-            if(e.target.name === "recordType") {
-                const length = this.state.recordType.length;
-                if (length >= 1) {
-                    this.setState({recordTypeValidationState: 'success'});
-                }
-                else {
-                    this.setState({titleValidationState: null});
-                }
-            }
-            if(e.target.name === "location") {
-                const length = this.state.location.length;
-                if (length >= 1) {
-                    this.setState({locationValidationState: 'success'});
-                }
-                else {
-                    this.setState({locationValidationState: null});
-                }
-            }
-            //TODO Record Number
-
-            if(e.target.name === "title") {
-                const length = this.state.title.length;
-                if (length >= 1 && length < 256) {
-                    this.setState({titleValidationState:'success'});
-                }
-                else if (length >=50){
-                    this.setState({titleValidationMsg:"Please enter less than 256 characters"})
-                    this.setState({titleValidationState:'error'});
-                }
-                else {
-                    this.setState({titleValidationState:null});
-                }
-            }
-            //TODO Classification
-            if(e.target.name === "retentionSchedule") {
-                const length = this.state.retentionSchedule.length;
-                if (length >= 1) {
-                    this.setState({retentionValidationState:'success'});
-                }
-                else {
-                    this.setState({retentionValidationState:null});
-                }
-            }
-            if(e.target.name === "container") {
-                const regexNumbers = /^[0-9\b]{1,11}$/;
-                const regexNumbersExceed = /^[0-9\b]{12,}$/;
-                const regexNotNumbers = /[^0-9]+/;
-
-                if (regexNumbers.test(this.state.container)) {
-                    this.setState({containerValidationState:'success'});
-                }
-                else if (regexNumbersExceed.test(this.state.container)) {
-                    this.setState({containerValidationState:'error'});
-                    this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
-                }
-                else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
-                    this.setState({containerValidationState:'error'});
-                    this.setState({containerValidationMsg:'Please enter numbers only'});
-                }
-                else {
-                    this.setState({container: null});
-                    this.setState({containerValidationState:'success'});
-                }
-            }
-
-            if(e.target.name === "consignmentCode") {
-                const length = this.state.consignmentCode.length;
-                if (length >= 1 && length <= 50) {
-                    this.setState({consignmentCodeValidationState:'success'});
-                }
-                else if (length > 50) {
-                    this.setState({consignmentCodeValidationState:'error'});
-                    this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
-                }
-                else {
-                    this.setState({consignmentCode: null});
-                    this.setState({consignmentCodeValidationState:'success'});
-                }
-            }
-
-            if(e.target.name === "notes") {
-                const length = this.state.notes.length;
-                this.setState({notesValidationState:'success'});
-                if (length === 0) {
-                    this.setState({notes: null});
-                }
-            }
-
-        });
-        //When RecordType is changed, adjust record number
-        if (e.target.name === "recordType") {
-            for (var k in this.state.recordJson) {
-                if (k === e.target.value) {
-                    this.setState({recordNumber: this.state.recordJson[k]["numberPattern"]});
-                    break;
-                }
-            }
-        }
-        //When Classification is changed, populate clickbox with proper children
-        //TODO - Need to see how far the children information goes
-        if (e.target.name === "classification") {
-            for (k in this.state.classificationJson) {
-                if (k === e.target.value) {
-                    this.setState({classificationChildren: this.state.classificationJson[k]["children"]});
-                    console.log(this.state.classificationChildren);
-                    break;
-                }
-            }
-        }
-    }
-
-    //TODO Might have to go further into children field to display all possible options
-    returnCheckboxes() {
-        if (this.state.classificationChildren.length > 0) {
-            return this.state.classificationChildren.map((item, i) =>
-                <Checkbox inline key={i} value={i}>{item}</Checkbox>);
+        if(Array.isArray(e)){
+            this.setState({retentionSchedule: e}, ()=> {
+               if(this.state.retentionSchedule.length > 0) {
+                   this.setState({retentionValidationState: 'success'});
+               }
+               else {
+                   this.setState({retentionValidationState: 'error'});
+                   this.setState({retentionValidationMsg:'Please select a retention schedule from the dropdown'});
+               }
+            });
         }
         else {
-            return null;
+            e.persist();
+            this.setState({[e.target.name]: e.target.value}, ()=> {
+                //Validation handling here
+                if(e.target.name === "recordType") {
+                    this.setState({recordNumberPattern: this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]});
+                    const length = this.state.recordType.length;
+                    if (length >= 1) {
+                        this.setState({recordTypeValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({titleValidationState: null});
+                    }
+                }
+                if(e.target.name === "location") {
+                    const length = this.state.location.length;
+                    if (length >= 1) {
+                        this.setState({locationValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({locationValidationState: null});
+                    }
+                }
+                //TODO Record number
+                //XXX and ZZZ is alphanumeric
+                //KKK is location code
+                //LL with client
+                //GG is autogenerated
+                //YY Year
+                if(e.target.name === "recordNumber") {
+                    //TODO depends if client want to show backend-validations
+                    /*
+                    const client = /[a-zA-Z]{3}-CLIENT$/;
+                    const task = /[a-zA-Z]{3}-TASK-[a-zA-Z0-9]{4}$/;
+                    const accounting = /[a-zA-Z]{3}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}\.[a-zA-Z0-9]{3}$/;
+                    const case_records_22 = /[a-zA-Z]{3}-[a-zA-Z0-9]{22}$/;
+                    const case_records_23 = /[a-zA-Z]{3}-[a-zA-Z0-9]{23}$/;
+                    const subject = /[a-zA-Z]{3}-[0-9]{4}$/;
+                    const proposal = /[a-zA-Z]{3}_P_[0-9]{4}$/;
+                    const project = /[a-zA-Z0-9]{8}\.[a-zA-Z0-9]{2}\.[a-zA-Z0-9]\.[a-zA-Z0-9]{2}\.[a-zA-Z0-9]{2}/;*/
+
+
+                    const length = this.state.recordNumber.length;
+                    if (length >= 1) {
+                        this.setState({recordNumberValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({recordNumberValidationState: null});
+                    }
+                }
+                if(e.target.name === "title") {
+                    const length = this.state.title.length;
+                    if (length >= 1 && length < 256) {
+                        this.setState({titleValidationState:'success'});
+                    }
+                    else if (length >=50){
+                        this.setState({titleValidationMsg:"Please enter less than 256 characters"})
+                        this.setState({titleValidationState:'error'});
+                    }
+                    else {
+                        this.setState({titleValidationState:null});
+                    }
+                }
+                //TODO Classification
+
+                if(e.target.name === "classification") {
+                    getClassifications(this.state.classification)
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.length >0) {
+                                if (this.state.classificationAtLeaf) {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                else {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.state.classificationBack.push(this.state.classification);
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                this.setState({classificationValidationState:null});
+                                this.setState({classificationAtLeaf:false});
+
+                            }
+                            else {
+                                if(!this.state.classificationAtLeaf) {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.state.classificationBack.push(this.state.classification);
+                                }
+                                else {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                }
+                                this.setState({classificationAtLeaf:true});
+                                this.setState({classificationValidationState:"success"});
+                            }
+                        });
+                }
+
+                if(e.target.name === "retentionSchedule") {
+                    const length = this.state.retentionSchedule.length;
+                    if (length >= 1) {
+                        this.setState({retentionValidationState:'success'});
+                    }
+                    else {
+                        this.setState({retentionValidationState:null});
+                    }
+                }
+                if(e.target.name === "container") {
+                    const regexNumbers = /^[0-9\b]{1,11}$/;
+                    const regexNumbersExceed = /^[0-9\b]{12,}$/;
+                    const regexNotNumbers = /[^0-9]+/;
+
+                    if (regexNumbers.test(this.state.container)) {
+                        this.setState({containerValidationState:'success'});
+                    }
+                    else if (regexNumbersExceed.test(this.state.container)) {
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
+                    }
+                    else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter numbers only'});
+                    }
+                    else {
+                        this.setState({container: null});
+                        this.setState({containerValidationState:'success'});
+                    }
+                }
+
+                if(e.target.name === "consignmentCode") {
+                    const length = this.state.consignmentCode.length;
+                    if (length >= 1 && length <= 50) {
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
+                    else if (length > 50) {
+                        this.setState({consignmentCodeValidationState:'error'});
+                        this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
+                    }
+                    else {
+                        this.setState({consignmentCode: null});
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
+                }
+
+                if(e.target.name === "notes") {
+                    const length = this.state.notes.length;
+                    this.setState({notesValidationState:'success'});
+                    if (length === 0) {
+                        this.setState({notes: null});
+                    }
+                }
+            });
         }
-    };
+    }
 
     handleSubmit(event) {
+        console.log(this.state.location);
         const regexValidationState = /^.*ValidationState$/;
         var keys = Object.keys(this.state);
         var failValidation = false;
@@ -274,15 +332,83 @@ class CreateRecord extends Component {
         event.preventDefault();
     }
 
+    backClassification() {
+        this.state.classificationBack.pop();
+        if (this.state.classificationParentHistory.length > 1) {
+            this.state.classificationParentHistory.pop();
+        }
+            this.setState({classificationParent: this.state.classificationParentHistory[this.state.classificationParentHistory.length-1]});
+        document.getElementById("formClassification").value = "0";
+        getClassifications(this.state.classificationBack[this.state.classificationBack.length - 1])
+            .then(response => response.json())
+            .then(data => {
+                if(data.length > 0) {
+                    this.setState({classificationResponse: data});
+                    this.setState({classificationValidationState: null});
+                    this.setState({classificationAtLeaf:false});
+                }
+                else {
+                    this.setState({classificationAtLeaf:true});
+                    this.setState({classificationValidationState: "success"});
+                }
+            })
+            .catch(error => {
+
+            })
+    }
+
+    resetClassification(){
+        getClassifications()
+            .then(response => response.json())
+            .then(data => {
+                if(data.length >0) {
+                    this.setState({classificationBack:[]});
+                    this.setState({classificationParentHistory:["(Select Record Type)"]})
+                    this.setState({classificationParent:"(Select Record Type)"});
+                    this.setState({classificationValidationState:null});
+                    this.setState({classificationResponse: data});
+                }
+            });
+        document.getElementById("formClassification").value = "0";
+    }
+
     render() {
-        const listRecordTypeJson = this.state.recordJson.map((item, i) => <option key={i}
-                                                                                  value={i}>{item.name}</option>);
-        const listLocationJson = this.state.locationJson.map((item, i) => <option key={i}
-                                                                                  value={i}>{item.location}</option>);
-        const listClassificationJson = this.state.classificationJson.map((item, i) =>
-            <option key={i} value={i}>{item.name}</option>);
-        const listRetentionScheduleJson = this.state.retentionScheduleJson.map((item, i) =>
-            <option key={i} value={i}>{item.name}</option>);
+        let listRecordTypeJson = null;
+        let listClassificationJson = null;
+        let retentionForm = null;
+        let listLocationJson = null;
+        let classificationPath = "";
+        if (this.state.recordTypeResponse !== null) {
+            listRecordTypeJson = this.state.recordTypeResponse.map((item, i) => <option data-order={i} value={item.typeId}>{item.typeName}</option>);
+        }
+        if (this.state.classificationResponse !== null) {
+            listClassificationJson = this.state.classificationResponse.map((item, i) =>
+                <option key={i} value={item.id}>{item.name}</option>);
+        }
+        if (this.state.userLocations !== null) {
+            listLocationJson = this.state.userLocations.map((item, i) =>
+                <option key={i} value={item.locationId}>{item.locationName}</option>);
+        }
+        if (this.state.retentionScheduleResponse !== null) {
+            retentionForm =
+                <Typeahead
+                    onChange={this.handleChange}
+                    labelKey={option => `${option.name} ${option.code.trim()}`}
+                options={this.state.retentionScheduleResponse}
+                placeholder="Choose a state..."/>
+        }
+        if (this.state.classificationParentHistory.length > 1) {
+            for(let i = 1; this.state.classificationParentHistory.length > i; i++) {
+                if(i===1) {
+                    classificationPath += this.state.classificationParentHistory[i];
+
+                }
+                else {
+                    classificationPath += "/" + this.state.classificationParentHistory[i];
+                }
+            }
+        }
+
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
 
         let formStyle = {
@@ -291,7 +417,9 @@ class CreateRecord extends Component {
             padding: '10px',
             textAlign:'left'
         }
-
+        let classificationDefault = {
+            color:'red',
+        }
         return (
             <div>
                 {this.state.alertMsg.length !== 0
@@ -301,7 +429,7 @@ class CreateRecord extends Component {
                 <h1>Create a New Record</h1>
                 <form onSubmit={this.handleSubmit} style = {formStyle}>
                     <FormGroup
-                        controlId="formControlsSelect"
+                        controlId="formRecordType"
                         onChange={this.handleChange}
                         validationState={this.state.recordTypeValidationState}
                     >
@@ -319,7 +447,7 @@ class CreateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
-                        controlId="formControlsSelect"
+                        controlId="formLocation"
                         onChange={this.handleChange}
                         validationState={this.state.locationValidationState}
                     >
@@ -327,6 +455,7 @@ class CreateRecord extends Component {
                         <FormControl
                             name="location"
                             componentClass="select"
+                            value = {this.state.location}
                         >
                         {listLocationJson}
                         </FormControl>
@@ -336,12 +465,11 @@ class CreateRecord extends Component {
                             :null
                         }
                     </FormGroup>
-                    {/*TODO RecordNumber*/}
                     <FormGroup
-                        controlId="formBasicText"
+                        controlId="formRecordNumber"
                         validationState={this.state.recordNumberValidationState}
                     >
-                        <ControlLabel>Record Number {requiredLabel}</ControlLabel>
+                        <ControlLabel>Record Number {requiredLabel} <br/> {this.state.recordNumberPattern}</ControlLabel>
                         <FormControl
                             name="recordNumber"
                             type="text"
@@ -374,14 +502,16 @@ class CreateRecord extends Component {
                     </FormGroup>
                    {/* TODO Classifications */}
                     <FormGroup
-                        controlId="formControlsSelect "
+                        controlId="formClassification"
                         onChange={this.handleChange}
                         validationState={this.state.classificationValidationState}
                     >
-                        <ControlLabel>Classification {requiredLabel}</ControlLabel>
+                        <ControlLabel>Classification {requiredLabel} <br/> {classificationPath} </ControlLabel>
                         <FormControl name="classification"
                                      componentClass="select"
-                                     placeholder="select">
+                                     placeholder="select"
+                        >
+                            <option style={classificationDefault} value="0" disabled selected>{this.state.classificationParent}</option>
                             {listClassificationJson}
                         </FormControl>
                         <FormControl.Feedback/>
@@ -389,27 +519,21 @@ class CreateRecord extends Component {
                             ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
                             :null
                         }
-                    </FormGroup>
-                    <FormGroup>
-                        {this.returnCheckboxes()}
+                        <ButtonGroup>
+                        <Button onClick={this.backClassification}>Back</Button>
+                        <Button onClick={this.resetClassification}>Reset</Button>
+                        </ButtonGroup>
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect"
-                               onChange={this.handleChange}
                                validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
-                        <FormControl name="retentionSchedule"
-                                     componentClass="select"
-                                     placeholder="select">
-                            <option value="" disabled selected>(Select a record type)</option>
-                            {listRetentionScheduleJson}
-                        </FormControl>
+                            {retentionForm}
                         <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
                             :null
                         }
                     </FormGroup>
-
                     <FormGroup
                         validationState={this.state.containerValidationState}
                     >

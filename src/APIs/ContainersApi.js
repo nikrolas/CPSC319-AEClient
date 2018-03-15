@@ -4,6 +4,10 @@ let containersPath = "/containers";
 let containerPath = "/container";
 let userId = "500";
 
+export function getContainersByNumber(containerNumber) {
+    return fetch(serviceRoot + containersPath + "?num=" + containerNumber + "&userId=" + userId);
+}
+
 export function getContainerById(containerId) {
     return fetch(serviceRoot + containersPath + "/" + containerId + "?userId=" + userId);
 }
