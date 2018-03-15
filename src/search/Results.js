@@ -10,7 +10,8 @@ import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
-export const resultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode", "schedule"];
+export const recordsResultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode", "schedule"];
+export const containersResultsAccessors = ["containerNumber", "title", "state", "location", "consignmentCode", "schedule"];
 
 class SelectTable extends Component {
     constructor(props) {
@@ -75,13 +76,13 @@ class SelectTable extends Component {
                     let rdata = data[0];
                     let cdata = data[1];
                     this.setState({rdata, cdata});
-                    let columns = getColumns(this, resultsAccessors);
+                    let columns = getColumns(this, recordsResultsAccessors);
                     setData(this, rdata.concat(cdata), columns, this.tableDataAndSelectionCallback);
                 } else {
                     setTableState(this, [], [], this.tableDataAndSelectionCallback);
                 }
             });
-    }
+    };
 
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
@@ -181,11 +182,13 @@ class SelectTable extends Component {
         });
         switch (e.target.value) {
             case 'records': {
-                setData(this, this.state.rdata, this.state.columns);
+                let columns = getColumns(this, recordsResultsAccessors);
+                setData(this, this.state.rdata, columns);
                 break;
             }
             case 'containers': {
-                setData(this, this.state.cdata, this.state.columns);
+                let columns = getColumns(this, containersResultsAccessors);
+                setData(this, this.state.cdata, columns);
                 break;
             }
             default: {
