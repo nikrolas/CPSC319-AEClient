@@ -1,40 +1,41 @@
 import React, {Component} from 'react';
-import {getRecordById} from "../APIs/RecordsApi";
-import {Row, Col, Grid, Button} from 'react-bootstrap'
-import {Link,Redirect} from 'react-router-dom';
+import {getRecordById, deleteRecordByIds} from "../APIs/RecordsApi";
+import {Row, Col, Grid, Button, ButtonToolbar,Alert} from 'react-bootstrap'
+import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
+import {getDateTimeString} from "../Utilities/DateTime";
 
 
 class ViewRecord extends Component {
 
     constructor(props, context) {
         super(props, context);
-        let mockDate = new Date(1127779200000).toTimeString();
         this.state =
             {
+
+                alertMsg:"",
                 recordJson: {
-                    Id: 51,
-                    Number: "EDM-2003/001",
-                    title: "Sample Record",
-                    ScheduleId: 26,
-                    TypeId: 3,
-                    ConsignmentCode: "DESTRUCTION CERTIFICATE 2009-01",
-                    StateId: 6,
-                    ContainerId: 24365,
-                    LocationId: 5,
-                    createdAt: mockDate,
-                    updatedAt: mockDate,
-                    closedAt: mockDate,
-                    ClassificationIds: [3, 4, 5, 6],
-                    state: "Active",
-                    location: "AE Corporate Office - Edmonton - Accounting",
-                    type: "AE CORP - ACCOUNTING - EDM - PROJECT BILLINGS",
-                    consignmentCode: null,
-                    schedule: "FINANCIAL MANAGEMENT - ACCOUNTING",
-                    scheduleYear: 6,
-                    Notes: "This is a note!"
+                    title:"",
+                    number:"",
+                    scheduleId:"",
+                    typeId:"",
+                    consignmentCode:"",
+                    containerId:"",
+                    locationId:"",
+                    classifications:"",
+                    notes:"",
+                    id:"",
+                    stateId:"",
+                    createdAt:"",
+                    updatedAt:"",
+                    closedAt:"",
+                    location:"",
+                    schedule:"",
+                    type:"",
+                    state:"",
+                    container:"",
+                    scheduleYear:""
                 },
-                navigate:false
             };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -43,7 +44,7 @@ class ViewRecord extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId, 5)
+        getRecordById(this.props.match.params.recordId)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
@@ -59,7 +60,7 @@ class ViewRecord extends Component {
         let keys = Object.keys(data);
         keys.forEach( key => {
             if (key.endsWith("At")) {
-                data[key] = new Date(data[key]).toTimeString();
+                data[key] = getDateTimeString(new Date(data[key]));
             }
         });
         context.setState({"recordJson": data});
@@ -68,87 +69,125 @@ class ViewRecord extends Component {
 
     }
 
-    handleSubmit(event) {
-        alert('Form has been submitted - for rollback');
-        event.preventDefault();
+    handleSubmit() {
+        deleteRecordByIds(this.props.match.params.recordId)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if(data.status === 500) {
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else {
+                    this.props.history.push("/results/");
+                }
+            })
+            .catch(error => console.log('error============:', error));
     }
 
     render() {
-        const { navigate } = this.state;
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
-        // here is the important part
-        if (navigate) {
-            return <Redirect to="/" push={true} />
-        }
+        let title = {
+            textAlign:"left",
+        };
+        let btnStyle = {
+            display:"flex",
+            justifyContent:"left"
+        };
 
         return (
             <div>
-                <h1>{this.state.recordJson["number"]}</h1>
-                <Link to={updateRecordLink}>
-                    <Button> Edit Record </Button>
-                </Link>
-                    <Confirm
-                        onConfirm={() => this.setState({ navigate: true })}
-                        body="Are you sure you want to delete this?"
-                        confirmText="Confirm Delete"
-                        title="Deleting Record">
-                        <Button>Delete </Button>
-                    </Confirm>
-                <br/><br/>
+                {this.state.alertMsg.length !== 0
+                    ?<Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    :null
+                }
                 <Grid>
                     <Row>
-                        <Col sm={4} smOffset={2}>
-                            <b>Title</b>
-                            <br/>
-                            {this.state.recordJson["title"]}
-                            <br/>
-                            <b>State</b>
-                            <br/>
-                            {this.state.recordJson["state"]}
-                            <br/>
-                            <b>Location</b>
-                            <br/>
-                            {this.state.recordJson["location"]}
-                            <br/>
-                            <b>Record Type</b>
-                            <br/>
-                            {this.state.recordJson["type"]}
-                            <br/>
-                            <b>Classification</b>
-                            <br/>
-                            {/*TODO*/}
-                            To Be Completed
-                            <br/>
-                            <b>Consignment Code</b>
-                            <br/>
-                            {this.state.recordJson["consignmentCode"]}
-                            <br/>
-
-                        </Col>
-                        <Col sm={3}>
-                            <b>Created At</b>
-                            <br/>
-                            {this.state.recordJson["createdAt"]}
-                            <br/>
-                            <b>Updated At</b>
-                            <br/>
-                            {this.state.recordJson["updatedAt"]}
-                            <br/>
-                            <b>Closed At</b>
-                            <br/>
-                            {this.state.recordJson["closedAt"]}
-                            <br/>
-                            <b>Retention Schedule</b>
-                            <br/>
-                            {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
-                            <br/>
+                        <Col md={10} mdOffset={2}>
+                        <h1 style = {title}>{this.state.recordJson["number"]}</h1>
                         </Col>
                     </Row>
                     <Row>
-                        <b>Note</b>
-                        <br/>
-                        {this.state.recordJson["Notes"]}
+                        <Col md={4} mdOffset={2}>
+                            <p style ={title}>
+                                <b>Title</b>
+                                <br/>
+                                {this.state.recordJson["title"]}
+                            </p>
+                            <p style ={title}>
+                                <b>State</b>
+                                <br/>
+                                {this.state.recordJson["state"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Location</b>
+                                <br/>
+                                {this.state.recordJson["location"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Record Type</b>
+                                <br/>
+                                {this.state.recordJson["type"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Classification</b>
+                                <br/>
+                                {this.state.recordJson["classifications"]}
+
+                            </p>
+                            <p style ={title}>
+                                <b>Consignment Code</b>
+                                <br/>
+                                {this.state.recordJson["consignmentCode"]}
+                            </p>
+                        </Col>
+                        <Col md={5}>
+                            <p style ={title}>
+                                <b>Created At:</b>
+                                <br/>
+                                {this.state.recordJson["createdAt"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Updated At:</b>
+                                <br/>
+                                {this.state.recordJson["updatedAt"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Closed At:</b>
+                                <br/>
+                                {this.state.recordJson["closedAt"]}
+                            </p>
+                            <p style ={title}>
+                                <b>Retention Schedule:</b>
+                                <br/>
+                                {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
+                            </p>
+                        </Col>
+                        <Col md={9} mdOffset={2}>
+                            <p style ={title}>
+                                <b>Note</b>
+                                <br/>
+                                {this.state.recordJson["notes"]}
+                            </p>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={10} mdOffset={2}>
+                        <ButtonToolbar style = {btnStyle}>
+                            <Link to={updateRecordLink}>
+                                <Button  bsStyle="primary"> Edit Record </Button>
+                            </Link>
+                            <Confirm
+                                onConfirm={this.handleSubmit}
+                                body="Are you sure you want to delete this?"
+                                confirmText="Confirm Delete"
+                                title="Deleting Record">
+                                <Button bsStyle="danger">Delete Record</Button>
+                            </Confirm>
+                        </ButtonToolbar>
+                        </Col>
                     </Row>
                 </Grid>
             </div>

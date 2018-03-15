@@ -1,269 +1,628 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Checkbox} from 'react-bootstrap'
-import {getRecordById} from "../APIs/RecordsApi";
+import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
+import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
+import {Typeahead} from 'react-bootstrap-typeahead';
+import {getDateTimeString} from "../Utilities/DateTime";
 
 class UpdateRecord extends Component {
 
     constructor(props, context) {
         super(props, context);
-        let mockDate = new Date(1127779200000).toTimeString();
         this.state =
             {
-                recordType: "",
-                recordNumber: "",
+                alertMsg:"",
+
+                userLocations:null,
+
+                recordNumberValidationMsg:"",
+                recordNumberValidationState:"success",
+                recordNumber: null,
+                recordNumberPattern: null,
+
+                titleValidationMsg:"",
+                titleValidationState:"success",
                 title: "",
-                state:"",
-                containerNumber: "",
-                consignmentCode: "",
-                location: "Burnaby",
-                classificationChildren: [],
+
+
+                locationValidationMsg:"",
+                locationValidationState:"success",
+                location: null,
+
+
+                //TODO Classifications
+                classificationValidationMsg:"",
+                classificationValidationState:"success",
+                classification: null,
+                classificationBack:[],
+                classificationParentHistory:["(Select Record Type)"],
+                classificationParent:"(Select Record Type)",
+                classificationAtLeaf: false,
+
+                //TODO RetentionSechdule
+                retentionValidationMsg:"",
+                retentionValidationState:"success",
+                retentionSchedule:null,
+                retentionScheduleName:"",
+
+
+                //TODO State
+                stateValidationMsg:"",
+                stateValidationState:"success",
+                stateId:null,
+
+                containerValidationMsg:"",
+                containerValidationState:"success",
+                container: null,
+
+
+                consignmentCodeValidationMsg:"",
+                consignmentCodeValidationState:"success",
+                consignmentCode: null,
+
+                notesValidationMsg:"",
+                notesValidationState:"success",
+                notes:null,
+
+
                 responseJson:{
-                    Id: 51,
-                    Number: "EDM-2003/001",
-                    title: "Sample Record",
-                    ScheduleId: 26,
-                    TypeId: 3,
-                    ConsignmentCode: "DESTRUCTION CERTIFICATE 2009-01",
-                    StateId: 6,
-                    ContainerId: 24365,
-                    LocationId: 5,
-                    createdAt: mockDate,
-                    updatedAt: mockDate,
-                    closedAt: mockDate,
-                    ClassificationIds: [3, 4, 5, 6],
-                    state: "Active",
-                    location: "AE Corporate Office - Edmonton - Accounting",
-                    type: "AE CORP - ACCOUNTING - EDM - PROJECT BILLINGS",
-                    consignmentCode: null,
-                    schedule: "FINANCIAL MANAGEMENT - ACCOUNTING",
-                    scheduleYear: 6,
-                    Notes: "This is a note!"
+                    title:null,
+                    number:null,
+                    scheduleId:null,
+                    typeId:null,
+                    consignmentCode:null,
+                    containerId:null,
+                    locationId:null,
+                    classifications:null,
+                    notes:null,
+                    id:null,
+                    stateId:null,
+                    createdAt:null,
+                    updatedAt:null,
+                    closedAt:null,
+                    location:"",
+                    schedule:null,
+                    type:null,
+                    state:null,
+                    container:null,
+                    scheduleYear:null
                 },
-                recordJson: [{
-                    "id": "10",
-                    "name": "CASE RECORDS",
-                    "numberPattern": "XXX-ZZZ/NN",
-                    "defaultScheduleId": "322"
-                }, {
-                    "id": "3",
-                    "name": "subject",
-                    "numberPattern": "KKK-yyyy/ggg",
-                    "defaultScheduleId": ""
-                }]
-                ,
-                classificationJson: [{
-                    "id": "2",
-                    "name": "COMPLIANCE",
-                    "keyword": "F",
-                    "updatedAt": "2003-10-10 19:00:48.000000",
-                    "parent": "",
-                    "children": [3, 4, 5]
-                }, {
-                    "id": "3",
-                    "name": "SAMPLE",
-                    "keyword": "G",
-                    "updatedAt": "2003-10-10 19:00:52.000000",
-                    "parent": 2,
-                    "children": ""
-                }]
-                ,
-                retentionScheduleJson: [{
-                    "id": "2",
-                    "name": "INFORMATION MANAGEMENT - ACQUISITION",
-                    "code": "I1.A1.01",
-                    "years": "3"
-                }, {
-                    "id": "4",
-                    "name": "BUSINESS DEVELOPMENT - COMMITTEES",
-                    "code": "B1.C2.00",
-                    "years": "1"
-                }],
-                checked: false
+
+                classificationResponse: null,
+                retentionScheduleResponse:null,
+                recordStateResponse:null,
             };
 
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.backClassification = this.backClassification.bind(this);
+        this.resetClassification = this.resetClassification.bind(this);
     }
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId, 5)
+        getRecordById(this.props.match.params.recordId)
             .then(response => response.json())
             .then(data => {
+                this.setState({recordNumber: data.number});
+                this.setState({title: data.title});
+                this.setState({location: data.locationId});
+                //Classification
+                this.setState({retentionSchedule: data.scheduleId});
+                this.setState({retentionScheduleName:data.schedule});
+                this.setState({stateId: data.stateId});
+                this.setState({container:data.container});
+                this.setState({consignmentCode:data.consignmentCode});
+                this.setState({notes:data.notes});
                 if (data && !data.exception) {
                     setData(that, data);
                 }
+                console.log(this.state);
+            })
+            .catch(err => {
+            console.error("Error loading record: " + err.message);
+        });
+        getClassifications()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({classificationResponse: data});
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getRetentionSchedule()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({retentionScheduleResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getUser(500)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({userLocations: data.locations});
+                this.setState({location:data.locations[0].locationId})
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+            });
+        getRecordStates()
+            .then(response => response.json())
+            .then(data => {
+                this.setState({recordStateResponse: data});
+            })
+            .catch(err => {
+                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
     }
+
     setData = (context, data) => {
         let keys = Object.keys(data);
         keys.forEach( key => {
             if (key.endsWith("At")) {
-                data[key] = new Date(data[key]).toTimeString();
+                data[key] = getDateTimeString(new Date(data[key]).toTimeString());
             }
         });
         context.setState({"responseJson": data});
     };
-    componentDidMount(){
-    }
-    //TODO - Validationstate is working but will have to likely create many for different validations
-    getValidationState() {
-/*        const length = this.state.recordNumber.length;
-        if (length > 10) return 'success';
-        else if (length > 5) return 'warning';
-        else if (length > 0) return 'error';
-        return null;*/
-    }
 
     handleChange(e) {
-        let responseCopy = JSON.parse(JSON.stringify(this.state.responseJson));
-        responseCopy[e.target.name] = e.target.value;
-        this.setState({responseJson:responseCopy});
-        //When RecordType is changed, adjust record number
-        if (e.target.name === "recordType") {
-            for (var k in this.state.recordJson) {
-                if (k === e.target.value) {
-                    this.setState({recordNumber: this.state.recordJson[k]["numberPattern"]});
-                    break;
-                }
+        if(Array.isArray(e)){
+            if(e.length > 0) {
+                this.setState({retentionSchedule: e[0].id}, ()=> {
+                    this.setState({retentionValidationState: 'success'});
+                });
+            }
+            else {
+                this.setState({retentionValidationState: 'error'});
+                this.setState({retentionValidationMsg:'Please select a retention schedule from the dropdown'});
             }
         }
-        //When Classification is changed, populate clickbox with proper children
-        //TODO - Need to see how far the children information goes
-        if (e.target.name === "classification") {
-            for (k in this.state.classificationJson) {
-                if (k === e.target.value) {
-                    this.setState({classificationChildren: this.state.classificationJson[k]["children"]});
-                    console.log(this.state.classificationChildren);
-                    break;
+        else {
+            e.persist();
+            this.setState({[e.target.name]: e.target.value}, ()=> {
+                //Validation handling here
+                if(e.target.name === "recordNumber") {
+                    const length = this.state.responseJson["number"];
+                    if (length >= 1) {
+                        this.setState({recordNumberValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({recordNumberValidationState: 'error'});
+                        this.setState({recordNumberValidationMsg: 'Record Number should be pre-filled. Please notify the developers.'});
+                    }
                 }
-            }
+                if(e.target.name === "title") {
+                    const length = this.state.responseJson["title"].length;
+                    if (length >= 1 && length < 256) {
+                        this.setState({titleValidationState:'success'});
+                    }
+                    else if (length >=50){
+                        this.setState({titleValidationMsg:"Please enter less than 256 characters"})
+                        this.setState({titleValidationState:'error'});
+                    }
+                    else {
+                        this.setState({titleValidationState:null});
+                    }
+                }
+
+                if(e.target.name === "location") {
+                    const length = this.state.responseJson["location"].length;
+                    if (length >= 1) {
+                        this.setState({locationValidationState: 'success'});
+                    }
+                    else {
+                        this.setState({locationValidationState: 'error'});
+                        this.setState({locationValidationMsg: 'Record Number should be pre-filled. Please notify the developers.'});
+                    }
+                }
+                if(e.target.name === "classification") {
+                    getClassifications(this.state.classification)
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.length >0) {
+                                if (this.state.classificationAtLeaf) {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                else {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.setState({classificationParent:e.target.options[e.target.selectedIndex].text});
+                                    this.state.classificationBack.push(this.state.classification);
+                                    document.getElementById("formClassification").value = "0";
+                                    this.setState({classificationResponse: data});
+                                }
+                                this.setState({classificationValidationState:null});
+                                this.setState({classificationAtLeaf:false});
+
+                            }
+                            else {
+                                if(!this.state.classificationAtLeaf) {
+                                    this.state.classificationParentHistory.push(e.target.options[e.target.selectedIndex].text);
+                                    this.state.classificationBack.push(this.state.classification);
+                                }
+                                else {
+                                    let parentHistory =  this.state.classificationParentHistory;
+                                    let backHistory = this.state.classificationBack;
+                                    parentHistory[parentHistory.length-1] = e.target.options[e.target.selectedIndex].text;
+                                    backHistory[backHistory.length-1]=this.state.classification;
+                                    this.setState({classificationParentHistory: parentHistory});
+                                    this.setState({classificationBack: backHistory});
+                                }
+                                this.setState({classificationAtLeaf:true});
+                                this.setState({classificationValidationState:"success"});
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Error loading record: " + err.message);
+                            this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+                        });
+                }
+                if(e.target.name === "container") {
+                    const regexNumbers = /^[0-9\b]{1,11}$/;
+                    const regexNumbersExceed = /^[0-9\b]{12,}$/;
+                    const regexNotNumbers = /[^0-9]+/;
+
+                    if (regexNumbers.test(this.state.container)) {
+                        this.setState({containerValidationState:'success'});
+                    }
+                    else if (regexNumbersExceed.test(this.state.container)) {
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
+                    }
+                    else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
+                        this.setState({containerValidationState:'error'});
+                        this.setState({containerValidationMsg:'Please enter numbers only'});
+                    }
+                    else {
+                        this.setState({container: null});
+                        this.setState({containerValidationState:'success'});
+                    }
+                }
+
+                if(e.target.name === "consignmentCode") {
+                    const length = this.state.consignmentCode.length;
+                    if (length >= 1 && length <= 50) {
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
+                    else if (length > 50) {
+                        this.setState({consignmentCodeValidationState:'error'});
+                        this.setState({consignmentCodeValidationMsg:'Please enter less than 51 characters only'});
+                    }
+                    else {
+                        this.setState({consignmentCode:null});
+                        this.setState({consignmentCodeValidationState:'success'});
+                    }
+                }
+
+                if(e.target.name === "notes") {
+                    const length = this.state.notes.length;
+                    if (length >= 0) {
+                        this.setState({notesValidationState:'success'});
+                    }
+                }
+
+            });
         }
     }
 
-    //TODO Might have to go further into children field to display all possible options
-    returnCheckboxes() {
-        if (this.state.classificationChildren.length > 0) {
-            return this.state.classificationChildren.map((item, i) =>
-                <Checkbox inline key={i} value={i}>{item}</Checkbox>);
-        }
-        else {
-            return null;
-        }
-    };
-
     handleSubmit(event) {
-        alert('Form has been submitted');
+        const regexValidationState = /^.*ValidationState$/;
+        var keys = Object.keys(this.state);
+        var failValidation = false;
+        for(var i=0;i<keys.length;i++){
+            var key = keys[i];
+            if (regexValidationState.test(key)) {
+                if(this.state[key] === null) {
+                    failValidation = true;
+                    var returnObj = {};
+                    returnObj[key] = "error";
+                    this.setState(returnObj);
+                    var returnObjMsg = {};
+                    var keyValidationMsg = key.replace("ValidationState", "ValidationMsg");
+                    returnObjMsg[keyValidationMsg]= "Please fill out the required field.";
+                    this.setState(returnObjMsg);
+                }
+                if(this.state[key] === "error") {
+                    failValidation = true;
+                }
+            }
+        }
+        if(!failValidation) {
+            updateRecord(this.props.match.params.recordId, this.state)
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    if(data.status === 500) {
+                        this.setState({alertMsg: data.message});
+                        window.scrollTo(0, 0)
+                    }
+                    else {
+                        this.props.history.push("/viewRecord/"+ data.id);
+                    }
+                })
+                .catch(error => {
+                    this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                    window.scrollTo(0, 0)
+                });
+        }
         event.preventDefault();
+    }
+    backClassification() {
+        this.state.classificationBack.pop();
+        if (this.state.classificationParentHistory.length > 1) {
+            this.state.classificationParentHistory.pop();
+        }
+        this.setState({classificationParent: this.state.classificationParentHistory[this.state.classificationParentHistory.length-1]});
+        document.getElementById("formClassification").value = "0";
+        getClassifications(this.state.classificationBack[this.state.classificationBack.length - 1])
+            .then(response => response.json())
+            .then(data => {
+                if(data.length > 0) {
+                    this.setState({classificationResponse: data});
+                    this.setState({classificationValidationState: null});
+                    this.setState({classificationAtLeaf:false});
+                }
+                else {
+                    this.setState({classificationAtLeaf:true});
+                    this.setState({classificationValidationState: "success"});
+                }
+            })
+            .catch(error => {
+
+            })
+    }
+
+    resetClassification(){
+/*        getClassifications()
+            .then(response => response.json())
+            .then(data => {
+                if(data.length >0) {
+                    this.setState({classificationBack:[]});
+                    this.setState({classificationParentHistory:["(Select Record Type)"]})
+                    this.setState({classificationParent:"(Select Record Type)"});
+                    this.setState({classificationValidationState:null});
+                    this.setState({classificationResponse: data});
+                }
+            });
+        document.getElementById("formClassification").value = "0";*/
+        console.log(this.state);
     }
 
     render() {
-        const listClassificationJson = this.state.classificationJson.map((item, i) =>
-            <option key={i} value={i}>{item.name}</option>);
-        const listRetentionScheduleJson = this.state.retentionScheduleJson.map((item, i) =>
-            <option key={i} value={i}>{item.name}</option>);
+        let listClassificationJson = null;
+        let listLocationJson = null;
+        let listRecordStatesJson = null;
+        let retentionForm = null;
+        let classificationPath = "";
+        if (this.state.classificationResponse !== null) {
+            listClassificationJson = this.state.classificationResponse.map((item, i) =>
+                <option key={i} value={item.id}>{item.name}</option>);
+        }
+        if (this.state.recordStateResponse !== null) {
+            listRecordStatesJson = this.state.recordStateResponse.map((item, i) =>
+                <option key={i} value={item.id}>{item.name}</option>);
+        }
+        if (this.state.retentionScheduleResponse !== null) {
+            if(this.state.retentionSchedule != null) {
+                retentionForm =
+                    <Typeahead
+                        onChange={this.handleChange}
+                        defaultInputValue = {this.state.retentionScheduleName}
+                        labelKey={option => `${option.name} ${option.code.trim()}`}
+                        options={this.state.retentionScheduleResponse}
+                        placeholder="Choose a state..."/>
+            }
+        }
+        if (this.state.classificationParentHistory.length > 1) {
+            for(let i = 1; this.state.classificationParentHistory.length > i; i++) {
+                if(i===1) {
+                    classificationPath += this.state.classificationParentHistory[i];
+
+                }
+                else {
+                    classificationPath += "/" + this.state.classificationParentHistory[i];
+                }
+            }
+        }
+        if (this.state.userLocations !== null) {
+            listLocationJson = this.state.userLocations.map((item, i) =>
+                <option key={i} value={item.locationId}>{item.locationName}</option>);
+        }
+
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
+
+        let formStyle = {
+            margin: 'auto',
+            width: '50%',
+            padding: '10px',
+            textAlign:'left'
+        }
+        let classificationDefault = {
+            color:'red',
+        }
 
         return (
             <div>
+                {this.state.alertMsg.length !== 0
+                    ?<Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    :null
+                }
                 <h1>Update Record</h1>
-                <h2>{this.state.responseJson["number"]}</h2>
-                <form onSubmit={this.handleSubmit}>
+                <h2>{this.state.recordNumber}</h2>
+                <form onSubmit={this.handleSubmit}  style = {formStyle}>
                     <FormGroup
                         controlId="formBasicText"
-                        validationState={this.getValidationState()}
+                        validationState={this.state.recordNumberValidationState}
                     >
                         <ControlLabel>Record Number {requiredLabel}</ControlLabel>
                         <FormControl
                             disabled
                             name="number"
                             type="text"
-                            value={this.state.responseJson["number"]}
+                            value={this.state.recordNumber}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
                         <FormControl.Feedback/>
+                        { this.state.recordNumberValidationState === "error"
+                            ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <FormGroup
-                        validationState={this.getValidationState()}
+                        validationState={this.state.titleValidationState}
                     >
                         <ControlLabel>Title {requiredLabel}</ControlLabel>
                         <FormControl
                             name="title"
                             type="text"
-                            value={this.state.responseJson["title"]}
+                            value={this.state.title}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
                         <FormControl.Feedback/>
+                        { this.state.titleValidationState === "error"
+                            ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
-                    <FormGroup>
+                    <FormGroup
+                        controlId="formControlsSelect"
+                        onChange={this.handleChange}
+                        validationState={this.state.locationValidationState}
+                    >
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
                         <FormControl
+                            disabled
                             name="location"
-                            type="text"
-                            value={this.state.responseJson["location"]}
-                            placeholder="Enter text"
-                            onChange={this.handleChange}
-                        />
+                            componentClass="select"
+                        >
+                            {listLocationJson}
+                        </FormControl>
+                        <FormControl.Feedback/>
+                        { this.state.locationValidationState === "error"
+                            ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
-                    <FormGroup controlId="formControlsSelect " onChange={this.handleChange}>
-                        <ControlLabel>Classification {requiredLabel}</ControlLabel>
+                    {/* TODO Classifications */}
+                    <FormGroup
+                        controlId="formClassification"
+                        onChange={this.handleChange}
+                        validationState={this.state.classificationValidationState}
+                    >
+                        <ControlLabel>Classification {requiredLabel} <br/> {classificationPath} </ControlLabel>
                         <FormControl name="classification"
                                      componentClass="select"
-                                     placeholder="select">
+                                     placeholder="select"
+                        >
+                            <option style={classificationDefault} value="0" disabled selected>{this.state.classificationParent}</option>
                             {listClassificationJson}
                         </FormControl>
+                        <FormControl.Feedback/>
+                        { this.state.classificationValidationState === "error"
+                            ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
+                            :null
+                        }
+                        <ButtonGroup>
+                            <Button onClick={this.backClassification}>Back</Button>
+                            <Button onClick={this.resetClassification}>Reset</Button>
+                        </ButtonGroup>
                     </FormGroup>
-                    <FormGroup>
-                        {this.returnCheckboxes()}
-                    </FormGroup>
-                    <FormGroup controlId="formControlsSelect ">
+                    <FormGroup controlId="formControlsSelect"
+                               validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
-                        <FormControl name="retentionSchedule"
-                                     componentClass="select"
-                                     placeholder="select">
-                            {listRetentionScheduleJson}
-                        </FormControl>
+                        {retentionForm}
+                        <FormControl.Feedback/>
+                        { this.state.retentionValidationState === "error"
+                            ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <FormGroup
                         controlId="formControlsSelect "
                         onChange={this.handleChange}
+                        validationState={this.state.stateValidationState}
+
                     >
                         <ControlLabel>State {requiredLabel}</ControlLabel>
-                        <FormControl name="state"
+                        <FormControl name="stateId"
                                      componentClass="select"
-                                     placeholder="select">
-                            <option>Active</option>
-                            <option>Inactive</option>
-                            <option>Archived - Local</option>
-                            <option>Archived - Interim</option>
-                            <option>Destroyed</option>
+                                     placeholder="select"
+                                     value = {this.state.stateId}
+                        >
+                            {listRecordStatesJson}
                         </FormControl>
+                        <FormControl.Feedback/>
+                        { this.state.containerValidationState === "error"
+                            ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
-                    <FormGroup>
+                    <FormGroup
+                        validationState={this.state.containerValidationState}
+                    >
                         <ControlLabel>Container Number</ControlLabel>
                         <FormControl
-                            name="containerNumber"
+                            name="container"
                             type="text"
-                            value={this.state.containerNumber}
-                            placeholder="Enter text"
+                            value={this.state.container}
+                            placeholder="Enter digits"
                             onChange={this.handleChange}
                         />
+                        <FormControl.Feedback/>
+                        { this.state.containerValidationState === "error"
+                            ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
-                    <FormGroup>
-                        <ControlLabel>Consignment Code {requiredLabel}</ControlLabel>
+                    <FormGroup
+                        validationState={this.state.consignmentCodeValidationState}
+                    >
+                        <ControlLabel>Consignment Code</ControlLabel>
                         <FormControl
                             name="consignmentCode"
                             type="text"
-                            value={this.state.responseJson["consignmentCode"]}
+                            value={this.state.consignmentCode}
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
+                        <FormControl.Feedback/>
+                        { this.state.consignmentCodeValidationState === "error"
+                            ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
+                            :null
+                        }
+                    </FormGroup>
+                    <FormGroup
+                        validationState={this.state.notesValidationState}
+                    >
+                        <ControlLabel>Notes</ControlLabel>
+                        <FormControl
+                            name="notes"
+                            componentClass="textarea"
+                            value={this.state.notes}
+                            placeholder="Enter text"
+                            onChange={this.handleChange}
+                        />
+                        <FormControl.Feedback/>
+                        { this.state.notesValidationState === "error"
+                            ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
+                            :null
+                        }
                     </FormGroup>
                     <Button type="submit">Submit</Button>
                 </form>
