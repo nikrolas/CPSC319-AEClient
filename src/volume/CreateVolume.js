@@ -159,21 +159,20 @@ class CreateVolume extends Component {
                     {this.newVolNum(this.state.numbers.length)}
                 </li>
     };
-    newVolNum = (i) => {
+    newVolNum = (n) => {
         let numbers = this.state.numbers;
         let arr = [];
-        if (i < numbers.length && numbers[i])
-            arr = numbers[i].split(":");
-        else if (numbers[i-1])
-            arr = numbers[i-1].split(":");
+        if (n < numbers.length && numbers[n])
+            arr = numbers[n].split(":");
+        else if (numbers[n-1])
+            arr = numbers[n-1].split(":");
 
-        let num;
-        if (arr[1]) {
-            if (arr[1].startsWith("0"))
-                num = arr[0] + ":0" + (Number(arr[1]) + 1);
-            else num = arr[0] + ":" + (Number(arr[1]) + 1);
-        }
-        else num = arr[0] + ":0" + (i+1);
+        let num = arr[0] + ":";
+        let vol = arr[1] ? Number(arr[1]) : n;
+        let newvol = vol + 1;
+        if (newvol >= 10)
+            num += newvol;
+        else num += "0" + newvol;
         return num;
     };
 
@@ -214,7 +213,6 @@ class CreateVolume extends Component {
                         <Button className='btn btn-primary' onClick={this.handleSubmit}>Submit</Button>
                     </div>
                 </div>
-                {JSON.stringify(this.props.prevPath)}
             </div>
         )
     }
