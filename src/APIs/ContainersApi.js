@@ -24,6 +24,18 @@ export function createContainer(data) {
     });
 }
 
+export function updateContainer(containerId, data) {
+    return fetch(serviceRoot + '/container/' + containerId + '?userId=' + userId, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+}
+
+
 export function deleteContainers(ids) {
     let path = serviceRoot + containersPath + "?ids=" + ids + "&userId=" + userId;
     return fetch(path, {

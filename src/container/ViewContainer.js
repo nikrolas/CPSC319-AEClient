@@ -6,6 +6,7 @@ import {getRecordById} from "../APIs/RecordsApi";
 import ReactTable from "react-table";
 import {getColumns, setData} from "../Utilities/ReactTable";
 import {getDateString, getDateTimeString, transformDates} from "../Utilities/DateTime";
+import {Link} from 'react-router-dom';
 
 
 class ViewContainer extends Component {
@@ -24,7 +25,6 @@ class ViewContainer extends Component {
                 data: [],
                 columns: columns,
                 records: [],
-                note: "Container Note",
                 containerJson: {
                     containerId: "",
                     locationId: "",
@@ -42,7 +42,7 @@ class ViewContainer extends Component {
                     createdAt: "",
                     updatedAt: "",
                     childRecordIds: [],
-                    notes: ""
+                    notes: "Container Note"
                 },
             };
         this.handleChange = this.handleChange.bind(this);
@@ -131,7 +131,7 @@ class ViewContainer extends Component {
     }
 
     render() {
-        // const updateContainerLink = "/updateContainer/" + this.props.match.params.containerId;
+        const updateContainerLink = "/updateContainer/" + this.props.match.params.containerId;
 
         let title = {
             textAlign: "left",
@@ -151,7 +151,9 @@ class ViewContainer extends Component {
                 }
                 <h1>{containerNumber}</h1>
                 <ButtonToolbar style={btnStyle}>
+                    <Link to={updateContainerLink}>
                         <Button bsStyle="primary"> Edit Container </Button>
+                    </Link>
                     <Confirm
                         onConfirm={this.handleSubmit}
                         body={"Are you sure you want to delete " + containerNumber + "?"}
@@ -210,9 +212,9 @@ class ViewContainer extends Component {
                         </Col>
                         <Col md={9} mdOffset={3}>
                             <p style={title}>
-                                <b>Note</b>
+                                <b>Notes</b>
                                 <br/>
-                                {this.state.note}
+                                {this.state.containerJson["notes"]}
                             </p>
                         </Col>
                     </Row>
