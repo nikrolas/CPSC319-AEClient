@@ -60,7 +60,7 @@ class ViewRecord extends Component {
                 console.error("Error loading record: " + err.message);
             });
     }
-
+    
 
     setData = (context, data) => {
         let keys = Object.keys(data);

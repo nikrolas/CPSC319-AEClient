@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Button, Alert} from 'react-bootstrap';
 import {createVolume, getRecordsByNumber} from "../APIs/RecordsApi";
 import {MdCreateNewFolder} from 'react-icons/lib/md';
+import PropTypes from 'prop-types';
 
 class CreateVolume extends Component {
 
@@ -23,7 +24,7 @@ class CreateVolume extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     static contextTypes = {
-        router: () => true,
+        router: PropTypes.object,
     };
 
     componentWillMount() {
@@ -44,8 +45,7 @@ class CreateVolume extends Component {
                     data.forEach((volume) => {
                         numbers.push(volume.number);
                     });
-                    //console.log(JSON.stringify(numbers));
-                    let notes = data[data.length-1].notes;
+                    let notes = data[data.length -1].notes;
                     this.setState({volumes: data, numbers, notes});
                 }
             })
@@ -53,7 +53,6 @@ class CreateVolume extends Component {
                 console.error("Error loading search results: " + err.message);
             });
     };
-
     naturalCompare = (a, b) => {
         let ax = [], bx = [];
 
@@ -147,7 +146,7 @@ class CreateVolume extends Component {
                     {this.newVolNum(0)}
                 </li>
             }
-            else return <li style={{fontSize: '25px'}}> {number} </li>
+            else return <li key={index} style={{fontSize: '25px'}}> {number} </li>
         });
     };
     displayNew = () => {
@@ -177,9 +176,13 @@ class CreateVolume extends Component {
         return num;
     };
 
-    render() {
-        const {notes} = this.state;
+    displayNotes = () => {
+        let {notes} = this.state;
+        //console.log("notes: " + notes);
+        return notes;
+    };
 
+    render() {
         return (
             <div style={styles.container}>
                 {this.state.alertMsg.length !== 0 && !this.state.success
@@ -187,7 +190,7 @@ class CreateVolume extends Component {
                     : null
                 }
                 {this.state.alertMsg.length !== 0 && this.state.success
-                    ? <Alert bsStyle="success"><h4>{this.state.alertMsg}</h4></Alert>
+                    ? <Alert bsStyle="success"><h4 style={{fontSize: '25px'}}>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
 
@@ -206,7 +209,9 @@ class CreateVolume extends Component {
                                 Copy notes from last volume:
                             </label>
                         </div>
-                        <textarea readonly="true" style={styles.notes}>{notes !== "" ? notes : null}</textarea>
+                        <textarea readonly="true"
+                                  style={styles.notes}
+                                  value={this.displayNotes()}/>
                     </div>
                     <div>
                         <Button className='btn btn-danger' onClick={this.handleCancel}>Cancel</Button>
