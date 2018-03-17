@@ -10,6 +10,7 @@ class CreateVolume extends Component {
         super(props);
         this.state =
             {
+                timeout: false,
                 success: false,
                 alertMsg: "",
                 location: this.getUserLocations()[0], //TODO://set user default location
@@ -24,12 +25,23 @@ class CreateVolume extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     static contextTypes = {
-        router: PropTypes.object,
+        router: PropTypes.object
     };
 
     componentWillMount() {
-        if (this.state.selectedRecord)
-            this.search(this.state.selectedRecord.number.split(":")[0]);
+        if (!this.state.success) {
+            if (this.state.selectedRecord)
+                this.search(this.state.selectedRecord.number.split(":")[0]);
+            else {
+                if (!this.state.timeout) {
+                    this.setState({alertMsg: "Nothing selected. Redirecting..", timeout: true});
+                    window.scrollTo(0, 0);
+                    setTimeout(() => {
+                        this.context.router.history.goBack();
+                    }, 2000);
+                }
+            }
+        }
     }
     search = (searchString) => {
         getRecordsByNumber(searchString)
@@ -82,13 +94,17 @@ class CreateVolume extends Component {
     };
 
     handleCancel(event) {
-        this.setState({
-            success: false,
-            alertMsg: "Cancelled",
-        });
-        setTimeout(() => {
-            this.context.router.history.goBack();
-        }, 2000);
+        if (!this.state.timeout) {
+            this.setState({
+                timeout: true,
+                success: false,
+                alertMsg: "Cancelled",
+            });
+            window.scrollTo(0, 0);
+            setTimeout(() => {
+                this.context.router.history.goBack();
+            }, 2000);
+        }
 
         event.preventDefault();
     }
@@ -118,13 +134,17 @@ class CreateVolume extends Component {
                 window.scrollTo(0, 0)
             }
             else {
-                this.setState({
-                    success: true,
-                    alertMsg: "Success",
-                });
-                setTimeout(() => {
-                    this.props.history.push("/viewRecord/"+ data.id);
-                }, 2000);
+                if (!this.state.timeout) {
+                    this.setState({
+                        timeout: true,
+                        success: true,
+                        alertMsg: "Success",
+                    });
+                    window.scrollTo(0, 0);
+                    setTimeout(() => {
+                        this.props.history.push("/viewRecord/" + data.id);
+                    }, 2000);
+                }
             }
         })
         .catch(error => {
@@ -176,12 +196,6 @@ class CreateVolume extends Component {
         return num;
     };
 
-    displayNotes = () => {
-        let {notes} = this.state;
-        //console.log("notes: " + notes);
-        return notes;
-    };
-
     render() {
         return (
             <div style={styles.container}>
@@ -210,8 +224,8 @@ class CreateVolume extends Component {
                             </label>
                         </div>
                         <textarea readonly="true"
-                                  style={styles.notes}
-                                  value={this.displayNotes()}/>
+                                  style={this.state.notes === "" ? styles.notes : styles.notes2}
+                                  value={this.state.notes}/>
                     </div>
                     <div>
                         <Button className='btn btn-danger' onClick={this.handleCancel}>Cancel</Button>
@@ -258,6 +272,14 @@ let styles = {
     },
     notes: {
         width: '75%',
+        overflowY: 'auto',
+        minWidth: '25%',
+        maxWidth: '100%',
+        minHeight: '1cm',
+    },
+    notes2: {
+        width: '75%',
+        height: '5cm',
         overflowY: 'auto',
         minWidth: '25%',
         maxWidth: '100%',
