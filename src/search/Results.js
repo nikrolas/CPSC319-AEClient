@@ -10,8 +10,8 @@ import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
-export const recordsResultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode", "schedule"];
-export const containersResultsAccessors = ["containerNumber", "title", "state", "location", "consignmentCode", "schedule"];
+export const recordsResultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode"];
+export const containersResultsAccessors = ["containerNumber", "title", "state", "location", "consignmentCode"];
 
 class SelectTable extends Component {
     constructor(props) {
@@ -82,6 +82,9 @@ class SelectTable extends Component {
                 } else {
                     setTableState(this, [], [], this.tableDataAndSelectionCallback);
                 }
+            })
+            .catch(err => {
+                setTableState(this, [], [], this.tableDataAndSelectionCallback);
             });
     };
 
