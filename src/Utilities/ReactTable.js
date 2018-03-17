@@ -24,32 +24,37 @@ export function getColumns(context, accessors) {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
-                    minWidth: 200,
+                    maxWidth: 150,
                     Cell: e => <a onClick={() => {
                         context.handleClick(accessor, e.row._original.id, 'record')
                     }}> {e.value} </a>
                 });
-            } else if (accessor === "containerNumber" && accessors.includes("number")) {
+            } else if (accessor === "containerNumber") {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
+                    maxWidth: 120,
                     Cell: e => <a onClick={() => {
                         context.handleClick(accessor, e.row._original.containerId, 'container')
                     }}> {e.value} </a>
                 });
-            } else if (accessor === "containerNumber" && !accessors.includes("number")) {
+            } else if (accessor === "title") {
                 columns.push({
                     accessor: accessor,
-                    Header: accessorHeaderMapping[accessor],
-                    minWidth: 150,
-                    Cell: e => <a onClick={() => {
-                        context.handleClick(accessor, e.row._original.containerId, 'container')
-                    }}> {e.value} </a>
+                    minWidth: 250,
+                    Header: accessorHeaderMapping[accessor]
+                });
+            } else if (accessor === "consignmentCode") {
+                columns.push({
+                    accessor: accessor,
+                    maxWidth: 120,
+                    Header: accessorHeaderMapping[accessor]
                 });
             }
             else {
                 columns.push({
                     accessor: accessor,
+                    maxWidth: 100,
                     Header: accessorHeaderMapping[accessor]
                 });
             }
