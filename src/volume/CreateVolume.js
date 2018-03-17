@@ -86,15 +86,10 @@ class CreateVolume extends Component {
         this.setState({
             success: false,
             alertMsg: "Cancelled",
-            notes: "",
-            copy: false,
-            selectedRecord: null,
-            volumes: [],
-            numbers: [],
         });
         setTimeout(() => {
             this.context.router.history.goBack();
-        }, 3000);
+        }, 2000);
 
         event.preventDefault();
     }
@@ -124,7 +119,13 @@ class CreateVolume extends Component {
                 window.scrollTo(0, 0)
             }
             else {
-                this.props.history.push("/viewRecord/"+ data.id);
+                this.setState({
+                    success: true,
+                    alertMsg: "Success",
+                });
+                setTimeout(() => {
+                    this.props.history.push("/viewRecord/"+ data.id);
+                }, 2000);
             }
         })
         .catch(error => {
@@ -210,7 +211,7 @@ class CreateVolume extends Component {
                     <div>
                         <Button className='btn btn-danger' onClick={this.handleCancel}>Cancel</Button>
                         &ensp;
-                        <Button className='btn btn-primary' onClick={this.handleSubmit}>Submit</Button>
+                        <Button className='btn btn-primary' onClick={this.handleSubmit}>Create</Button>
                     </div>
                 </div>
             </div>

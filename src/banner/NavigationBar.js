@@ -4,7 +4,7 @@ import banner_logo from './images/AE_Logo.png';
 import {Navbar, Nav, NavItem} from "react-bootstrap";
 
 export function isARecordItem(obj) {
-    return obj.hasOwnProperty('number');
+    return obj ? obj.hasOwnProperty('number') : false;
 }
 
 class NavigationBar extends Component {

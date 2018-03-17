@@ -53,7 +53,7 @@ class App extends Component {
                 <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData}/>
                 <Route exact path='/' component={Home}/>
                 <Route path='/createRecord/' component={CreateRecord} />
-                <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
+                <RouteWrapper path='/viewRecord/:recordId?' onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates}  component={ViewRecord}/>
                 <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                 <Route path='/viewContainer/:containerId?' component={ViewContainer}/>
                 <Route path='/updateContainer/:containerId?' component={UpdateContainer}/>

@@ -4,6 +4,7 @@ import {Row, Col, Grid, Button, ButtonToolbar,Alert} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
 import {getDateTimeString} from "../Utilities/DateTime";
+import {recordsResultsAccessors} from "../search/Results";
 
 
 class ViewRecord extends Component {
@@ -36,6 +37,8 @@ class ViewRecord extends Component {
                     container:"",
                     scheduleYear:""
                 },
+                onItemSelectCallback: props.onItemSelect,
+                onDataUpdateCallback: props.onDataUpdate
             };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -49,12 +52,15 @@ class ViewRecord extends Component {
             .then(data => {
                 if (data && !data.exception) {
                     setData(that, data);
+                    that.state.onItemSelectCallback([0]);
+                    that.state.onDataUpdateCallback([that.state.recordJson], recordsResultsAccessors);
                 }
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
             });
     }
+
 
     setData = (context, data) => {
         let keys = Object.keys(data);
