@@ -53,6 +53,8 @@ class WorkTray extends Component {
                             onMouseLeave={(e) => {e.target.style.backgroundColor = 'white'}}
                             style={styles.clearbtn}>Clear All</button>,
             sortable: false,
+            resizable: false,
+            width: 100,
             Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
         });
         return columns;

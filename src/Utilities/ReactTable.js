@@ -24,11 +24,12 @@ export function getColumns(context, accessors) {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
+                    minWidth: 200,
                     Cell: e => <a onClick={() => {
                         context.handleClick(accessor, e.row._original.id, 'record')
                     }}> {e.value} </a>
                 });
-            } else if (accessor === "containerNumber") {
+            } else if (accessor === "containerNumber" && accessors.includes("number")) {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
@@ -36,7 +37,17 @@ export function getColumns(context, accessors) {
                         context.handleClick(accessor, e.row._original.containerId, 'container')
                     }}> {e.value} </a>
                 });
-            } else {
+            } else if (accessor === "containerNumber" && !accessors.includes("number")) {
+                columns.push({
+                    accessor: accessor,
+                    Header: accessorHeaderMapping[accessor],
+                    minWidth: 150,
+                    Cell: e => <a onClick={() => {
+                        context.handleClick(accessor, e.row._original.containerId, 'container')
+                    }}> {e.value} </a>
+                });
+            }
+            else {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor]
