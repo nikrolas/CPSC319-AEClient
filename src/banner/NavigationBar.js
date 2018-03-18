@@ -78,6 +78,11 @@ class NavigationBar extends Component {
 
     render() {
         let userInfo = null;
+        let workTray = null;
+        let newRecord = null;
+        let containRecords = null;
+        let createVolume = null;
+
         if(this.state.user !== undefined && this.state.user!== null) {
             userInfo =
                 <Nav pullRight={true}>
@@ -87,7 +92,27 @@ class NavigationBar extends Component {
                         Location: {this.state.user.locations[0].locationName}
                     </NavItem>
                 </Nav>
-        };
+            if(this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+                workTray =
+                    <NavItem componentClass={Link} href="/worktray" to="/worktray">
+                        Work Tray
+                    </NavItem>;
+                newRecord =
+                    <NavItem componentClass={Link} href="/createRecord" to="/createRecord">
+                        New Record
+                    </NavItem>;
+                containRecords =
+                    <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
+                             to="/createContainer">
+                        Contain Records
+                    </NavItem>;
+                createVolume =
+                    <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
+                             to="/createVolume">
+                        Create Volume
+                    </NavItem>;
+            }
+        }
         return (
             <Navbar inverse fluid>
                 <Nav>
@@ -97,20 +122,10 @@ class NavigationBar extends Component {
                     <NavItem componentClass={Link} href="/results" to="/results">
                         Search
                     </NavItem>
-                    <NavItem componentClass={Link} href="/worktray" to="/worktray">
-                        Work Tray
-                    </NavItem>
-                    <NavItem componentClass={Link} href="/createRecord" to="/createRecord">
-                        New Record
-                    </NavItem>
-                    <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
-                             to="/createContainer">
-                        Contain Records
-                    </NavItem>;
-                    <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
-                             to="/createVolume">
-                        Create Volume
-                    </NavItem>;
+                    {workTray}
+                    {newRecord}
+                    {containRecords}
+                    {createVolume}
                 </Nav>
                 {userInfo}
             </Navbar>
