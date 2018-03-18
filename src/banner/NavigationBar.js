@@ -13,7 +13,8 @@ class NavigationBar extends Component {
         super(props);
         this.state = {
             records: [],
-            containers: []
+            containers: [],
+            user: props.userData,
         }
     }
 
@@ -76,10 +77,20 @@ class NavigationBar extends Component {
     };
 
     render() {
-        console.log(this.props);
         let userLoginStyle = {
             color:'white'
-        }
+        };
+        let userInfo = null;
+        if(this.state.user !== undefined) {
+            userInfo =
+                <Nav pullRight={true}>
+                    <NavItem>
+                        Signed in as: {this.state.user.firstName} {this.state.user.lastName} ({this.state.user.role})
+                        <br/>
+                        Location: {this.state.user.locations[0].locationName}
+                    </NavItem>
+                </Nav>
+        };
         return (
             <Navbar inverse fluid>
                 <Nav>
@@ -104,7 +115,7 @@ class NavigationBar extends Component {
                         Create Volume
                     </NavItem>;
                 </Nav>
-                <h1 style = {userLoginStyle}></h1>
+                {userInfo}
             </Navbar>
 
         );
