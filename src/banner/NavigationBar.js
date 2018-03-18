@@ -11,7 +11,14 @@ class NavigationBar extends Component {
 
     constructor(props) {
         super(props);
-        this.state = this.countItemTypes(props.selectedItemIndexes, props.resultsData);
+        this.state = {
+            records: [],
+            containers: []
+        }
+    }
+
+    componentWillMount() {
+        this.updateCounts(this.props);
     }
 
     countItemTypes = (selectedItemIndexes, data) => {
@@ -30,17 +37,21 @@ class NavigationBar extends Component {
     };
 
     componentWillReceiveProps(newProps) {
-        let newCounts = this.countItemTypes(newProps.selectedItemIndexes, newProps.resultsData);
-        this.setState(newCounts);
+        this.updateCounts(newProps);
     }
 
+
+    updateCounts = (newProps) => {
+        let newCounts = this.countItemTypes(newProps.selectedItemIndexes, newProps.resultsData);
+        this.setState(newCounts);
+    };
 
     enableContainRecords = () => {
         return this.state.records > 0 && this.state.containers <= 1;
     };
 
     enableCreateVolume = () => {
-        if (this.state.records > 0 && this.state.containers === 0){
+        if (this.state.records > 0 && this.state.containers === 0) {
             let {selectedItemIndexes, resultsData} = this.props;
             let index = -1;
             for (let i = 0; i < selectedItemIndexes.length; i++) {
