@@ -25,7 +25,7 @@ export function createContainer(data) {
 }
 
 export function updateContainer(containerId, data) {
-    return fetch(serviceRoot + '/container/' + containerId + '?userId=' + userId, {
+    return fetch(serviceRoot + containerPath + containerId + '?userId=' + userId, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -42,3 +42,16 @@ export function deleteContainers(ids) {
         method: 'delete'
     });
 }
+
+export function addRecordsToContainer(containerId, data) {
+    let path = serviceRoot + containerPath + containerId + "?userId=" + userId;
+    return fetch(path, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    });
+}
+

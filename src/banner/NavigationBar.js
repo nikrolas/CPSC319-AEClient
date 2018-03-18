@@ -36,11 +36,16 @@ class NavigationBar extends Component {
 
 
     enableContainRecords = () => {
-        return this.state.records > 0 && this.state.containers <= 1;
+        return this.state.records > 0 && this.state.containers === 0;
     };
 
+    enableAddToContainer = () => {
+        return this.state.records > 0 && this.state.containers === 1;
+    };
+
+
     enableCreateVolume = () => {
-        if (this.state.records > 0 && this.state.containers === 0){
+        if (this.state.records > 0 && this.state.containers === 0) {
             let {selectedItemIndexes, resultsData} = this.props;
             let index = -1;
             for (let i = 0; i < selectedItemIndexes.length; i++) {
@@ -80,10 +85,17 @@ class NavigationBar extends Component {
                     <NavItem componentClass={Link} href="/createRecord" to="/createRecord">
                         New Record
                     </NavItem>
-                    <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
-                             to="/createContainer">
-                        Contain Records
-                    </NavItem>;
+                    {!this.enableAddToContainer() ?
+                        <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
+                                 to="/createContainer">
+                            Contain Records
+                        </NavItem>
+                        :
+                        <NavItem componentClass={Link} href="/addToContainer"
+                                 to="/addToContainer">
+                            Contain Records
+                        </NavItem>
+                    }
                     <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
                              to="/createVolume">
                         Create Volume
