@@ -89,12 +89,13 @@ class App extends Component {
     };
 
     render() {
-        const PrivateRoute = ({ component: Component, ...rest }) => (
+
+        const PrivateRoute = ({ component, ...rest }) => (
             <Route
                 {...rest}
                 render={props =>
                     (this.state.userAuthenticated) ? (
-                        <Component {...props} />
+                        renderMergedProps(component,props,rest)
                     ) : (
                             <Redirect
                                 to={{
@@ -150,8 +151,7 @@ class App extends Component {
                                    resultsData={this.state.resultsData} userData={this.state.userData}/>
                     <Switch>
                         <Route exact path='/' component={Home}/>
-                        <PrivateRoute path='/createRecord/' component={CreateRecord} userData={this.state.userData}
-                                      userAuthorized={this.state.userAuthenticated}/>
+                        <RouteWrapper path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
                         <PrivateRoute path='/viewRecord/:recordId?' component={ViewRecord}/>
                         <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                         <PrivateRoute path='/viewContainer/:containerId?' component={ViewContainer}/>
