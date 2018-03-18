@@ -110,16 +110,22 @@ class NavigationBar extends Component {
                     <NavItem componentClass={Link} href="/createRecord" to="/createRecord">
                         New Record
                     </NavItem>;
-                containRecords =
-                    <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
-                             to="/createContainer">
-                        Contain Records
-                    </NavItem>;
-                createVolume =
-                    <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
-                             to="/createVolume">
-                        Create Volume
-                    </NavItem>;
+                if (!this.enableAddToContainer()) {
+                    containRecords =
+                        <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
+                                 to="/createContainer">
+                            Contain Records
+                        </NavItem>
+                } else {
+                    containRecords =
+                        <NavItem componentClass={Link} href="/addToContainer" to="/addToContainer">
+                            Contain Records
+                        </NavItem>
+                }
+                createVolume = <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
+                                        to="/createVolume">
+                    Create Volume
+                </NavItem>;
             }
         }
         return (
