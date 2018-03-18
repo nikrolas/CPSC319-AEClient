@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Route} from 'react-router-dom';
+import {Route,Redirect,Switch} from 'react-router-dom';
 import './App.css';
 import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
@@ -12,6 +12,8 @@ import Home from "./search/Home";
 import NavigationBar from "./banner/NavigationBar";
 import ViewContainer from "./container/ViewContainer";
 import UpdateContainer from "./container/UpdateContainer";
+import NotAuthenticated from "./errors/NotAuthenticated"
+import NotFound from "./errors/NotFound"
 import {serviceRoot} from "./APIs/ServiceRoot";
 import {LoadingOverlay} from 'react-load-overlay'
 
@@ -40,7 +42,8 @@ class App extends Component {
             resultsData: [],
             resultsColumns: [],
             selectedItemIndexes: [],
-            userData:null
+            userData: null,
+            userAuthenticated: false,
         };
 
     }
@@ -54,10 +57,19 @@ class App extends Component {
             fetch(serviceRoot + "/users/"+userId)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     this.setState({
                         userData: data,
                     });
+                    if(data.role === "Administrator" || data.role === "RMC") {
+                        this.setState({
+                            userAuthenticated: true,
+                        });
+                    }
+                    else {
+                        this.setState({
+                            userAuthenticated: false,
+                        });
+                    }
                     setTimeout(() => {
                         this.setState({loading: false}); }, 1500);
                 })
@@ -77,6 +89,24 @@ class App extends Component {
     };
 
     render() {
+        const PrivateRoute = ({ component: Component, ...rest }) => (
+            <Route
+                {...rest}
+                render={props =>
+                    (this.state.userAuthenticated) ? (
+                        <Component {...props} />
+                    ) : (
+                            <Redirect
+                                to={{
+                                    pathname: "/notAuthorized",
+                                    state: { from: props.location }
+                                }}
+                            />
+                    )
+                }
+            />
+        );
+
         let overlaySize = {
         width:      '100%',
         height:     '100',
@@ -100,11 +130,11 @@ class App extends Component {
                     <div className="App">
                         <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData}/>
                         <Route exact path='/' component={Home}/>
-                        <RouteWrapper path='/createRecord/' component={CreateRecord} userData = {this.state.userData}/>
+                        <PrivateRoute path='/createRecord/' component={CreateRecord} userData = {this.state.userData}/>
                         <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
-                        <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
+                        <PrivateRoute path='/updateRecord/:recordId?' component={UpdateRecord}/>
                         <Route path='/viewContainer/:containerId?' component={ViewContainer}/>
-                        <Route path='/updateContainer/:containerId?' component={UpdateContainer}/>
+                        <PrivateRoute path='/updateContainer/:containerId?' component={UpdateContainer}/>
                         <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={SelectTable}/>
                         <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
                         <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
@@ -116,17 +146,29 @@ class App extends Component {
         else {
             return (
                 <div className="App">
-                    <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} userData = {this.state.userData}/>
-                    <Route exact path='/' component={Home}/>
-                    <RouteWrapper path='/createRecord/' component={CreateRecord} userData = {this.state.userData}/>
-                    <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
-                    <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
-                    <Route path='/viewContainer/:containerId?' component={ViewContainer}/>
-                    <Route path='/updateContainer/:containerId?' component={UpdateContainer}/>
-                    <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={SelectTable}/>
-                    <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
-                    <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
-                    <RouteWrapper path='/createVolume/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateVolume}/>
+                    <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes}
+                                   resultsData={this.state.resultsData} userData={this.state.userData}/>
+                    <Switch>
+                        <Route exact path='/' component={Home}/>
+                        <PrivateRoute path='/createRecord/' component={CreateRecord} userData={this.state.userData}
+                                      userAuthorized={this.state.userAuthenticated}/>
+                        <PrivateRoute path='/viewRecord/:recordId?' component={ViewRecord}/>
+                        <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
+                        <PrivateRoute path='/viewContainer/:containerId?' component={ViewContainer}/>
+                        <Route path='/updateContainer/:containerId?' component={UpdateContainer}/>
+                        <Route path='/notAuthorized/' component={NotAuthenticated}/>
+                        <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes}
+                                      onDataUpdate={this.setResultsStates} component={SelectTable}/>
+                        <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes}
+                                      onDataUpdate={this.setResultsStates} component={WorkTray}/>
+                        <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes}
+                                      resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns}
+                                      component={CreateContainer}/>
+                        <RouteWrapper path='/createVolume/' selectedItemIndexes={this.state.selectedItemIndexes}
+                                      resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns}
+                                      component={CreateVolume}/>
+                        <Route component={NotFound}/>
+                    </Switch>
                 </div>
             );
         }

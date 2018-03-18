@@ -77,11 +77,8 @@ class NavigationBar extends Component {
     };
 
     render() {
-        let userLoginStyle = {
-            color:'white'
-        };
         let userInfo = null;
-        if(this.state.user !== undefined) {
+        if(this.state.user !== undefined && this.state.user!== null) {
             userInfo =
                 <Nav pullRight={true}>
                     <NavItem>
