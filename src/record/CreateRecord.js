@@ -11,6 +11,7 @@ class CreateRecord extends Component {
             {
                 alertMsg:"",
 
+                user:props,
                 userLocations:null,
 
                 recordTypeValidationMsg:"",
@@ -59,6 +60,8 @@ class CreateRecord extends Component {
                 recordTypeResponse: null,
                 classificationResponse: null,
                 retentionScheduleResponse:null,
+
+
             };
 
 
@@ -370,6 +373,7 @@ class CreateRecord extends Component {
                 }
             });
         document.getElementById("formClassification").value = "0";
+        console.log(this.state.user);
     }
 
     render() {

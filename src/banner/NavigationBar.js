@@ -65,6 +65,10 @@ class NavigationBar extends Component {
     };
 
     render() {
+        console.log(this.props);
+        let userLoginStyle = {
+            color:'white'
+        }
         return (
             <Navbar inverse fluid>
                 <Nav>
@@ -89,7 +93,9 @@ class NavigationBar extends Component {
                         Create Volume
                     </NavItem>;
                 </Nav>
+                <h1 style = {userLoginStyle}></h1>
             </Navbar>
+
         );
     }
 }
