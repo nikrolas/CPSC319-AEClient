@@ -11,8 +11,8 @@ class CreateRecord extends Component {
             {
                 alertMsg:"",
 
-                user:props,
-                userLocations:null,
+                user:props.userData,
+                userLocations: null,
 
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
@@ -99,16 +99,18 @@ class CreateRecord extends Component {
                 console.error("Error loading record: " + err.message);
                 this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
-        getUser(500)
-            .then(response => response.json())
-            .then(data => {
-                this.setState({userLocations: data.locations});
-                this.setState({location:data.locations[0].locationId})
-            })
-            .catch(err => {
-                console.error("Error loading record: " + err.message);
-                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
-            });
+        if(this.state.user !== undefined && this.state.user!== null) {
+            getUser(this.state.user.id)
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({userLocations: data.locations});
+                    this.setState({location:data.locations[0].locationId})
+                })
+                .catch(err => {
+                    console.error("Error loading record: " + err.message);
+                    this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+                });
+        }
     }
     handleChange(e) {
         if(Array.isArray(e)){

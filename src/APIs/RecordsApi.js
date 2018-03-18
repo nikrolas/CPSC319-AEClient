@@ -61,7 +61,7 @@ export function createRecord(state) {
             }
         }
     }
-    return fetch(serviceRoot + '/record?userId=' + userId, {
+    return fetch(serviceRoot + '/record?userId=' + state.user.id, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',

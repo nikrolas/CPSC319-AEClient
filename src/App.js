@@ -151,7 +151,7 @@ class App extends Component {
                                    resultsData={this.state.resultsData} userData={this.state.userData}/>
                     <Switch>
                         <Route exact path='/' component={Home}/>
-                        <RouteWrapper path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
+                        <PrivateRoute path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
                         <PrivateRoute path='/viewRecord/:recordId?' component={ViewRecord}/>
                         <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
                         <PrivateRoute path='/viewContainer/:containerId?' component={ViewContainer}/>
