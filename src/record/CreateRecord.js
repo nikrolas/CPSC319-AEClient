@@ -293,7 +293,6 @@ class CreateRecord extends Component {
     }
 
     handleSubmit(event) {
-        console.log(this.state.location);
         const regexValidationState = /^.*ValidationState$/;
         var keys = Object.keys(this.state);
         var failValidation = false;
@@ -375,7 +374,6 @@ class CreateRecord extends Component {
                 }
             });
         document.getElementById("formClassification").value = "0";
-        console.log(this.state.user);
     }
 
     render() {

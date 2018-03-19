@@ -82,8 +82,7 @@ class NavigationBar extends Component {
         let newRecord = null;
         let containRecords = null;
         let createVolume = null;
-
-        if(this.state.user !== undefined && this.state.user!== null) {
+        if(this.state.user !== undefined && this.state.user!== null && this.state.user!=="") {
             userInfo =
                 <Nav pullRight={true}>
                     <NavItem>

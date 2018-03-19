@@ -50,29 +50,53 @@ class App extends Component {
 
     componentWillMount(){
         let user = sessionStorage.getItem('user');
+        const search = window.location.search.substr(1);
+        const params = new URLSearchParams(search);
+        const userId = params.get('userId');
         if (user !== null) {
             let userJson =JSON.parse(user);
-            this.setState({userData: JSON.parse(user)});
-            if(userJson.role === "Administrator" || userJson.role === "RMC") {
-                this.setState({
-                    userAuthenticated: true,
-                });
+            if(userId !== null) {
+                if(userId === userJson.id.toString()) {
+                    this.userExists(userJson);
+                }
+                else {
+                    this.userChange(userId);
+                }
             }
             else {
-                this.setState({
-                    userAuthenticated: false,
-                });
+                this.userExists(userJson);
             }
         }
         else {
-            const search = window.location.search.substr(1);
-            const params = new URLSearchParams(search);
-            const userId = params.get('userId');
-            if (userId !== null) {
-                this.setState({ loading: true });
-                fetch(serviceRoot + "/users/"+userId)
-                    .then(response => response.json())
-                    .then(data => {
+            this.userChange(userId);
+        }
+    }
+    userExists(userJson) {
+        this.setState({userData: userJson});
+        if(userJson.role === "Administrator" || userJson.role === "RMC") {
+            this.setState({
+                userAuthenticated: true,
+            });
+        }
+        else {
+            this.setState({
+                userAuthenticated: false,
+            });
+        }
+    }
+
+    userChange(userId){
+        if (userId !== null) {
+            this.setState({ loading: true });
+            fetch(serviceRoot + "/users/"+userId)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 404){
+                        //TODO display error message?
+                        setTimeout(() => {
+                            this.setState({loading: false}); }, 1000);
+                    }
+                    else {
                         sessionStorage.setItem("user",JSON.stringify(data));
                         this.setState({
                             userData: data,
@@ -88,13 +112,13 @@ class App extends Component {
                             });
                         }
                         setTimeout(() => {
-                            this.setState({loading: false}); }, 1500);
-                    })
-                    .catch(err => {
-                        console.error("Error loading record: " + err.message);
-                        this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
-                    });
-            }
+                            this.setState({loading: false}); }, 1000);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error loading record: " + err.message);
+                    this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+                });
         }
     }
 
