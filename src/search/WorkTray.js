@@ -87,18 +87,16 @@ class WorkTray extends Component {
     deleteRow = (e) => {
         let index = e.row._index;
         let data = [...this.state.data];
+        let selection = [...this.state.selection];
 
-        //TODO: we may want to keep selection
-        this.setState({selection: [], selectAll: false}, () => {
-            this.state.onItemSelectCallback(this.state.selection);
-        });
-
+        selection.splice(-1,1);
         data.splice(index, 1);
         data.forEach((item, index) => {
            //recalculate index
            item._id = index;
         });
-        this.setState({data}, () => {
+        this.setState({selection, data}, () => {
+            this.state.onItemSelectCallback(this.state.selection);
             this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
         });
         //console.log(JSON.stringify(this.state.data));

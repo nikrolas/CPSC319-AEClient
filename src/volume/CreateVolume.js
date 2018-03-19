@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Button, Alert} from 'react-bootstrap';
-import {createVolume, getRecordsByNumber} from "../APIs/RecordsApi";
+import {getRecordsByNumber} from '../APIs/RecordsApi';
+import {createVolume} from "../APIs/VolumesApi";
 import {MdCreateNewFolder} from 'react-icons/lib/md';
 import PropTypes from 'prop-types';
 
@@ -155,19 +156,33 @@ class CreateVolume extends Component {
         event.preventDefault();
     }
 
+    handleClick(event, index) {
+            let routePath = "/viewRecord/" + this.state.volumes[index].id;
+            this.props.history.push(routePath);
+            event.preventDefault();
+    };
+
     displayVolumes = () => {
-        if (this.state.volumes.length > 0)
-        return this.state.numbers.map((number, index) => {
-            if (index === 0 && !number.includes(":")) {
-                return <li key={index} style={{fontSize: '25px'}}>
-                    <span style={{color: '#79ff46'}}>UPDATE:&ensp;</span>
-                    {number}
-                    <i className="fa fa-long-arrow-right" style={styles.arrow}/>
-                    {this.newVolNum(0)}
-                </li>
-            }
-            else return <li key={index} style={{fontSize: '25px'}}> {number} </li>
-        });
+        if (this.state.volumes.length > 0) {
+            let n = this.state.numbers.length;
+            return this.state.numbers.map((number, index) => {
+                console.log(index);
+                if (index === 0 && !number.includes(":")) {
+                    return <li key={index} style={{fontSize: '25px'}}>
+                        <span style={{color: '#79ff46'}}>UPDATE:&ensp;</span>
+                        <a onClick={(e) => this.handleClick(e, index)}>{number}</a>
+                        <i className="fa fa-long-arrow-right" style={styles.arrow}/>
+                        {this.newVolNum(0)}
+                    </li>
+                }
+                else if (index === n-1) {
+                    return <li key={index} style={{fontSize: '25px'}}>
+                        <a onClick={(e) => this.handleClick(e, index)}>{number}</a>
+                    </li>
+                }
+                else return <li key={index} style={{fontSize: '25px'}}> {number} </li>
+            });
+        }
     };
     displayNew = () => {
         if (this.state.volumes.length > 0)
@@ -228,9 +243,9 @@ class CreateVolume extends Component {
                                   value={this.state.notes}/>
                     </div>
                     <div>
-                        <Button className='btn btn-danger' onClick={this.handleCancel}>Cancel</Button>
+                        <Button bsStyle="danger" onClick={this.handleCancel}>Cancel</Button>
                         &ensp;
-                        <Button className='btn btn-primary' onClick={this.handleSubmit}>Create</Button>
+                        <Button bsStyle="primary" onClick={this.handleSubmit}>Create</Button>
                     </div>
                 </div>
             </div>
