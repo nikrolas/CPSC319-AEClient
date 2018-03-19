@@ -1,11 +1,8 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom'
 import banner_logo from './images/AE_Logo.png';
-import {Navbar, Nav, NavItem} from "react-bootstrap";
-
-export function isARecordItem(obj) {
-    return obj.hasOwnProperty('number');
-}
+import {Nav, Navbar, NavItem} from "react-bootstrap";
+import {isARecordItem} from "../Utilities/Items";
 
 class NavigationBar extends Component {
 
@@ -37,6 +34,10 @@ class NavigationBar extends Component {
 
     enableContainRecords = () => {
         return this.state.records > 0 && this.state.containers <= 1;
+    };
+
+    recordsOnly = () => {
+        return this.state.records > 0 && this.state.containers === 0;
     };
 
     enableCreateVolume = () => {
@@ -83,11 +84,15 @@ class NavigationBar extends Component {
                     <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
                              to="/createContainer">
                         Contain Records
-                    </NavItem>;
+                    </NavItem>
                     <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
                              to="/createVolume">
                         Create Volume
-                    </NavItem>;
+                    </NavItem>
+                    <NavItem componentClass={Link} disabled={!this.recordsOnly()} onClick={() => this.props.onSelectAction("RemoveFromContainer")} href="/confirmAction"
+                             to="/confirmAction">
+                        Remove from Container
+                    </NavItem>
                 </Nav>
             </Navbar>
         );

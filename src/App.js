@@ -12,6 +12,7 @@ import Home from "./search/Home";
 import NavigationBar from "./banner/NavigationBar";
 import ViewContainer from "./container/ViewContainer";
 import UpdateContainer from "./container/UpdateContainer";
+import ConfirmAction from "./bulk/ConfirmAction";
 
 const renderMergedProps = (component, ...rest) => {
     const finalProps = Object.assign({}, ...rest);
@@ -35,7 +36,8 @@ class App extends Component {
         this.state = {
             resultsData: [],
             resultsColumns: [],
-            selectedItemIndexes: []
+            selectedItemIndexes: [],
+            confirmAction: ""
         };
     }
 
@@ -47,10 +49,14 @@ class App extends Component {
         this.setState({resultsData: data, resultsColumns: columns});
     };
 
+    setConfirmAction = (confirmAction) => {
+        this.setState({confirmAction});
+    };
+
     render() {
         return (
             <div className="App">
-                <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData}/>
+                <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} onSelectAction={this.setConfirmAction}/>
                 <Route exact path='/' component={Home}/>
                 <Route path='/createRecord/' component={CreateRecord} />
                 <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
@@ -61,6 +67,7 @@ class App extends Component {
                 <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
                 <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
                 <RouteWrapper path='/createVolume/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateVolume}/>
+                <RouteWrapper path='/confirmAction' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={ConfirmAction}/>
             </div>
         );
     }
