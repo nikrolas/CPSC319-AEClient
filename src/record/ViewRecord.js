@@ -14,6 +14,7 @@ class ViewRecord extends Component {
             {
 
                 alertMsg: "",
+                success: true,
                 recordJson: {
                     title: "",
                     number: "",
@@ -33,7 +34,7 @@ class ViewRecord extends Component {
                     schedule: "",
                     type: "",
                     state: "",
-                    container: "",
+                    containerNumber: "",
                     scheduleYear: ""
                 },
             };
@@ -52,18 +53,18 @@ class ViewRecord extends Component {
                 }
             })
             .catch(err => {
-                console.error("Error loading record: " + err.message);
+                this.setState({alertMsg: "Error loading record: " + err.message, success: false});
             });
     }
 
-    setData = (context, data) => {
+    setData = (context, data, callback) => {
         let keys = Object.keys(data);
         keys.forEach(key => {
             if (key.endsWith("At")) {
                 data[key] = getDateTimeString(new Date(data[key]));
             }
         });
-        context.setState({"recordJson": data});
+        context.setState({"recordJson": data}, callback);
     };
 
     handleChange(e) {
@@ -91,19 +92,34 @@ class ViewRecord extends Component {
         //TODO: use remove from containers API instead of update record
         let recordState = JSON.parse(JSON.stringify(this.state.recordJson));
         recordState.responseJson = {classifications: recordState.classifications};
-        recordState.container = "";
+        recordState.containerNumber = "";
         recordState.retentionSchedule = recordState.scheduleId;
 
         updateRecord(this.props.match.params.recordId, recordState)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
-                    this.setData(this, data);
+                    this.setData(this, data, () => {
+                        if(!this.isInContainer()) {
+                            this.setState({alertMsg: "Record has been removed from its container.", success: true});
+                        } else {
+                            this.setState({alertMsg: "Unable to remove record from its container.", success: false});
+                        }
+                    });
+
                 }
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
             });
+    };
+
+    isInContainer = () => {
+        return (this.state.recordJson["containerId"] !== 0 || this.state.recordJson["containerNumber"] != null);
+    };
+
+    alertStyle = () => {
+        return this.state.success ? 'success' : 'danger';
     };
 
     render() {
@@ -120,7 +136,7 @@ class ViewRecord extends Component {
         return (
             <div>
                 {this.state.alertMsg.length !== 0
-                    ? <Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    ? <Alert bsStyle={this.alertStyle()}><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
                 <Grid>
@@ -203,7 +219,8 @@ class ViewRecord extends Component {
                                     body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
                                     confirmText="Remove"
                                     title="Removing from container">
-                                    <Button bsStyle="danger">Remove From Container</Button>
+                                    <Button bsStyle="warning" disabled={!this.isInContainer()}>Remove From
+                                        Container</Button>
                                 </Confirm>
                                 <Confirm
                                     onConfirm={this.handleSubmit}
