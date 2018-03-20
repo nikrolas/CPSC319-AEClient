@@ -25,9 +25,11 @@ export function getColumns(context, accessors) {
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
                     maxWidth: 150,
-                    Cell: e => <a onClick={() => {
-                        context.handleClick(accessor, e.row._original.id, 'record')
-                    }}> {e.value} </a>
+                    Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>
+                        <a onClick={() => {
+                            context.handleClick(accessor, e.row._original.id, 'record')
+                        }}> {e.value} </a>
+                    </div>
                 });
             } else if (accessor === "containerNumber") {
                 columns.push({
@@ -42,12 +44,13 @@ export function getColumns(context, accessors) {
                 columns.push({
                     accessor: accessor,
                     minWidth: 250,
-                    Header: accessorHeaderMapping[accessor]
+                    Header: accessorHeaderMapping[accessor],
+                    Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>{e.value}</div>
                 });
             } else if (accessor === "consignmentCode") {
                 columns.push({
                     accessor: accessor,
-                    maxWidth: 120,
+                    maxWidth: 140,
                     Header: accessorHeaderMapping[accessor]
                 });
             }

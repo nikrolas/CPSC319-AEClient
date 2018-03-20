@@ -128,9 +128,9 @@ class CreateVolume extends Component {
             this.setState({
                 timeout: setTimeout(() => {
                     this.context.router.history.goBack();
-                }, 2000),
+                }, 1500),
                 success: false,
-                alertMsg: "Cancelled",
+                alertMsg: "Cancelled. Redirecting..",
             });
             window.scrollTo(0, 0);
         }
