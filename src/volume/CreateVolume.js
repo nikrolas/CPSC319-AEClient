@@ -11,7 +11,7 @@ class CreateVolume extends Component {
         super(props);
         this.state =
             {
-                timeout: false,
+                timeout: null,
                 success: false,
                 alertMsg: "",
                 location: this.getUserLocations()[0], //TODO://set user default location
@@ -35,11 +35,14 @@ class CreateVolume extends Component {
                 this.search(this.state.selectedRecord.number.split(":")[0]);
             else {
                 if (!this.state.timeout) {
-                    this.setState({alertMsg: "Nothing selected. Redirecting..", timeout: true});
+                    this.setState({
+                            alertMsg: "Nothing selected. Redirecting..",
+                            timeout: setTimeout(() => {
+                                this.context.router.history.goBack();
+                            }, 2000)
+                        }
+                    );
                     window.scrollTo(0, 0);
-                    setTimeout(() => {
-                        this.context.router.history.goBack();
-                    }, 2000);
                 }
             }
         }
@@ -65,6 +68,27 @@ class CreateVolume extends Component {
             .catch(err => {
                 console.error("Error loading search results: " + err.message);
             });
+
+        //TODO waiting for endpoint
+        /*getVolumesByNumber(searchString)
+            .then(response => {
+                //console.log(response);
+                return response.json()
+            })
+            .then(data => {
+                //console.log(JSON.stringify(data));
+                if (data && data.length > 0) {
+                    let numbers = [];
+                    data.forEach((volume) => {
+                        numbers.push(volume.number);
+                    });
+                    let notes = data[data.length -1].notes;
+                    this.setState({volumes: data, numbers, notes});
+                }
+            })
+            .catch(err => {
+                console.error("Error loading search results: " + err.message);
+            });*/
     };
     naturalCompare = (a, b) => {
         let ax = [], bx = [];
@@ -82,6 +106,11 @@ class CreateVolume extends Component {
         return ax.length - bx.length;
     };
 
+    componentWillUnmount() {
+        if (this.state.timeout)
+            clearTimeout(this.state.timeout);
+    }
+
     getSelectedRecord = (record, selection) => {
         let index = selection[0];
         if (record[index] && record[index].hasOwnProperty('number')) {
@@ -97,14 +126,13 @@ class CreateVolume extends Component {
     handleCancel(event) {
         if (!this.state.timeout) {
             this.setState({
-                timeout: true,
+                timeout: setTimeout(() => {
+                    this.context.router.history.goBack();
+                }, 2000),
                 success: false,
                 alertMsg: "Cancelled",
             });
             window.scrollTo(0, 0);
-            setTimeout(() => {
-                this.context.router.history.goBack();
-            }, 2000);
         }
 
         event.preventDefault();
@@ -137,14 +165,13 @@ class CreateVolume extends Component {
             else {
                 if (!this.state.timeout) {
                     this.setState({
-                        timeout: true,
+                        timeout: setTimeout(() => {
+                            this.props.history.push("/viewRecord/" + data.id);
+                        }, 2000),
                         success: true,
                         alertMsg: "Success",
                     });
                     window.scrollTo(0, 0);
-                    setTimeout(() => {
-                        this.props.history.push("/viewRecord/" + data.id);
-                    }, 2000);
                 }
             }
         })
@@ -164,9 +191,7 @@ class CreateVolume extends Component {
 
     displayVolumes = () => {
         if (this.state.volumes.length > 0) {
-            let n = this.state.numbers.length;
             return this.state.numbers.map((number, index) => {
-                console.log(index);
                 if (index === 0 && !number.includes(":")) {
                     return <li key={index} style={{fontSize: '25px'}}>
                         <span style={{color: '#79ff46'}}>UPDATE:&ensp;</span>
@@ -175,12 +200,9 @@ class CreateVolume extends Component {
                         {this.newVolNum(0)}
                     </li>
                 }
-                else if (index === n-1) {
-                    return <li key={index} style={{fontSize: '25px'}}>
-                        <a onClick={(e) => this.handleClick(e, index)}>{number}</a>
-                    </li>
-                }
-                else return <li key={index} style={{fontSize: '25px'}}> {number} </li>
+                else return <li key={index} style={{fontSize: '25px'}}>
+                    <a onClick={(e) => this.handleClick(e, index)}>{number}</a>
+                </li>
             });
         }
     };
@@ -238,7 +260,7 @@ class CreateVolume extends Component {
                                 Copy notes from last volume:
                             </label>
                         </div>
-                        <textarea readonly="true"
+                        <textarea readOnly="true"
                                   style={this.state.notes === "" ? styles.notes : styles.notes2}
                                   value={this.state.notes}/>
                     </div>

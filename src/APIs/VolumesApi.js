@@ -2,7 +2,7 @@ import {serviceRoot} from "./ServiceRoot";
 
 let userId = "500";
 
-export function searchVolumes(number) {
+export function getVolumesByNumber(number) {
     //TODO waiting for endpoint
     return fetch(serviceRoot + "/volume?num=" + number + "&userId=" + userId);
 }
