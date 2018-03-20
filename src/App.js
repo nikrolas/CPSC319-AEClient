@@ -93,6 +93,7 @@ class App extends Component {
                 .then(data => {
                     if(data.status === 404){
                         //TODO display error message?
+                        sessionStorage.clear();
                         setTimeout(() => {
                             this.setState({loading: false}); }, 1000);
                     }
@@ -192,13 +193,13 @@ class App extends Component {
                     <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes}
                                    resultsData={this.state.resultsData} userData={this.state.userData}/>
                     <Switch>
-                        <Route exact path='/' component={Home}/>
+                        <RouteWrapper exact path='/' component={Home}/>
                         <PrivateRoute path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
-                        <PrivateRoute path='/viewRecord/:recordId?' component={ViewRecord}/>
-                        <Route path='/updateRecord/:recordId?' component={UpdateRecord}/>
+                        <RouteWrapper path='/viewRecord/:recordId?' component={ViewRecord}/>
+                        <PrivateRoute path='/updateRecord/:recordId?' component={UpdateRecord}/>
                         <PrivateRoute path='/viewContainer/:containerId?' component={ViewContainer}/>
-                        <Route path='/updateContainer/:containerId?' component={UpdateContainer}/>
-                        <Route path='/notAuthorized/' component={NotAuthenticated}/>
+                        <RouteWrapper path='/updateContainer/:containerId?' component={UpdateContainer}/>
+                        <RouteWrapper path='/notAuthorized/' component={NotAuthenticated}/>
                         <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes}
                                       onDataUpdate={this.setResultsStates} component={SelectTable}/>
                         <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes}
