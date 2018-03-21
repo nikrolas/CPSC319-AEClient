@@ -87,6 +87,14 @@ class ViewRecord extends Component {
     }
 
     render() {
+        let buttons = {
+            display:"none"
+        };
+        if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+            buttons = {
+                display:"block"
+            }
+        }
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         let title = {
@@ -175,20 +183,21 @@ class ViewRecord extends Component {
                     </Row>
                     <Row>
                         <Col md={10} mdOffset={2}>
-                        <ButtonToolbar style = {btnStyle}>
-                            <Link to={updateRecordLink}>
-                                <Button  bsStyle="primary"> Edit Record </Button>
-                            </Link>
-                            <Confirm
-                                onConfirm={this.handleSubmit}
-                                body="Are you sure you want to delete this?"
-                                confirmText="Confirm Delete"
-                                title="Deleting Record">
-                                <Button bsStyle="danger">Delete Record</Button>
-                            </Confirm>
-                        </ButtonToolbar>
+                            <ButtonToolbar style = {btnStyle}>
+                                <Link to={updateRecordLink}>
+                                    <Button style={buttons}  bsStyle="primary"> Edit Record </Button>
+                                </Link>
+                                <Confirm
+                                    onConfirm={this.handleSubmit}
+                                    body="Are you sure you want to delete this?"
+                                    confirmText="Confirm Delete"
+                                    title="Deleting Record">
+                                    <Button style ={buttons} bsStyle="danger">Delete Record</Button>
+                                </Confirm>
+                            </ButtonToolbar>
                         </Col>
                     </Row>
+
                 </Grid>
             </div>
         )
