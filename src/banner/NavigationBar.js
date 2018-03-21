@@ -78,6 +78,7 @@ class NavigationBar extends Component {
 
     render() {
         let userInfo = null;
+        let search = null;
         let workTray = null;
         let newRecord = null;
         let containRecords = null;
@@ -90,8 +91,12 @@ class NavigationBar extends Component {
                         <br/>
                         Location: {this.state.user.locations[0].locationName}
                     </NavItem>
-                </Nav>
+                </Nav>;
             if(this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+                search =
+                    <NavItem componentClass={Link} href="/results" to="/results">
+                        Search
+                    </NavItem>;
                 workTray =
                     <NavItem componentClass={Link} href="/worktray" to="/worktray">
                         Work Tray
@@ -118,9 +123,7 @@ class NavigationBar extends Component {
                     <NavItem className="logo-container" componentClass={Link} href="/" to="/">
                         <img src={banner_logo} className="App-logo" alt="logo"/>
                     </NavItem>
-                    <NavItem componentClass={Link} href="/results" to="/results">
-                        Search
-                    </NavItem>
+                    {search}
                     {workTray}
                     {newRecord}
                     {containRecords}
