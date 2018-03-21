@@ -14,11 +14,12 @@ export function getDateString(date) {
     return result;
 }
 
-export function transformDates(data, transformer) {
+export function  transformDates(data, transformer) {
     let keys = Object.keys(data);
     keys.forEach(key => {
         if (key.endsWith("At")) {
             data[key] = transformer(new Date(data[key]));
         }
     });
+    return data;
 }
