@@ -195,7 +195,7 @@ class App extends Component {
                     <Switch>
                         <RouteWrapper exact path='/' component={Home}/>
                         <PrivateRoute path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
-                        <RouteWrapper path='/viewRecord/:recordId?' component={ViewRecord}/>
+                        <RouteWrapper path='/viewRecord/:recordId?' component={ViewRecord} userData={this.state.userData}/>
                         <PrivateRoute path='/updateRecord/:recordId?' component={UpdateRecord} userData={this.state.userData}/>
                         <PrivateRoute path='/viewContainer/:containerId?' component={ViewContainer}/>
                         <RouteWrapper path='/updateContainer/:containerId?' component={UpdateContainer}/>

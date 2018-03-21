@@ -12,7 +12,7 @@ class ViewRecord extends Component {
         super(props, context);
         this.state =
             {
-
+                user:props.userData,
                 alertMsg:"",
                 recordJson: {
                     title:"",
@@ -44,7 +44,7 @@ class ViewRecord extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId)
+        getRecordById(this.props.match.params.recordId,this.state.user.id)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
