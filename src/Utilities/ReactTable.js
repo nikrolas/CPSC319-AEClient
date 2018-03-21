@@ -50,7 +50,6 @@ export function getColumns(context, accessors) {
             } else if (accessor === "consignmentCode") {
                 columns.push({
                     accessor: accessor,
-                    maxWidth: 140,
                     Header: accessorHeaderMapping[accessor]
                 });
             }

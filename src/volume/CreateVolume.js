@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, Alert} from 'react-bootstrap';
 import {getRecordsByNumber} from '../APIs/RecordsApi';
-import {createVolume} from "../APIs/VolumesApi";
+import {getVolumesByNumber, createVolume} from "../APIs/VolumesApi";
 import {MdCreateNewFolder} from 'react-icons/lib/md';
 import PropTypes from 'prop-types';
 
@@ -48,14 +48,22 @@ class CreateVolume extends Component {
         }
     }
     search = (searchString) => {
-        getRecordsByNumber(searchString)
+        getVolumesByNumber(searchString)
             .then(response => {
                 //console.log(response);
                 return response.json()
             })
             .then(data => {
-                //console.log(JSON.stringify(data));
-                if (data && data.length > 0) {
+                if (data.error) {
+                    let msg = data.status + ": " + data.error;
+                    this.setState({alertMsg: msg});
+                    window.scrollTo(0, 0)
+                }
+                else if (data.status && data.status !== 200) {
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else if (data && data.length > 0) {
                     data.sort((a,b) => this.naturalCompare(a.number,b.number));
                     let numbers = [];
                     data.forEach((volume) => {
@@ -66,29 +74,8 @@ class CreateVolume extends Component {
                 }
             })
             .catch(err => {
-                console.error("Error loading search results: " + err.message);
+                console.error("Error loading volumes: " + err.message);
             });
-
-        //TODO waiting for endpoint
-        /*getVolumesByNumber(searchString)
-            .then(response => {
-                //console.log(response);
-                return response.json()
-            })
-            .then(data => {
-                //console.log(JSON.stringify(data));
-                if (data && data.length > 0) {
-                    let numbers = [];
-                    data.forEach((volume) => {
-                        numbers.push(volume.number);
-                    });
-                    let notes = data[data.length -1].notes;
-                    this.setState({volumes: data, numbers, notes});
-                }
-            })
-            .catch(err => {
-                console.error("Error loading search results: " + err.message);
-            });*/
     };
     naturalCompare = (a, b) => {
         let ax = [], bx = [];
