@@ -9,6 +9,7 @@ class CreateVolume extends Component {
         super(props);
         this.state =
             {
+                user: props.userData,
                 success: false,
                 alertMsg: "",
                 location: this.getUserLocations()[0], //TODO://set user default location
@@ -31,7 +32,7 @@ class CreateVolume extends Component {
             this.search(this.state.selectedRecord.number.split(":")[0]);
     }
     search = (searchString) => {
-        getRecordsByNumber(searchString)
+        getRecordsByNumber(searchString,this.state.user.id)
             .then(response => {
                 //console.log(response);
                 return response.json()
@@ -107,7 +108,7 @@ class CreateVolume extends Component {
         if (latest) {
             id = latest.id;
         }
-        createVolume(id, copy)
+        createVolume(id, copy,this.state.user.id)
         .then(response => {
             //console.log(response);
             return response.json();

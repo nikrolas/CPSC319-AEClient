@@ -1,12 +1,12 @@
 import {serviceRoot} from "./ServiceRoot";
 
 let recordsPath = "/records";
-let userId = "500";
-export function getRecordsByNumber(recordNumber) {
+
+export function getRecordsByNumber(recordNumber, userId) {
     return fetch(serviceRoot + recordsPath + "?num=" + recordNumber + "&userId=" + userId);
 }
 
-export function getRecordById(recordId) {
+export function getRecordById(recordId, userId) {
     return fetch(serviceRoot + recordsPath + "/" + recordId + "?userId=" + userId);
 }
 
@@ -35,7 +35,7 @@ export function getRecordStates() {
     return fetch(serviceRoot + "/recordstates/");
 }
 
-export function deleteRecordByIds(recordIds) {
+export function deleteRecordByIds(recordIds,userId) {
     return fetch(serviceRoot + recordsPath + '?userId=' + userId, {
         method: 'DELETE',
         headers: {
@@ -82,7 +82,7 @@ export function createRecord(state) {
 }
 
 export function updateRecord(recordId,state) {
-    return fetch(serviceRoot + '/records/' + recordId + '?userId=' + userId, {
+    return fetch(serviceRoot + '/records/' + recordId + '?userId=' + state.user.id, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -101,7 +101,7 @@ export function updateRecord(recordId,state) {
     })
 }
 
-export function createVolume(id, copy) {
+export function createVolume(id, copy, userId) {
     return fetch(serviceRoot + '/volume/' + id + '?copyNotes=' + copy + '&userId=' + userId, {
         method: 'PUT',
         headers: {

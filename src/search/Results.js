@@ -17,6 +17,7 @@ class SelectTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            user: props.userData,
             data: [],
             rdata: [],
             cdata: [],
@@ -33,7 +34,7 @@ class SelectTable extends Component {
     }
 
     componentWillMount() {
-        let stored = sessionStorage.getItem("tray" + this.state.userId);
+        let stored = sessionStorage.getItem("tray" + this.state.user.id);
         //console.log("get stored: " + stored);
         if (stored) {
             /*let tray = JSON.parse(stored);
@@ -60,11 +61,11 @@ class SelectTable extends Component {
 
 
     search = (searchString) => {
-        let recordsPromise = getRecordsByNumber(searchString)
+        let recordsPromise = getRecordsByNumber(searchString,this.state.user.id)
             .then(response => {
                 return response.json()
             });
-        let containersPromise = getContainersByNumber(searchString)
+        let containersPromise = getContainersByNumber(searchString,this.state.user.id)
             .then(response => {
                 //console.log(response);
                 return response.json()
@@ -150,7 +151,7 @@ class SelectTable extends Component {
         if (updated) {
             this.setState({tray, addbtntext: 'Success'});
             //console.log("tray after: "+JSON.stringify(this.state.tray));
-            sessionStorage.setItem("tray" + this.state.userId, JSON.stringify(tray));
+            sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
             //console.log(sessionStorage.getItem("tray"+this.state.userId));
             setTimeout(() => {
                 this.setState({addbtntext: 'Add to Tray'});

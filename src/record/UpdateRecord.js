@@ -12,6 +12,7 @@ class UpdateRecord extends Component {
             {
                 alertMsg:"",
 
+                user:props.userData,
                 userLocations:null,
 
                 recordNumberValidationMsg:"",
@@ -101,7 +102,7 @@ class UpdateRecord extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId)
+        getRecordById(this.props.match.params.recordId, this.state.user.id)
             .then(response => response.json())
             .then(data => {
                 this.setState({recordNumber: data.number});
@@ -140,16 +141,6 @@ class UpdateRecord extends Component {
                 console.error("Error loading record: " + err.message);
                 this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
-        getUser(500)
-            .then(response => response.json())
-            .then(data => {
-                this.setState({userLocations: data.locations});
-                this.setState({location:data.locations[0].locationId})
-            })
-            .catch(err => {
-                console.error("Error loading record: " + err.message);
-                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
-            });
         getRecordStates()
             .then(response => response.json())
             .then(data => {
@@ -159,6 +150,10 @@ class UpdateRecord extends Component {
                 console.error("Error loading record: " + err.message);
                 this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
+        if(this.state.user !== undefined && this.state.user!== null) {
+            this.setState({userLocations: this.state.user.locations});
+            this.setState({location:this.state.user.locations[0].locationId})
+        }
     }
 
     setData = (context, data) => {
@@ -346,7 +341,7 @@ class UpdateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    if(data.status === 500) {
+                    if(data.status === 401) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }

@@ -196,12 +196,12 @@ class App extends Component {
                         <RouteWrapper exact path='/' component={Home}/>
                         <PrivateRoute path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
                         <RouteWrapper path='/viewRecord/:recordId?' component={ViewRecord}/>
-                        <PrivateRoute path='/updateRecord/:recordId?' component={UpdateRecord}/>
+                        <PrivateRoute path='/updateRecord/:recordId?' component={UpdateRecord} userData={this.state.userData}/>
                         <PrivateRoute path='/viewContainer/:containerId?' component={ViewContainer}/>
                         <RouteWrapper path='/updateContainer/:containerId?' component={UpdateContainer}/>
                         <RouteWrapper path='/notAuthorized/' component={NotAuthenticated}/>
                         <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes}
-                                      onDataUpdate={this.setResultsStates} component={SelectTable}/>
+                                      onDataUpdate={this.setResultsStates} component={SelectTable} userData={this.state.userData}/>
                         <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes}
                                       onDataUpdate={this.setResultsStates} component={WorkTray}/>
                         <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes}
@@ -209,7 +209,7 @@ class App extends Component {
                                       component={CreateContainer}/>
                         <RouteWrapper path='/createVolume/' selectedItemIndexes={this.state.selectedItemIndexes}
                                       resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns}
-                                      component={CreateVolume}/>
+                                      component={CreateVolume} userData={this.state.userData}/>
                         <Route component={NotFound}/>
                     </Switch>
                 </div>
