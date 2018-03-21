@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactTable from 'react-table';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getColumns} from "../Utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
+
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class WorkTray extends Component {
@@ -15,19 +16,18 @@ class WorkTray extends Component {
             columns: [],
             selection: [],
             selectAll: false,
-            userId: '5',
+            user: props.userData,
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
         };
     }
 
-    componentWillMount() {}
     componentDidMount() {
         //const data = this.props.location.state.traydata;
-        let stored = sessionStorage.getItem("tray"+this.state.userId);
+        let stored = sessionStorage.getItem("tray" + this.state.user.id);
         if (stored) {
             //console.log("stored: " + stored);
-            const data = JSON.parse(stored).map((item, index)=>{
+            const data = JSON.parse(stored).map((item, index) => {
                 const _id = index;
                 return {
                     _id,
@@ -40,6 +40,7 @@ class WorkTray extends Component {
             });
         }
     }
+
     componentWillUnmount() {
         this.state.onItemSelectCallback([]);
     }
@@ -49,11 +50,17 @@ class WorkTray extends Component {
         columns.push({
             Header: <button className="btn btn-xs"
                             onClick={this.deleteAll}
-                            onMouseOver={(e) => {e.target.style.backgroundColor = '#ff9c81'}}
-                            onMouseLeave={(e) => {e.target.style.backgroundColor = 'white'}}
+                            onMouseOver={(e) => {
+                                e.target.style.backgroundColor = '#ff9c81'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'white'
+                            }}
                             style={styles.clearbtn}>Clear All</button>,
             sortable: false,
-            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
+            Cell: e => <button className="btn btn-xs" onClick={() => {
+                this.deleteRow(e)
+            }} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
         });
         return columns;
     };
@@ -93,22 +100,22 @@ class WorkTray extends Component {
 
         data.splice(index, 1);
         data.forEach((item, index) => {
-           //recalculate index
-           item._id = index;
+            //recalculate index
+            item._id = index;
         });
         this.setState({data}, () => {
             this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
         });
         //console.log(JSON.stringify(this.state.data));
 
-        let stored = JSON.parse(sessionStorage.getItem("tray"+this.state.userId));
+        let stored = JSON.parse(sessionStorage.getItem("tray" + this.state.user.id));
         stored.splice(index, 1);
-        sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(stored));
+        sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(stored));
         //console.log(JSON.stringify(stored));
     };
 
     deleteAll = () => {
-        sessionStorage.removeItem("tray"+this.state.userId);
+        sessionStorage.removeItem("tray" + this.state.user.id);
         this.setState({data: [], columns: [], selection: [], selectAll: false}, () => {
             this.state.onItemSelectCallback(this.state.selection);
             this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
@@ -163,8 +170,8 @@ class WorkTray extends Component {
     };
 
     render() {
-        const { toggleSelection, toggleAll, isSelected } = this;
-        const { data, columns, selectAll, } = this.state;
+        const {toggleSelection, toggleAll, isSelected} = this;
+        const {data, columns, selectAll,} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -178,7 +185,7 @@ class WorkTray extends Component {
                 <div style={styles.btncontainer}></div>
                 <div style={styles.tablestyle}>
                     <CheckboxTable
-                        ref={(r)=>this.checkboxTable=r}
+                        ref={(r) => this.checkboxTable = r}
                         data={data}
                         columns={columns}
                         defaultPageSize={10}

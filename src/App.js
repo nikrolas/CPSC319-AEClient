@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Route,Redirect,Switch} from 'react-router-dom';
+import {Route, Redirect, Switch} from 'react-router-dom';
 import './App.css';
 import CreateRecord from './record/CreateRecord';
 import ViewRecord from './record/ViewRecord';
@@ -25,10 +25,14 @@ const renderMergedProps = (component, ...rest) => {
     );
 };
 
-const RouteWrapper = ({ component, ...rest }) => {
+const RouteWrapper = ({component, redirectTo, authenticated, ...rest}) => {
     return (
         <Route {...rest} render={routeProps => {
-            return renderMergedProps(component, routeProps, rest);
+            return authenticated ? (
+                renderMergedProps(component, routeProps, rest)
+            ) : (
+                renderMergedProps(NotAuthenticated)
+            );
         }}/>
     );
 };
@@ -48,15 +52,15 @@ class App extends Component {
 
     }
 
-    componentWillMount(){
+    componentWillMount() {
         let user = sessionStorage.getItem('user');
         const search = window.location.search.substr(1);
         const params = new URLSearchParams(search);
         const userId = params.get('userId');
         if (user !== null) {
-            let userJson =JSON.parse(user);
-            if(userId !== null) {
-                if(userId === userJson.id.toString()) {
+            let userJson = JSON.parse(user);
+            if (userId !== null) {
+                if (userId === userJson.id.toString()) {
                     this.userExists(userJson);
                 }
                 else {
@@ -71,9 +75,10 @@ class App extends Component {
             this.userChange(userId);
         }
     }
+
     userExists(userJson) {
         this.setState({userData: userJson});
-        if(userJson.role === "Administrator" || userJson.role === "RMC") {
+        if (userJson.role === "Administrator" || userJson.role === "RMC") {
             this.setState({
                 userAuthenticated: true,
             });
@@ -85,24 +90,25 @@ class App extends Component {
         }
     }
 
-    userChange(userId){
+    userChange(userId) {
         if (userId !== null) {
-            this.setState({ loading: true });
-            fetch(serviceRoot + "/users/"+userId)
+            this.setState({loading: true});
+            fetch(serviceRoot + "/users/" + userId)
                 .then(response => response.json())
                 .then(data => {
-                    if(data.status === 404){
+                    if (data.status === 404) {
                         //TODO display error message?
                         sessionStorage.clear();
                         setTimeout(() => {
-                            this.setState({loading: false}); }, 1000);
+                            this.setState({loading: false});
+                        }, 1000);
                     }
                     else {
-                        sessionStorage.setItem("user",JSON.stringify(data));
+                        sessionStorage.setItem("user", JSON.stringify(data));
                         this.setState({
                             userData: data,
                         });
-                        if(data.role === "Administrator" || data.role === "RMC") {
+                        if (data.role === "Administrator" || data.role === "RMC") {
                             this.setState({
                                 userAuthenticated: true,
                             });
@@ -113,7 +119,8 @@ class App extends Component {
                             });
                         }
                         setTimeout(() => {
-                            this.setState({loading: false}); }, 1000);
+                            this.setState({loading: false});
+                        }, 1000);
                     }
                 })
                 .catch(err => {
@@ -133,57 +140,26 @@ class App extends Component {
 
     render() {
 
-        const PrivateRoute = ({ component, ...rest }) => (
-            <Route
-                {...rest}
-                render={props =>
-                    (this.state.userAuthenticated) ? (
-                        renderMergedProps(component,props,rest)
-                    ) : (
-                            <Redirect
-                                to={{
-                                    pathname: "/notAuthorized",
-                                    state: { from: props.location }
-                                }}
-                            />
-                    )
-                }
-            />
-        );
-
         let overlaySize = {
-        width:      '100%',
-        height:     '100',
-        zIndex:    '10',
-        top:        '0',
-        left:       '0',
-        position:   'fixed',
-    }
-        if(this.state.loading){
+            width: '100%',
+            height: '100',
+            zIndex: '10',
+            top: '0',
+            left: '0',
+            position: 'fixed',
+        }
+        if (this.state.loading) {
             return (
                 <LoadingOverlay
-                    loading= {this.state.loading}
+                    loading={this.state.loading}
                     spinner={
                         <div>
                             <i className="fa fa-cog fa-spin fa-4x fa-fw"/>
                             <p>Loading user...</p>
                         </div>
                     }
-                    overlayStyle = {overlaySize}
+                    overlayStyle={overlaySize}
                 >
-                    <div className="App">
-                        <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData}/>
-                        <Route exact path='/' component={Home}/>
-                        <PrivateRoute path='/createRecord/' component={CreateRecord} userData = {this.state.userData}/>
-                        <Route path='/viewRecord/:recordId?' component={ViewRecord}/>
-                        <PrivateRoute path='/updateRecord/:recordId?' component={UpdateRecord}/>
-                        <Route path='/viewContainer/:containerId?' component={ViewContainer}/>
-                        <PrivateRoute path='/updateContainer/:containerId?' component={UpdateContainer}/>
-                        <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={SelectTable}/>
-                        <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
-                        <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
-                        <RouteWrapper path='/createVolume/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateVolume}/>
-                    </div>
                 </LoadingOverlay>
             );
         }
@@ -193,17 +169,20 @@ class App extends Component {
                     <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes}
                                    resultsData={this.state.resultsData} userData={this.state.userData}/>
                     <Switch>
-                        <RouteWrapper exact path='/' component={Home}/>
-                        <PrivateRoute path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
-                        <RouteWrapper path='/viewRecord/:recordId?' component={ViewRecord} userData={this.state.userData}/>
-                        <PrivateRoute path='/updateRecord/:recordId?' component={UpdateRecord} userData={this.state.userData}/>
-                        <PrivateRoute path='/viewContainer/:containerId?' component={ViewContainer}/>
+                        <RouteWrapper exact path='/' component={Home} authenticated={this.state.userAuthenticated}/>
+                        <RouteWrapper path='/createRecord/' component={CreateRecord} userData={this.state.userData}/>
+                        <RouteWrapper path='/viewRecord/:recordId?' component={ViewRecord}
+                                      userData={this.state.userData}/>
+                        <RouteWrapper path='/updateRecord/:recordId?' component={UpdateRecord}
+                                      userData={this.state.userData}/>
+                        <RouteWrapper path='/viewContainer/:containerId?' component={ViewContainer}/>
                         <RouteWrapper path='/updateContainer/:containerId?' component={UpdateContainer}/>
                         <RouteWrapper path='/notAuthorized/' component={NotAuthenticated}/>
                         <RouteWrapper path="/results/:searchString?" onItemSelect={this.setselectedItemIndexes}
-                                      onDataUpdate={this.setResultsStates} component={SelectTable} userData={this.state.userData}/>
+                                      onDataUpdate={this.setResultsStates} component={SelectTable}
+                                      userData={this.state.userData} authenticated={this.state.userAuthenticated}/>
                         <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes}
-                                      onDataUpdate={this.setResultsStates} component={WorkTray}/>
+                                      onDataUpdate={this.setResultsStates} component={WorkTray} userData={this.state.userData} authenticated={this.state.userAuthenticated}/>
                         <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes}
                                       resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns}
                                       component={CreateContainer}/>

@@ -27,7 +27,6 @@ class SelectTable extends Component {
             tray: [],
             addbtntext: 'Add to Tray',
             selectvalue: 'none',
-            userId: '5',
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
         };
@@ -150,9 +149,8 @@ class SelectTable extends Component {
         });
         if (updated) {
             this.setState({tray, addbtntext: 'Success'});
-            //console.log("tray after: "+JSON.stringify(this.state.tray));
+            console.log(this.state.user.id);
             sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
-            //console.log(sessionStorage.getItem("tray"+this.state.userId));
             setTimeout(() => {
                 this.setState({addbtntext: 'Add to Tray'});
             }, 700);
