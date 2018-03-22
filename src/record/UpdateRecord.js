@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
-import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
+//import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
+import {
+    getClassifications,
+    getRecordById,
+    getRetentionSchedule,
+    getRecordStates,
+    updateRecord
+} from "../APIs/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {getDateTimeString} from "../Utilities/DateTime";
 

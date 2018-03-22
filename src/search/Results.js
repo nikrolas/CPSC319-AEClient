@@ -204,7 +204,7 @@ class SelectTable extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, updateTray} = this;
-        const {data, columns, selectAll} = this.state;
+        const {data, columns, selectAll, selection} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -218,7 +218,9 @@ class SelectTable extends Component {
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
                 <div style={styles.btncontainer}>
-                    <button className='btn btn-s' style={this.addStyle()}
+                    <button className='btn btn-s'
+                            style={this.addStyle()}
+                            disabled={!selection.length}
                             onClick={updateTray}>{this.state.addbtntext}</button>
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>

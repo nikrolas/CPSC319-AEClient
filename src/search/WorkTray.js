@@ -5,6 +5,8 @@ import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getColumns} from "../Utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
+//import {deleteRecordByIds} from "../APIs/RecordsApi";
+import {Alert} from 'react-bootstrap';
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -12,6 +14,8 @@ class WorkTray extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            success: false,
+            alertMsg: "",
             data: [],
             columns: [],
             selection: [],
@@ -49,14 +53,16 @@ class WorkTray extends Component {
         const columns = getColumns(this, recordsResultsAccessors);
         columns.push({
             Header: <button className="btn btn-xs"
-                            onClick={this.deleteAll}
+                            onClick={this.removeAll}
                             onMouseOver={(e) => {e.target.style.backgroundColor = '#ff9c81'}}
                             onMouseLeave={(e) => {e.target.style.backgroundColor = 'white'}}
                             style={styles.clearbtn}>Clear All</button>,
             sortable: false,
             resizable: false,
             width: 100,
-            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
+            Cell: e => <button className="btn btn-xs" onClick={() => {
+                this.removeRow(e)
+            }} style={styles.trashbtn}><i className="fa fa-trash-o"/></button>
         });
         return columns;
     };
@@ -85,7 +91,7 @@ class WorkTray extends Component {
         }
     };
 
-    deleteRow = (e) => {
+    removeRow = (e) => {
         let index = e.row._index;
         let data = [...this.state.data];
         let selection = [...this.state.selection];
@@ -108,9 +114,26 @@ class WorkTray extends Component {
         //console.log(JSON.stringify(stored));
     };
 
-    deleteAll = () => {
+    removeAll = () => {
         sessionStorage.removeItem("tray" + this.state.user.id);
         this.setState({data: [], columns: [], selection: [], selectAll: false}, () => {
+            this.state.onItemSelectCallback(this.state.selection);
+            this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
+        });
+    };
+
+    removeSelected = () => {
+        let selection = [...this.state.selection];
+        let stored = [...JSON.parse(sessionStorage.getItem("tray" + this.state.user.id))];
+
+        let data = stored.filter((item, index) => selection.indexOf(index) < 0);
+        sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(data));
+
+        data.forEach((item, index) => {
+            //recalculate index
+            item._id = index;
+        });
+        this.setState({selection: [], data, selectAll: false}, () => {
             this.state.onItemSelectCallback(this.state.selection);
             this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
         });
@@ -163,9 +186,46 @@ class WorkTray extends Component {
         return this.state.selection.includes(key);
     };
 
+    deleteSelected = () => {
+        let data = [...this.state.data];
+        let selection = [...this.state.selection];
+        let recordIds = [];
+        selection.forEach((i) => {
+            recordIds.push(data[i].id);
+        });
+
+        this.setState({alertMsg: "WIP"});
+        window.scrollTo(0, 0);
+
+        /*deleteRecordByIds(recordIds, this.state.user.id)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    let msg = data.status + ": " + data.error;
+                    this.setState({alertMsg: msg});
+                    window.scrollTo(0, 0)
+                }
+                else if(data.status && data.status !== 200) {
+                    //console.log(JSON.stringify(data));
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else if (data.status === 500) {
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else {
+                    this.removeSelected();
+                }
+            })
+            .catch(error => console.log('Error: ', error));*/
+    };
+
     render() {
-        const {toggleSelection, toggleAll, isSelected} = this;
-        const {data, columns, selectAll,} = this.state;
+        const {toggleSelection, toggleAll, isSelected, removeSelected, deleteSelected} = this;
+        const {data, columns, selectAll, selection, alertMsg} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -173,20 +233,49 @@ class WorkTray extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        return (
-            <div style={styles.container}>
-                <h1>Work Tray</h1>
-                <div style={styles.btncontainer}></div>
-                <div style={styles.tablestyle}>
-                    <CheckboxTable
-                        ref={(r) => this.checkboxTable = r}
-                        data={data}
-                        columns={columns}
-                        defaultPageSize={10}
-                        className="-striped -highlight"
 
-                        {...checkboxProps}
-                    />
+        return (
+            <div>
+                {alertMsg.length !== 0 && !this.state.success
+                    ? <Alert bsStyle="danger">
+                        <h3>{alertMsg}</h3>
+                        <button onClick={() => {
+                            this.setState({alertMsg: ""})
+                        }}>Close
+                        </button>
+                    </Alert>
+                    : null
+                }
+                <div style={styles.container}>
+                    <h1>Work Tray</h1>
+                    <div style={styles.btncontainer}>
+                        <button className='btn btn-s'
+                                style={styles.removeselbtn}
+                                disabled={!selection.length}
+                                onClick={removeSelected}>
+                            <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
+                            Selected
+                        </button>
+                        <button className='btn btn-s'
+                                style={styles.delbtn}
+                            //disabled="true"
+                                disabled={!selection.length}
+                                onClick={deleteSelected}>
+                            <i className="fa fa-exclamation-triangle" style={{marginRight: '5px'}}/>
+                            Delete
+                        </button>
+                    </div>
+                    <div style={styles.tablestyle}>
+                        <CheckboxTable
+                            ref={(r) => this.checkboxTable = r}
+                            data={data}
+                            columns={columns}
+                            defaultPageSize={10}
+                            className="-striped -highlight"
+
+                            {...checkboxProps}
+                        />
+                    </div>
                 </div>
             </div>
         );
@@ -195,14 +284,14 @@ class WorkTray extends Component {
 
 let styles = {
     container: {
-        padding: '5%'
+        padding: '2% 5% 5% 5%'
     },
     tablestyle: {
         //border: '5px solid gray'
         marginTop: '5px',
     },
 
-    delbtn: {
+    trashbtn: {
         backgroundColor: '#ff6c60',
         borderColor: '#ff6c60',
         color: 'white'
@@ -217,6 +306,22 @@ let styles = {
         backgroundColor: 'white',
         borderColor: '#ff9c81',
     },
+    removeselbtn: {
+        float: 'left',
+        width: 'auto',
+        backgroundColor: '#ff6c60',
+        borderColor: '#FFFFFF',
+        color: 'white',
+        fontSize: '13px',
+    },
+    delbtn: {
+        float: 'left',
+        width: 'auto',
+        marginLeft: '0.5cm',
+        backgroundColor: '#ffea65',
+        borderColor: '#FFFFFF',
+        fontSize: '13px',
+    }
 };
 
 export default WorkTray;

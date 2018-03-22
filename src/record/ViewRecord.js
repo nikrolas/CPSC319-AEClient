@@ -130,14 +130,14 @@ class ViewRecord extends Component {
     };
 
     render() {
-        let buttons = {
+        /*let buttons = {
             display: "none"
         };
         if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
             buttons = {
                 display: "block"
             }
-        }
+        }*/
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         let title = {
