@@ -1,5 +1,15 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, ButtonGroup, HelpBlock, Alert, OverlayTrigger, Popover} from 'react-bootstrap'
+import {
+    Button,
+    FormGroup,
+    ControlLabel,
+    FormControl,
+    ButtonGroup,
+    HelpBlock,
+    Alert,
+    OverlayTrigger,
+    Popover
+} from 'react-bootstrap'
 import {createRecord, getClassifications, getRecordType,getRetentionSchedule, getUser} from "../APIs/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
 
@@ -11,7 +21,7 @@ class CreateRecord extends Component {
             {
                 alertMsg:"",
 
-                user:props.userData,
+                user: props.userData,
                 userLocations: null,
 
                 recordTypeValidationMsg:"",
@@ -99,9 +109,9 @@ class CreateRecord extends Component {
                 console.error("Error loading record: " + err.message);
                 this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
-        if(this.state.user !== undefined && this.state.user!== null) {
+        if (this.state.user !== undefined && this.state.user !== null) {
             this.setState({userLocations: this.state.user.locations});
-            this.setState({location:this.state.user.locations[0].locationId})
+            this.setState({location: this.state.user.locations[0].locationId})
         }
     }
     handleChange(e) {
@@ -312,7 +322,7 @@ class CreateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    if(data.status === 401) {
+                    if (data.status === 401) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }
@@ -443,9 +453,9 @@ class CreateRecord extends Component {
         }
         let tooltipStyle = {
             padding: '0',
-            background:'white',
-            border:'none',
-            float:'right',
+            background: 'white',
+            border: 'none',
+            float: 'right',
         }
         return (
             <div>
@@ -497,13 +507,13 @@ class CreateRecord extends Component {
                         validationState={this.state.recordNumberValidationState}
                     >
                         <ControlLabel>Record Number {requiredLabel}
-                        <br/> {this.state.recordNumberPattern} </ControlLabel>
+                            <br/> {this.state.recordNumberPattern} </ControlLabel>
                         <OverlayTrigger
                             trigger="click"
                             placement="right"
                             overlay={popoverRightRecordNumber}
                         >
-                            <Button style = {tooltipStyle}>
+                            <Button style={tooltipStyle}>
                                 <i className="fa fa-question-circle"></i>
                             </Button>
                         </OverlayTrigger>
@@ -549,7 +559,7 @@ class CreateRecord extends Component {
                             placement="right"
                             overlay={popoverRightClassification}
                         >
-                            <Button style = {tooltipStyle}>
+                            <Button style={tooltipStyle}>
                                 <i className="fa fa-question-circle"></i>
                             </Button>
                         </OverlayTrigger>

@@ -5,6 +5,7 @@ import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
 import {getDateTimeString} from "../Utilities/DateTime";
 import {recordsResultsAccessors} from "../search/Results";
+import {getColumns} from "../Utilities/ReactTable";
 
 
 class ViewRecord extends Component {
@@ -13,9 +14,7 @@ class ViewRecord extends Component {
         super(props, context);
         this.state =
             {
-                user:props.userData,
-                alertMsg:"",
-
+                user: props.userData,
                 alertMsg: "",
                 success: true,
                 recordJson: {
@@ -50,13 +49,13 @@ class ViewRecord extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId,this.state.user.id)
+        getRecordById(this.props.match.params.recordId, this.state.user.id)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
                     setData(that, data);
                     that.state.onItemSelectCallback([0]);
-                    that.state.onDataUpdateCallback([that.state.recordJson], recordsResultsAccessors);
+                    that.state.onDataUpdateCallback([that.state.recordJson], getColumns(this, recordsResultsAccessors));
                 }
             })
             .catch(err => {
@@ -132,11 +131,11 @@ class ViewRecord extends Component {
 
     render() {
         let buttons = {
-            display:"none"
+            display: "none"
         };
         if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
             buttons = {
-                display:"block"
+                display: "block"
             }
         }
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;

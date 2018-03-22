@@ -48,7 +48,7 @@ class CreateVolume extends Component {
         }
     }
     search = (searchString) => {
-        getVolumesByNumber(searchString,this.state.user.id)
+        getVolumesByNumber(searchString, this.state.user.id)
             .then(response => {
                 //console.log(response);
                 return response.json()
@@ -133,7 +133,7 @@ class CreateVolume extends Component {
         if (latest) {
             id = latest.id;
         }
-        createVolume(id, copy,this.state.user.id)
+        createVolume(id, copy, this.state.user.id)
         .then(response => {
             //console.log(response);
             return response.json();

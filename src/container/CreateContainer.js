@@ -52,7 +52,7 @@ class CreateContainer extends Component {
     getSelectedItems = (records, selection) => {
         let selectedRecords = [];
         let selectedContainers = [];
-
+        
         selection.forEach((index) => {
             if (isARecordItem(records[index])) {
                 selectedRecords.push(records[index]);

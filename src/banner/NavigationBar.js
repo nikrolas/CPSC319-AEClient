@@ -88,7 +88,7 @@ class NavigationBar extends Component {
         let newRecord = null;
         let containRecords = null;
         let createVolume = null;
-        if(this.state.user !== undefined && this.state.user!== null && this.state.user!=="") {
+        if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "") {
             userInfo =
                 <Nav pullRight={true}>
                     <NavItem>
@@ -97,7 +97,7 @@ class NavigationBar extends Component {
                         Location: {this.state.user.locations[0].locationName}
                     </NavItem>
                 </Nav>;
-            if(this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+            if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
                 search =
                     <NavItem componentClass={Link} href="/results" to="/results">
                         Search

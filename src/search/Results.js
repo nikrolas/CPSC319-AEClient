@@ -60,11 +60,11 @@ class SelectTable extends Component {
 
 
     search = (searchString) => {
-        let recordsPromise = getRecordsByNumber(searchString,this.state.user.id)
+        let recordsPromise = getRecordsByNumber(searchString, this.state.user.id)
             .then(response => {
                 return response.json()
             });
-        let containersPromise = getContainersByNumber(searchString,this.state.user.id)
+        let containersPromise = getContainersByNumber(searchString, this.state.user.id)
             .then(response => {
                 //console.log(response);
                 return response.json()

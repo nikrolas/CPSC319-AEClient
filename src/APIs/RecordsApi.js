@@ -35,7 +35,7 @@ export function getRecordStates() {
     return fetch(serviceRoot + "/recordstates/");
 }
 
-export function deleteRecordByIds(recordIds,userId) {
+export function deleteRecordByIds(recordIds, userId) {
     return fetch(serviceRoot + recordsPath + '?userId=' + userId, {
         method: 'DELETE',
         headers: {

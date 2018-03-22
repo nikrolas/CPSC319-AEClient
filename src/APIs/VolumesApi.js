@@ -1,13 +1,11 @@
 import {serviceRoot} from "./ServiceRoot";
 
-let userId = "500";
-
-export function getVolumesByNumber(number) {
+export function getVolumesByNumber(number, userId) {
     //TODO waiting for endpoint
     return fetch(serviceRoot + "/volume?num=" + number + "&userId=" + userId);
 }
 
-export function createVolume(id, copy) {
+export function createVolume(id, copy, userId) {
     return fetch(serviceRoot + '/volume/' + id + '?copyNotes=' + copy + '&userId=' + userId, {
         method: 'PUT',
         headers: {

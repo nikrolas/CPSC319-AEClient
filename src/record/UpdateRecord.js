@@ -12,7 +12,7 @@ class UpdateRecord extends Component {
             {
                 alertMsg:"",
 
-                user:props.userData,
+                user: props.userData,
                 userLocations:null,
 
                 recordNumberValidationMsg:"",
@@ -150,9 +150,9 @@ class UpdateRecord extends Component {
                 console.error("Error loading record: " + err.message);
                 this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
             });
-        if(this.state.user !== undefined && this.state.user!== null) {
+        if (this.state.user !== undefined && this.state.user !== null) {
             this.setState({userLocations: this.state.user.locations});
-            this.setState({location:this.state.user.locations[0].locationId})
+            this.setState({location: this.state.user.locations[0].locationId})
         }
     }
 
@@ -341,7 +341,7 @@ class UpdateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    if(data.status === 401) {
+                    if (data.status === 401) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }

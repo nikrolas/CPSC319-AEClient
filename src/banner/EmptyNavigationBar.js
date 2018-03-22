@@ -4,7 +4,6 @@ import banner_logo from './images/AE_Logo.png';
 import {Navbar, Nav, NavItem} from "react-bootstrap";
 
 
-
 class EmptyNavigationBar extends Component {
     render() {
         return (

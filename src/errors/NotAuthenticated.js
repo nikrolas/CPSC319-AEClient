@@ -3,7 +3,6 @@ import {Jumbotron} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 
 
-
 class NotAuthenticated extends Component {
     render() {
         return (

@@ -187,6 +187,8 @@ class App extends Component {
                         />
                         <PrivateRoute path='/viewRecord/:recordId?'
                                       component={ViewRecord}
+                                      onItemSelect={this.setselectedItemIndexes}
+                                      onDataUpdate={this.setResultsStates}
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}
                         />
@@ -217,7 +219,7 @@ class App extends Component {
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}
                         />
-                        <PrivateRoute path="/worktray"
+                        <PrivateRoute path="/worktray/"
                                       component={WorkTray}
                                       onItemSelect={this.setselectedItemIndexes}
                                       onDataUpdate={this.setResultsStates}
@@ -226,6 +228,14 @@ class App extends Component {
                         />
                         <PrivateRoute path='/createContainer/'
                                       component={CreateContainer}
+                                      selectedItemIndexes={this.state.selectedItemIndexes}
+                                      resultsData={this.state.resultsData}
+                                      resultsColumns={this.state.resultsColumns}
+                                      userData={this.state.userData}
+                                      authenticated={this.state.userAuthenticated}
+                        />
+                        <PrivateRoute path='/addToContainer/'
+                                      component={AddToContainer}
                                       selectedItemIndexes={this.state.selectedItemIndexes}
                                       resultsData={this.state.resultsData}
                                       resultsColumns={this.state.resultsColumns}
