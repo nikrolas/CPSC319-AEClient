@@ -13,6 +13,8 @@ class ViewRecord extends Component {
         super(props, context);
         this.state =
             {
+                user:props.userData,
+                alertMsg:"",
 
                 alertMsg: "",
                 success: true,
@@ -48,7 +50,7 @@ class ViewRecord extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getRecordById(this.props.match.params.recordId)
+        getRecordById(this.props.match.params.recordId,this.state.user.id)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
@@ -61,7 +63,7 @@ class ViewRecord extends Component {
                 this.setState({alertMsg: "Error loading record: " + err.message, success: false});
             });
     }
-    
+
 
     setData = (context, data, callback) => {
         let keys = Object.keys(data);
@@ -129,6 +131,14 @@ class ViewRecord extends Component {
     };
 
     render() {
+        let buttons = {
+            display:"none"
+        };
+        if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+            buttons = {
+                display:"block"
+            }
+        }
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         let title = {

@@ -10,6 +10,7 @@ class CreateVolume extends Component {
         super(props);
         this.state =
             {
+                user: props.userData,
                 timeout: null,
                 success: false,
                 alertMsg: "",
@@ -47,7 +48,7 @@ class CreateVolume extends Component {
         }
     }
     search = (searchString) => {
-        getVolumesByNumber(searchString)
+        getVolumesByNumber(searchString,this.state.user.id)
             .then(response => {
                 //console.log(response);
                 return response.json()
@@ -132,7 +133,7 @@ class CreateVolume extends Component {
         if (latest) {
             id = latest.id;
         }
-        createVolume(id, copy)
+        createVolume(id, copy,this.state.user.id)
         .then(response => {
             //console.log(response);
             return response.json();
