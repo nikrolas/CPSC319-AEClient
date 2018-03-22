@@ -2,6 +2,7 @@ import {serviceRoot} from "./ServiceRoot";
 
 let containersPath = "/containers";
 let containerPath = "/container";
+let removeRecordsPath = "/removeRecords";
 let userId = "500";
 
 export function getContainersByNumber(containerNumber) {
@@ -35,10 +36,25 @@ export function updateContainer(containerId, data) {
     })
 }
 
-
 export function deleteContainers(ids) {
     let path = serviceRoot + containersPath + "?ids=" + ids + "&userId=" + userId;
     return fetch(path, {
         method: 'delete'
+    });
+}
+
+export function removeRecordsFromContainer(recordIds) {
+    // let path = serviceRoot + containerPath + removeRecordsPath + "?userId=" + userId;
+    // return fetch(path, {
+    //     method: 'post',
+    //     headers: {
+    //         'Accept': 'application/json',
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(recordIds)
+    // });
+
+    return new Promise((resolve, reject) => {
+        resolve("Test resolve.");
     });
 }

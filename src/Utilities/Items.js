@@ -27,3 +27,23 @@ export function getSelectedContainers(containers, selection) {
 export function getSelectedItems(data, selection) {
     return selection.map((index) => data[index]);
 }
+
+export function getSelectedItemsCategorized(data, selection) {
+    let selectedItems = {
+        records: [],
+        containers: [],
+        unknown: []
+    };
+    selection.forEach((index) => {
+        if (isARecordItem(data[index])) {
+            selectedItems.records.push(data[index]);
+        }
+        else if (isAContainerItem(data[index])) {
+            selectedItems.containers.push(data[index]);
+        }
+        else {
+            selectedItems.unknown.push(data[index]);
+        }
+    });
+    return selectedItems;
+}

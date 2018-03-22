@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Row, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
-import {Confirm} from 'react-confirm-bootstrap'
 import ReactTable from "react-table";
 import {getSelectedItems} from "../Utilities/Items";
 
@@ -17,19 +16,32 @@ class ConfirmAction extends Component {
                 columns: props.resultsColumns,
                 header: "",
                 prompt: "",
-                action: ""
+                action: null
             };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentWillMount() {
         let data = getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
-        this.setState({data});
+        let action = this.props.confirmAction;
+        this.setState({data, action});
     };
 
-    handleSubmit() {
+    enableAction = () => {
+        return this.state.action != null;
+    };
 
-    }
+    handleSubmit = () => {
+        if (this.state.action != null) {
+            this.state.action(this, this.state.data)
+                .then(result => {
+                    this.setState({alertMsg: result, success: true});
+                })
+                .catch(error => {
+                    this.setState({alertMsg: error, success: false});
+                });
+        }
+    };
 
     onCancel = () => {
         this.props.history.goBack();
@@ -70,13 +82,7 @@ class ConfirmAction extends Component {
                     <Row>
                         <ButtonToolbar style={btnStyle}>
                             <Button bsStyle="primary" onClick={this.onCancel}> Cancel </Button>
-                            <Confirm
-                                onConfirm={this.handleSubmit}
-                                body={"Are you sure you want to delete?"}
-                                confirmText="Confirm Delete"
-                                title="Deleting Container">
-                                <Button bsStyle="danger">Confirm</Button>
-                            </Confirm>
+                            <Button bsStyle="danger" disabled={!this.enableAction()} onClick={this.handleSubmit()}>Confirm</Button>
                         </ButtonToolbar>
                     </Row>
                 </Grid>

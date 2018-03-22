@@ -37,7 +37,7 @@ class App extends Component {
             resultsData: [],
             resultsColumns: [],
             selectedItemIndexes: [],
-            confirmAction: ""
+            confirmAction: () => {}
         };
     }
 
@@ -67,7 +67,7 @@ class App extends Component {
                 <RouteWrapper path="/worktray" onItemSelect={this.setselectedItemIndexes} onDataUpdate={this.setResultsStates} component={WorkTray}/>
                 <RouteWrapper path='/createContainer/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateContainer}/>
                 <RouteWrapper path='/createVolume/' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={CreateVolume}/>
-                <RouteWrapper path='/confirmAction' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={ConfirmAction}/>
+                <RouteWrapper path='/confirmAction' selectedItemIndexes={this.state.selectedItemIndexes} resultsData={this.state.resultsData} resultsColumns={this.state.resultsColumns} component={ConfirmAction} action={this.state.confirmAction}/>
             </div>
         );
     }
