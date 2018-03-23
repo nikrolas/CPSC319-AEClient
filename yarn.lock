@@ -36,6 +36,10 @@
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.0.8.tgz#d27600e9ba2f371e08695d90a0fe0408d89c7be7"
 
+"@types/es6-shim@^0.31.32":
+  version "0.31.36"
+  resolved "https://registry.yarnpkg.com/@types/es6-shim/-/es6-shim-0.31.36.tgz#ad632af021b7f13846c2dddbba4db0a6f5b3eb6b"
+
 "@types/jquery@*", "@types/jquery@3.2.16":
   version "3.2.16"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.2.16.tgz#04419c404a3194350e7d3f339a90e72c88db3111"
@@ -51,6 +55,10 @@
 "@types/mocha@2.2.44":
   version "2.2.44"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.44.tgz#1d4a798e53f35212fd5ad4d04050620171cd5b5e"
+
+"@types/react@^15.0.0":
+  version "15.6.14"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-15.6.14.tgz#fe176209b9de3514f9782fa41a239bffd26a3b56"
 
 "@types/sinon-chai@2.7.29":
   version "2.7.29"
@@ -1042,6 +1050,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+bezier-easing@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/bezier-easing/-/bezier-easing-2.0.3.tgz#cb493fddb7f8920ecca00973344ce0518885f17e"
+
 big.js@^3.1.3:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
@@ -1697,6 +1709,14 @@ create-hmac@^1.1.0, create-hmac@^1.1.2, create-hmac@^1.1.4:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
+create-react-class@^15.6.0:
+  version "15.6.3"
+  resolved "https://registry.yarnpkg.com/create-react-class/-/create-react-class-15.6.3.tgz#2d73237fb3f970ae6ebe011a9e66f46dbca80036"
+  dependencies:
+    fbjs "^0.8.9"
+    loose-envify "^1.3.1"
+    object-assign "^4.1.1"
+
 cross-spawn@5.1.0, cross-spawn@^5.0.1, cross-spawn@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-5.1.0.tgz#e8bd0efee58fcff6f8f94510a0a554bbfa235449"
@@ -2267,6 +2287,10 @@ es6-set@~0.1.5:
     es6-symbol "3.1.1"
     event-emitter "~0.3.5"
 
+es6-shim@^0.35.2:
+  version "0.35.3"
+  resolved "https://registry.yarnpkg.com/es6-shim/-/es6-shim-0.35.3.tgz#9bfb7363feffff87a6cdb6cd93e405ec3c4b6f26"
+
 es6-symbol@3.1.1, es6-symbol@^3.1.1, es6-symbol@~3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/es6-symbol/-/es6-symbol-3.1.1.tgz#bf00ef4fdab6ba1b46ecb7b629b4c7ed5715cc77"
@@ -2657,7 +2681,7 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "^2.0.0"
 
-fbjs@^0.8.16:
+fbjs@^0.8.16, fbjs@^0.8.9:
   version "0.8.16"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.16.tgz#5e67432f550dc41b572bf55847b8aca64e5337db"
   dependencies:
@@ -5423,6 +5447,14 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-animate-hoc@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/react-animate-hoc/-/react-animate-hoc-0.5.1.tgz#9f5283a76de1dd051961f5f216d3ad7eab7fc679"
+  dependencies:
+    bezier-easing "^2.0.3"
+    es6-shim "^0.35.2"
+    typescript-object-utils "0.2.0"
+
 react-banner@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/react-banner/-/react-banner-0.4.0.tgz#6dc0a3e12b62b3b4d5949585b7fd51528736c128"
@@ -5525,6 +5557,15 @@ react-icons@^2.2.7:
   resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-2.2.7.tgz#d7860826b258557510dac10680abea5ca23cf650"
   dependencies:
     react-icon-base "2.1.0"
+
+react-load-overlay@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/react-load-overlay/-/react-load-overlay-0.2.2.tgz#096263308e05785dbd3dfe2896dc4556390f45eb"
+  dependencies:
+    "@types/react" "^15.0.0"
+    react "^15.3.0"
+    react-animate-hoc "^0.5.1"
+    typescript-object-utils "^0.2.1"
 
 react-onclickoutside@^6.1.1:
   version "6.7.1"
@@ -5640,6 +5681,16 @@ react-transition-group@^2.0.0, react-transition-group@^2.2.0:
     loose-envify "^1.3.1"
     prop-types "^15.5.8"
     warning "^3.0.0"
+
+react@^15.3.0:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/react/-/react-15.6.2.tgz#dba0434ab439cfe82f108f0f511663908179aa72"
+  dependencies:
+    create-react-class "^15.6.0"
+    fbjs "^0.8.9"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.0"
+    prop-types "^15.5.10"
 
 react@^16.2.0:
   version "16.2.0"
@@ -6593,6 +6644,17 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
+typescript-object-utils@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/typescript-object-utils/-/typescript-object-utils-0.2.0.tgz#279398c08f43a48dfa9115a82a51cf76d7741b6e"
+  dependencies:
+    "@types/es6-shim" "^0.31.32"
+    es6-shim "^0.35.2"
+
+typescript-object-utils@^0.2.1:
+  version "0.2.11"
+  resolved "https://registry.yarnpkg.com/typescript-object-utils/-/typescript-object-utils-0.2.11.tgz#d84d27108887a758a241717b46852766f2ec8b82"
+
 ua-parser-js@^0.7.9:
   version "0.7.17"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.17.tgz#e9ec5f9498b9ec910e7ae3ac626a805c4d09ecac"
@@ -6709,6 +6771,10 @@ url-parse@^1.1.8:
   dependencies:
     querystringify "~1.0.0"
     requires-port "~1.0.0"
+
+url-search-params-polyfill@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-3.0.0.tgz#145fae5b19fc72e8e0a148a2b3ee5330c58f9555"
 
 url@0.11.0, url@^0.11.0:
   version "0.11.0"

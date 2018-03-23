@@ -10,13 +10,14 @@ import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
-export const recordsResultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode", "schedule"];
-export const containersResultsAccessors = ["containerNumber", "title", "state", "location", "consignmentCode", "schedule"];
+export const recordsResultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode"];
+export const containersResultsAccessors = ["containerNumber", "title", "state", "location", "consignmentCode"];
 
 class SelectTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            user: props.userData,
             data: [],
             rdata: [],
             cdata: [],
@@ -26,14 +27,13 @@ class SelectTable extends Component {
             tray: [],
             addbtntext: 'Add to Tray',
             selectvalue: 'none',
-            userId: '5',
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
         };
     }
 
     componentWillMount() {
-        let stored = sessionStorage.getItem("tray" + this.state.userId);
+        let stored = sessionStorage.getItem("tray" + this.state.user.id);
         //console.log("get stored: " + stored);
         if (stored) {
             /*let tray = JSON.parse(stored);
@@ -60,11 +60,11 @@ class SelectTable extends Component {
 
 
     search = (searchString) => {
-        let recordsPromise = getRecordsByNumber(searchString)
+        let recordsPromise = getRecordsByNumber(searchString, this.state.user.id)
             .then(response => {
                 return response.json()
             });
-        let containersPromise = getContainersByNumber(searchString)
+        let containersPromise = getContainersByNumber(searchString, this.state.user.id)
             .then(response => {
                 //console.log(response);
                 return response.json()
@@ -82,6 +82,9 @@ class SelectTable extends Component {
                 } else {
                     setTableState(this, [], [], this.tableDataAndSelectionCallback);
                 }
+            })
+            .catch(err => {
+                setTableState(this, [], [], this.tableDataAndSelectionCallback);
             });
     };
 
@@ -149,9 +152,8 @@ class SelectTable extends Component {
         });
         if (updated) {
             this.setState({tray, addbtntext: 'Success'});
-            //console.log("tray after: "+JSON.stringify(this.state.tray));
-            sessionStorage.setItem("tray" + this.state.userId, JSON.stringify(tray));
-            //console.log(sessionStorage.getItem("tray"+this.state.userId));
+            console.log(this.state.user.id);
+            sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
             setTimeout(() => {
                 this.setState({addbtntext: 'Add to Tray'});
             }, 700);
@@ -202,7 +204,7 @@ class SelectTable extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, updateTray} = this;
-        const {data, columns, selectAll} = this.state;
+        const {data, columns, selectAll, selection} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -216,7 +218,9 @@ class SelectTable extends Component {
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
                 <div style={styles.btncontainer}>
-                    <button className='btn btn-s' style={this.addStyle()}
+                    <button className='btn btn-s'
+                            style={this.addStyle()}
+                            disabled={!selection.length}
                             onClick={updateTray}>{this.state.addbtntext}</button>
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>

@@ -1,33 +1,38 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactTable from 'react-table';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getColumns} from "../Utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
+//import {deleteRecordByIds} from "../APIs/RecordsApi";
+import {Alert} from 'react-bootstrap';
+import {MdCreateNewFolder} from 'react-icons/lib/md';
+
 const CheckboxTable = checkboxHOC(ReactTable);
 
 class WorkTray extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            success: false,
+            alertMsg: "",
             data: [],
             columns: [],
             selection: [],
             selectAll: false,
-            userId: '5',
+            user: props.userData,
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
         };
     }
 
-    componentWillMount() {}
     componentDidMount() {
         //const data = this.props.location.state.traydata;
-        let stored = sessionStorage.getItem("tray"+this.state.userId);
+        let stored = sessionStorage.getItem("tray" + this.state.user.id);
         if (stored) {
             //console.log("stored: " + stored);
-            const data = JSON.parse(stored).map((item, index)=>{
+            const data = JSON.parse(stored).map((item, index) => {
                 const _id = index;
                 return {
                     _id,
@@ -40,6 +45,7 @@ class WorkTray extends Component {
             });
         }
     }
+
     componentWillUnmount() {
         this.state.onItemSelectCallback([]);
     }
@@ -47,13 +53,24 @@ class WorkTray extends Component {
     getWorkTrayColumns = () => {
         const columns = getColumns(this, recordsResultsAccessors);
         columns.push({
-            Header: <button className="btn btn-xs"
-                            onClick={this.deleteAll}
-                            onMouseOver={(e) => {e.target.style.backgroundColor = '#ff9c81'}}
-                            onMouseLeave={(e) => {e.target.style.backgroundColor = 'white'}}
-                            style={styles.clearbtn}>Clear All</button>,
+            Header: <button className='btn btn-s'
+                            style={styles.removeselbtn}
+                            onMouseOver={(e) => {
+                                e.target.style.borderColor = '#ff6c60'
+                            }}
+                            onMouseOut={(e) => {
+                                e.target.style.borderColor = 'white'
+                            }}
+                            onClick={this.removeSelected}>
+                <i className="fa fa-remove" style={styles.removeicon}/>
+                Selected
+            </button>,
             sortable: false,
-            Cell: e => <button className="btn btn-xs" onClick={()=>{this.deleteRow(e)}} style={styles.delbtn}><i className="fa fa-trash-o"/></button>
+            resizable: false,
+            width: 100,
+            Cell: e => <button className="btn btn-xs" onClick={() => {
+                this.removeRow(e)
+            }} style={{background: 'transparent'}}><i className="fa fa-remove" style={styles.removerowbtn}/></button>
         });
         return columns;
     };
@@ -82,34 +99,54 @@ class WorkTray extends Component {
         }
     };
 
-    deleteRow = (e) => {
-        let index = e.row._index;
+    removeRow = (e) => {
+        let rowindex = e.row._index;
         let data = [...this.state.data];
+        let original = [...this.state.selection];
+        let selection = [];
 
-        //TODO: we may want to keep selection
-        this.setState({selection: [], selectAll: false}, () => {
-            this.state.onItemSelectCallback(this.state.selection);
-        });
-
-        data.splice(index, 1);
+        data.splice(rowindex, 1);
         data.forEach((item, index) => {
+            if (original.includes(item._id)) {
+                if (item._id >= rowindex)
+                    selection.push(index);
+                else selection.push(item._id);
+            }
            //recalculate index
            item._id = index;
         });
-        this.setState({data}, () => {
+        this.setState({selection, data}, () => {
+            this.state.onItemSelectCallback(this.state.selection);
             this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
         });
         //console.log(JSON.stringify(this.state.data));
 
-        let stored = JSON.parse(sessionStorage.getItem("tray"+this.state.userId));
-        stored.splice(index, 1);
-        sessionStorage.setItem("tray"+this.state.userId, JSON.stringify(stored));
+        let stored = JSON.parse(sessionStorage.getItem("tray" + this.state.user.id));
+        stored.splice(rowindex, 1);
+        sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(stored));
         //console.log(JSON.stringify(stored));
     };
 
-    deleteAll = () => {
-        sessionStorage.removeItem("tray"+this.state.userId);
+    removeAll = () => {
+        sessionStorage.removeItem("tray" + this.state.user.id);
         this.setState({data: [], columns: [], selection: [], selectAll: false}, () => {
+            this.state.onItemSelectCallback(this.state.selection);
+            this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
+        });
+    };
+
+    removeSelected = () => {
+        let selection = [...this.state.selection];
+        let stored = [...JSON.parse(sessionStorage.getItem("tray" + this.state.user.id))];
+
+        let data = stored.filter((item, index) => selection.indexOf(index) < 0);
+        sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(data));
+
+        data.forEach((item, index) => {
+            //recalculate index
+            item._id = index;
+        });
+        this.setState({selection: [], data, selectAll: false}, () => {
             this.state.onItemSelectCallback(this.state.selection);
             this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
         });
@@ -162,9 +199,46 @@ class WorkTray extends Component {
         return this.state.selection.includes(key);
     };
 
+    deleteSelected = () => {
+        let data = [...this.state.data];
+        let selection = [...this.state.selection];
+        let recordIds = [];
+        selection.forEach((i) => {
+            recordIds.push(data[i].id);
+        });
+
+        this.setState({alertMsg: "WIP"});
+        window.scrollTo(0, 0);
+
+        /*deleteRecordByIds(recordIds, this.state.user.id)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    let msg = data.status + ": " + data.error;
+                    this.setState({alertMsg: msg});
+                    window.scrollTo(0, 0)
+                }
+                else if(data.status && data.status !== 200) {
+                    //console.log(JSON.stringify(data));
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else if (data.status === 500) {
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else {
+                    this.removeSelected();
+                }
+            })
+            .catch(error => console.log('Error: ', error));*/
+    };
+
     render() {
-        const { toggleSelection, toggleAll, isSelected } = this;
-        const { data, columns, selectAll, } = this.state;
+        const {toggleSelection, toggleAll, isSelected, removeAll, deleteSelected} = this;
+        const {data, columns, selectAll, selection, alertMsg} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -172,20 +246,61 @@ class WorkTray extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
-        return (
-            <div style={styles.container}>
-                <h1>Work Tray</h1>
-                <div style={styles.btncontainer}></div>
-                <div style={styles.tablestyle}>
-                    <CheckboxTable
-                        ref={(r)=>this.checkboxTable=r}
-                        data={data}
-                        columns={columns}
-                        defaultPageSize={10}
-                        className="-striped -highlight"
 
-                        {...checkboxProps}
-                    />
+        return (
+            <div>
+                {alertMsg.length !== 0 && !this.state.success
+                    ? <Alert bsStyle="danger">
+                        <h3>{alertMsg}</h3>
+                        <button onClick={() => {
+                            this.setState({alertMsg: ""})
+                        }}>Close
+                        </button>
+                    </Alert>
+                    : null
+                }
+                <div style={styles.container}>
+                    <h1>Work Tray</h1>
+                    <div style={styles.btncontainer}>
+                        <button className='btn btn-s'
+                                style={styles.delbtn}
+                                disabled={!selection.length}
+                                onClick={deleteSelected}>
+                            <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
+                            Delete
+                        </button>
+                        <button className='btn btn-s'
+                                style={styles.destroybtn}
+                                disabled={!selection.length}
+                                onClick={deleteSelected}>
+                            <i className="fa fa-flag" style={{marginRight: '5px'}}/>
+                            Destroy
+                        </button>
+                        <button className='btn btn-s'
+                                style={styles.bluebtn}
+                                disabled={!selection.length}
+                                onClick={deleteSelected}>
+                            <MdCreateNewFolder style={styles.volumeicon}/>
+                            Volume
+                        </button>
+                        <button className='btn btn-s'
+                                style={styles.clearbtn}
+                                onClick={removeAll}>
+                            <i className="fa fa-remove" style={styles.removeiconwhite}/>
+                            All
+                        </button>
+                    </div>
+                    <div style={styles.tablestyle}>
+                        <CheckboxTable
+                            ref={(r) => this.checkboxTable = r}
+                            data={data}
+                            columns={columns}
+                            defaultPageSize={10}
+                            className="-striped -highlight"
+
+                            {...checkboxProps}
+                        />
+                    </div>
                 </div>
             </div>
         );
@@ -194,27 +309,80 @@ class WorkTray extends Component {
 
 let styles = {
     container: {
-        padding: '5%'
+        padding: '2% 5% 5% 5%'
     },
     tablestyle: {
         //border: '5px solid gray'
         marginTop: '5px',
     },
-
-    delbtn: {
-        backgroundColor: '#ff6c60',
-        borderColor: '#ff6c60',
-        color: 'white'
-    },
     btncontainer: {
         //border: '2px solid blue',
         alignItems: 'center',
+        verticalAlign: 'baseline',
         height: '1cm'
     },
+    delbtn: {
+        float: 'left',
+        marginRight: '0.5cm',
+        backgroundColor: '#ff6c60',
+        borderColor: 'white',
+        color: 'white',
+        fontSize: '13px',
+    },
+    destroybtn: {
+        float: 'left',
+        marginRight: '0.5cm',
+        backgroundColor: '#ffea65',
+        borderColor: 'white',
+        color: 'black',
+        fontSize: '13px',
+    },
+    bluebtn: {
+        float: 'left',
+        marginRight: '0.5cm',
+        backgroundColor: '#2f8bff',
+        borderColor: 'white',
+        color: 'white',
+        fontSize: '13px',
+    },
     clearbtn: {
-        //backgroundColor: '#ff9c81',
+        float: 'right',
+        marginRight: '0.5cm',
+        width: 'auto',
+        background: '#ff4e44',
+        borderColor: 'white',
+        color: 'white',
+        fontSize: '13px',
+    },
+    removerowbtn: {
+        color: '#ff6c60',
+        transform: 'scale(2,2)',
+    },
+    removeselbtn: {
+        height: '25px',
+        padding: '4px',
+        width: 'auto',
         backgroundColor: 'white',
-        borderColor: '#ff9c81',
+    },
+    removeicon: {
+        color: '#ff6c60',
+        background: 'inherit',
+        backgroundColor: 'inherit',
+        transform: 'scale(1.5,1.5)',
+        verticalAlign: 'top',
+        marginRight: '5px',
+    },
+    removeiconwhite: {
+        color: 'white',
+        background: 'inherit',
+        backgroundColor: 'inherit',
+        transform: 'scale(1.5,1.5)',
+        marginRight: '5px',
+    },
+    volumeicon: {
+        marginRight: '5px',
+        transform: 'scale(1.55, 1.45)',
+        verticalAlign: 'baseline',
     },
 };
 

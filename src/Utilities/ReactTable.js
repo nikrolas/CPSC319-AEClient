@@ -24,21 +24,39 @@ export function getColumns(context, accessors) {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
-                    Cell: e => <a onClick={() => {
-                        context.handleClick(accessor, e.row._original.id, 'record')
-                    }}> {e.value} </a>
+                    maxWidth: 150,
+                    Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>
+                        <a onClick={() => {
+                            context.handleClick(accessor, e.row._original.id, 'record')
+                        }}> {e.value} </a>
+                    </div>
                 });
             } else if (accessor === "containerNumber") {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
+                    maxWidth: 120,
                     Cell: e => <a onClick={() => {
                         context.handleClick(accessor, e.row._original.containerId, 'container')
                     }}> {e.value} </a>
                 });
-            } else {
+            } else if (accessor === "title") {
                 columns.push({
                     accessor: accessor,
+                    minWidth: 250,
+                    Header: accessorHeaderMapping[accessor],
+                    Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>{e.value}</div>
+                });
+            } else if (accessor === "consignmentCode") {
+                columns.push({
+                    accessor: accessor,
+                    Header: accessorHeaderMapping[accessor]
+                });
+            }
+            else {
+                columns.push({
+                    accessor: accessor,
+                    maxWidth: 100,
                     Header: accessorHeaderMapping[accessor]
                 });
             }

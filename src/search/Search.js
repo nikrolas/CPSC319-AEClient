@@ -33,18 +33,20 @@ class Search extends Component {
     render() {
         return (
             <div>
-                <form onSubmit={this.handleSubmit}>
-                    <div style={styles.searchwrap}>
-                        <i className="fa fa-search" style={styles.searchicon}/>
-                        <input type="text" defaultValue={this.state.searchValue} value={this.state.value}
-                               onChange={this.handleInputChange} placeholder="Search by record number. e.g. VAN"
-                               style={styles.searchbox}/>
-                        <Link to={this.state.searchPath}>
-                            <button type="submit" value="Submit" className='btn btn-default' style={styles.submitbtn}>
-                                <i className="fa fa-angle-right" style={styles.submiticon}/>
-                            </button>
-                        </Link>
-                    </div>
+                <form onSubmit={this.handleSubmit} style={styles.searchwrap}>
+                    <i className="fa fa-search" style={styles.searchicon}/>
+                    <input type="text"
+                           id="search"
+                           defaultValue={this.state.searchValue}
+                           value={this.state.value}
+                           onChange={this.handleInputChange}
+                           placeholder="Search by record number. e.g. VAN"
+                           style={styles.searchbox}/>
+                    <Link to={this.state.searchPath}>
+                        <button type="submit" value="Submit" className='btn btn-default' style={styles.submitbtn}>
+                            <i className="fa fa-angle-right" style={styles.submiticon}/>
+                        </button>
+                    </Link>
                 </form>
             </div>
         )
@@ -81,9 +83,7 @@ let styles = {
         width: '1.2cm',
         height: '100%',
         padding: '6px',
-        //backgroundColor: 'white',
         border: 'white',
-        //backgroundImage: 'none',
     },
     submiticon: {
         fontSize: '25px',

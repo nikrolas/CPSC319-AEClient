@@ -1,9 +1,9 @@
 export function isARecordItem(obj) {
-    return obj.hasOwnProperty('number');
+    return obj && obj.hasOwnProperty('number');
 }
 
 export function isAContainerItem(obj) {
-    return !obj.hasOwnProperty('number') && obj.hasOwnProperty('containerNumber');
+    return obj && !obj.hasOwnProperty('number') && obj.hasOwnProperty('containerNumber');
 }
 
 export function getSelectedRecords(records, selection) {

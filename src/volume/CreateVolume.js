@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Button, Alert} from 'react-bootstrap';
-import {createVolume, getRecordsByNumber} from "../APIs/RecordsApi";
+import {getVolumesByNumber, createVolume} from "../APIs/VolumesApi";
 import {MdCreateNewFolder} from 'react-icons/lib/md';
+import PropTypes from 'prop-types';
 
 class CreateVolume extends Component {
 
@@ -9,6 +10,8 @@ class CreateVolume extends Component {
         super(props);
         this.state =
             {
+                user: props.userData,
+                timeout: null,
                 success: false,
                 alertMsg: "",
                 location: this.getUserLocations()[0], //TODO://set user default location
@@ -23,37 +26,57 @@ class CreateVolume extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
     static contextTypes = {
-        router: () => true,
+        router: PropTypes.object
     };
 
     componentWillMount() {
-        if (this.state.selectedRecord)
-            this.search(this.state.selectedRecord.number.split(":")[0]);
+        if (!this.state.success) {
+            if (this.state.selectedRecord)
+                this.search(this.state.selectedRecord.number.split(":")[0]);
+            else {
+                if (!this.state.timeout) {
+                    this.setState({
+                            alertMsg: "Nothing selected. Redirecting..",
+                            timeout: setTimeout(() => {
+                                this.context.router.history.goBack();
+                            }, 2000)
+                        }
+                    );
+                    window.scrollTo(0, 0);
+                }
+            }
+        }
     }
     search = (searchString) => {
-        getRecordsByNumber(searchString)
+        getVolumesByNumber(searchString, this.state.user.id)
             .then(response => {
                 //console.log(response);
                 return response.json()
             })
             .then(data => {
-                //console.log(JSON.stringify(data));
-                if (data && data.length > 0) {
+                if (data.error) {
+                    let msg = data.status + ": " + data.error;
+                    this.setState({alertMsg: msg});
+                    window.scrollTo(0, 0)
+                }
+                else if (data.status && data.status !== 200) {
+                    this.setState({alertMsg: data.message});
+                    window.scrollTo(0, 0)
+                }
+                else if (data && data.length > 0) {
                     data.sort((a,b) => this.naturalCompare(a.number,b.number));
                     let numbers = [];
                     data.forEach((volume) => {
                         numbers.push(volume.number);
                     });
-                    //console.log(JSON.stringify(numbers));
-                    let notes = data[data.length-1].notes;
+                    let notes = data[data.length -1].notes;
                     this.setState({volumes: data, numbers, notes});
                 }
             })
             .catch(err => {
-                console.error("Error loading search results: " + err.message);
+                console.error("Error loading volumes: " + err.message);
             });
     };
-
     naturalCompare = (a, b) => {
         let ax = [], bx = [];
 
@@ -70,6 +93,11 @@ class CreateVolume extends Component {
         return ax.length - bx.length;
     };
 
+    componentWillUnmount() {
+        if (this.state.timeout)
+            clearTimeout(this.state.timeout);
+    }
+
     getSelectedRecord = (record, selection) => {
         let index = selection[0];
         if (record[index] && record[index].hasOwnProperty('number')) {
@@ -83,18 +111,16 @@ class CreateVolume extends Component {
     };
 
     handleCancel(event) {
-        this.setState({
-            success: false,
-            alertMsg: "Cancelled",
-            notes: "",
-            copy: false,
-            selectedRecord: null,
-            volumes: [],
-            numbers: [],
-        });
-        setTimeout(() => {
-            this.context.router.history.goBack();
-        }, 3000);
+        if (!this.state.timeout) {
+            this.setState({
+                timeout: setTimeout(() => {
+                    this.context.router.history.goBack();
+                }, 1500),
+                success: false,
+                alertMsg: "Cancelled. Redirecting..",
+            });
+            window.scrollTo(0, 0);
+        }
 
         event.preventDefault();
     }
@@ -107,7 +133,7 @@ class CreateVolume extends Component {
         if (latest) {
             id = latest.id;
         }
-        createVolume(id, copy)
+        createVolume(id, copy, this.state.user.id)
         .then(response => {
             //console.log(response);
             return response.json();
@@ -118,36 +144,54 @@ class CreateVolume extends Component {
                 this.setState({alertMsg: msg});
                 window.scrollTo(0, 0)
             }
-            else if(data.status !== 200) {
+            else if(data.status && data.status !== 200) {
                 //console.log(JSON.stringify(data));
                 this.setState({alertMsg: data.message});
                 window.scrollTo(0, 0)
             }
             else {
-                this.props.history.push("/viewRecord/"+ data.id);
+                if (!this.state.timeout) {
+                    this.setState({
+                        timeout: setTimeout(() => {
+                            this.props.history.push("/viewRecord/" + data.id);
+                        }, 2000),
+                        success: true,
+                        alertMsg: "Success",
+                    });
+                    window.scrollTo(0, 0);
+                }
             }
         })
         .catch(error => {
-            this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+            this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."});
             window.scrollTo(0, 0)
         });
 
         event.preventDefault();
     }
 
+    handleClick(event, index) {
+            let routePath = "/viewRecord/" + this.state.volumes[index].id;
+            this.props.history.push(routePath);
+            event.preventDefault();
+    };
+
     displayVolumes = () => {
-        if (this.state.volumes.length > 0)
-        return this.state.numbers.map((number, index) => {
-            if (index === 0 && !number.includes(":")) {
-                return <li key={index} style={{fontSize: '25px'}}>
-                    <span style={{color: '#79ff46'}}>UPDATE:&ensp;</span>
-                    {number}
-                    <i className="fa fa-long-arrow-right" style={styles.arrow}/>
-                    {this.newVolNum(0)}
+        if (this.state.volumes.length > 0) {
+            return this.state.numbers.map((number, index) => {
+                if (index === 0 && !number.includes(":")) {
+                    return <li key={index} style={{fontSize: '25px'}}>
+                        <span style={{color: '#79ff46'}}>UPDATE:&ensp;</span>
+                        <a onClick={(e) => this.handleClick(e, index)}>{number}</a>
+                        <i className="fa fa-long-arrow-right" style={styles.arrow}/>
+                        {this.newVolNum(0)}
+                    </li>
+                }
+                else return <li key={index} style={{fontSize: '25px'}}>
+                    <a onClick={(e) => this.handleClick(e, index)}>{number}</a>
                 </li>
-            }
-            else return <li style={{fontSize: '25px'}}> {number} </li>
-        });
+            });
+        }
     };
     displayNew = () => {
         if (this.state.volumes.length > 0)
@@ -177,8 +221,6 @@ class CreateVolume extends Component {
     };
 
     render() {
-        const {notes} = this.state;
-
         return (
             <div style={styles.container}>
                 {this.state.alertMsg.length !== 0 && !this.state.success
@@ -186,7 +228,7 @@ class CreateVolume extends Component {
                     : null
                 }
                 {this.state.alertMsg.length !== 0 && this.state.success
-                    ? <Alert bsStyle="success"><h4>{this.state.alertMsg}</h4></Alert>
+                    ? <Alert bsStyle="success"><h4 style={{fontSize: '25px'}}>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
 
@@ -205,12 +247,14 @@ class CreateVolume extends Component {
                                 Copy notes from last volume:
                             </label>
                         </div>
-                        <textarea readonly="true" style={styles.notes}>{notes !== "" ? notes : null}</textarea>
+                        <textarea readOnly="true"
+                                  style={this.state.notes === "" ? styles.notes : styles.notes2}
+                                  value={this.state.notes}/>
                     </div>
                     <div>
-                        <Button className='btn btn-danger' onClick={this.handleCancel}>Cancel</Button>
+                        <Button bsStyle="danger" onClick={this.handleCancel}>Cancel</Button>
                         &ensp;
-                        <Button className='btn btn-primary' onClick={this.handleSubmit}>Submit</Button>
+                        <Button bsStyle="primary" onClick={this.handleSubmit}>Create</Button>
                     </div>
                 </div>
             </div>
@@ -252,6 +296,14 @@ let styles = {
     },
     notes: {
         width: '75%',
+        overflowY: 'auto',
+        minWidth: '25%',
+        maxWidth: '100%',
+        minHeight: '1cm',
+    },
+    notes2: {
+        width: '75%',
+        height: '5cm',
         overflowY: 'auto',
         minWidth: '25%',
         maxWidth: '100%',

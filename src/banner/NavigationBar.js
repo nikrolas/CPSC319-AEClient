@@ -8,7 +8,15 @@ class NavigationBar extends Component {
 
     constructor(props) {
         super(props);
-        this.state = this.countItemTypes(props.selectedItemIndexes, props.resultsData);
+        this.state = {
+            records: [],
+            containers: [],
+            user: props.userData,
+        }
+    }
+
+    componentWillMount() {
+        this.updateCounts(this.props);
     }
 
     countItemTypes = (selectedItemIndexes, data) => {
@@ -27,13 +35,21 @@ class NavigationBar extends Component {
     };
 
     componentWillReceiveProps(newProps) {
-        let newCounts = this.countItemTypes(newProps.selectedItemIndexes, newProps.resultsData);
-        this.setState(newCounts);
+        this.updateCounts(newProps);
     }
 
 
+    updateCounts = (newProps) => {
+        let newCounts = this.countItemTypes(newProps.selectedItemIndexes, newProps.resultsData);
+        this.setState(newCounts);
+    };
+
     enableContainRecords = () => {
-        return this.state.records > 0 && this.state.containers <= 1;
+        return this.state.records > 0 && this.state.containers === 0;
+    };
+
+    enableAddToContainer = () => {
+        return this.state.records > 0 && this.state.containers === 1;
     };
 
     recordsOnly = () => {
@@ -41,7 +57,7 @@ class NavigationBar extends Component {
     };
 
     enableCreateVolume = () => {
-        if (this.state.records > 0 && this.state.containers === 0){
+        if (this.state.records > 0 && this.state.containers === 0) {
             let {selectedItemIndexes, resultsData} = this.props;
             let index = -1;
             for (let i = 0; i < selectedItemIndexes.length; i++) {
@@ -66,35 +82,80 @@ class NavigationBar extends Component {
     };
 
     render() {
+        let userInfo = null;
+        let search = null;
+        let workTray = null;
+        let newRecord = null;
+        let containRecords = null;
+        let createVolume = null;
+        let removeFromContainer = null;
+        if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "") {
+            userInfo =
+                <Nav pullRight={true}>
+                    <NavItem>
+                        Signed in as: {this.state.user.firstName} {this.state.user.lastName} ({this.state.user.role})
+                        <br/>
+                        Location: {this.state.user.locations[0].locationName}
+                    </NavItem>
+                </Nav>;
+            if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+                search =
+                    <NavItem componentClass={Link}
+                             href="/results"
+                             to="/results">
+                        Search
+                    </NavItem>;
+                workTray =
+                    <NavItem componentClass={Link}
+                             href="/worktray"
+                             to="/worktray">
+                        Work Tray
+                    </NavItem>;
+                newRecord =
+                    <NavItem componentClass={Link}
+                             href="/createRecord"
+                             to="/createRecord">
+                        New Record
+                    </NavItem>;
+                containRecords =
+                    <NavItem componentClass={Link}
+                             disabled={!this.enableContainRecords()}
+                             href="/createContainer"
+                             to="/createContainer">
+                        Contain Records
+                    </NavItem>
+                createVolume =
+                    <NavItem componentClass={Link}
+                             disabled={!this.enableCreateVolume()}
+                             href="/createVolume"
+                             to="/createVolume">
+                        Create Volume
+                    </NavItem>;
+                removeFromContainer =
+                    <NavItem componentClass={Link}
+                             disabled={!this.recordsOnly()}
+                             onClick={() => this.props.onSelectAction("RemoveFromContainer")}
+                             href="/confirmAction" to="/confirmAction">
+                        Remove from Container
+                    </NavItem>;
+            }
+        }
         return (
             <Navbar inverse fluid>
                 <Nav>
                     <NavItem className="logo-container" componentClass={Link} href="/" to="/">
                         <img src={banner_logo} className="App-logo" alt="logo"/>
                     </NavItem>
-                    <NavItem componentClass={Link} href="/results" to="/results">
-                        Search
-                    </NavItem>
-                    <NavItem componentClass={Link} href="/worktray" to="/worktray">
-                        Work Tray
-                    </NavItem>
-                    <NavItem componentClass={Link} href="/createRecord" to="/createRecord">
-                        New Record
-                    </NavItem>
-                    <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
-                             to="/createContainer">
-                        Contain Records
-                    </NavItem>
-                    <NavItem componentClass={Link} disabled={!this.enableCreateVolume()} href="/createVolume"
-                             to="/createVolume">
-                        Create Volume
-                    </NavItem>
-                    <NavItem componentClass={Link} disabled={!this.recordsOnly()} onClick={() => this.props.onSelectAction("RemoveFromContainer")} href="/confirmAction"
-                             to="/confirmAction">
-                        Remove from Container
-                    </NavItem>
+                    {search}
+                    {workTray}
+                    {newRecord}
+                    {containRecords}
+                    {removeFromContainer}
+                    {createVolume}
                 </Nav>
+                {userInfo}
             </Navbar>
+
         );
     }
 }

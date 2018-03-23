@@ -2,11 +2,15 @@ import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, Alert, HelpBlock} from 'react-bootstrap'
 import {createContainer} from "../APIs/ContainersApi";
 import ReactTable from "react-table";
+import AlertDismissable from "../AlertDismissable";
+import {isARecordItem} from "../Utilities/Items";
 
 class CreateContainer extends Component {
 
     constructor(props, context) {
         super(props, context);
+
+        let selectedItems = this.getSelectedItems(props.resultsData, props.selectedItemIndexes);
         this.state =
             {
                 success: false,
@@ -16,7 +20,8 @@ class CreateContainer extends Component {
                 locations: this.getUserLocations(),
                 destructionDate: this.getDestructionDate(),
                 notes: "",
-                selectedRecords: this.getSelectedRecords(props.resultsData, props.selectedItemIndexes),
+                selectedRecords: selectedItems.selectedRecords,
+                selectedContainers: selectedItems.selectedContainers,
                 columns: props.resultsColumns,
 
                 titleValidationMsg: "",
@@ -24,21 +29,38 @@ class CreateContainer extends Component {
                 locationValidationMsg: "",
                 locationValidationState: "success",
                 notesValidationMsg: "",
-                notesValidationState: "success"
+                notesValidationState: "success",
+
+                invalidStateErrors: []
             };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    getSelectedRecords = (records, selection) => {
-        //TODO: handle case when a container is also selected This component only handles records
+    componentDidMount() {
+        let invalidStateErrors = [];
+
+        if (!this.state.selectedRecords || !this.state.selectedRecords.length > 0) {
+            invalidStateErrors.push("At least one record must be selected.");
+        }
+
+        this.setState({invalidStateErrors});
+    }
+
+
+    getSelectedItems = (records, selection) => {
         let selectedRecords = [];
+        let selectedContainers = [];
+
         selection.forEach((index) => {
-            if (records[index].hasOwnProperty('number'))
+            if (isARecordItem(records[index])) {
                 selectedRecords.push(records[index]);
+            } else {
+                selectedContainers.push(records[index]);
+            }
         });
-        return selectedRecords;
+        return {selectedRecords, selectedContainers};
     };
 
     getUserLocations = () => {
@@ -123,14 +145,14 @@ class CreateContainer extends Component {
                 selectedRecords
             }))(this.state);
 
+            //TODO: workaround - remove!
+            formData.containerNumber = "9999/999-ZZZ";
+
             let selectedRecordIds = [];
             formData.selectedRecords.forEach(record => {
                 selectedRecordIds.push(record.id);
             });
             formData.selectedRecords = selectedRecordIds;
-
-            //TODO: workaround - remove!
-            formData.containerNumber = "9999/999-ZZZ";
 
             createContainer(formData).then(response => {
                 if (response.status !== 201) {
@@ -156,6 +178,16 @@ class CreateContainer extends Component {
         const destructionDate = <div>{this.state.destructionDate}</div>;
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
         const {selectedRecords, columns} = this.state;
+
+        let handleAction = () => {
+            this.props.history.push("/");
+        };
+
+        let alertMessage = this.state.invalidStateErrors.join("\n");
+
+        if (this.state.invalidStateErrors.length > 0) {
+            return <AlertDismissable handleAction={handleAction} alertMessage={alertMessage}/>
+        }
 
         return (
             <div>
@@ -196,15 +228,15 @@ class CreateContainer extends Component {
                         <FormControl
                             name="location"
                             componentClass="select"
-                            value = {this.state.location}
+                            value={this.state.location}
                             onChange={this.handleChange}
                         >
                             {listLocationsJson}
                         </FormControl>
                         <FormControl.Feedback/>
-                        { this.state.locationValidationState === "error"
-                            ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            :null
+                        {this.state.locationValidationState === "error"
+                            ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
+                            : null
                         }
                     </FormGroup>
                     <FormGroup
