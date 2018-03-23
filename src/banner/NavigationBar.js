@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom'
+import {Link} from 'react-router-dom';
 import banner_logo from './images/AE_Logo.png';
 import {Nav, Navbar, NavItem} from "react-bootstrap";
 import {isARecordItem} from "../Utilities/Items";

@@ -7,6 +7,7 @@ import {getRecordsByNumber} from "../APIs/RecordsApi";
 import {getContainersByNumber} from "../APIs/ContainersApi";
 import Search from "./Search";
 import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
+import ContextualActions from '../context/ContextualActions';
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -217,6 +218,7 @@ class SelectTable extends Component {
                 <div style={{marginBottom: '1cm'}}>
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
+                <ContextualActions {...this.props} selectedItemIndexes={this.state.selection} resultsData={this.state.data} columns={columns}/>
                 <div style={styles.btncontainer}>
                     <button className='btn btn-s'
                             style={this.addStyle()}
