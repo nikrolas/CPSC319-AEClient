@@ -7,6 +7,7 @@ import {getColumns} from "../Utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
 //import {deleteRecordByIds} from "../APIs/RecordsApi";
 import {Alert} from 'react-bootstrap';
+import {MdCreateNewFolder} from 'react-icons/lib/md';
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -52,17 +53,24 @@ class WorkTray extends Component {
     getWorkTrayColumns = () => {
         const columns = getColumns(this, recordsResultsAccessors);
         columns.push({
-            Header: <button className="btn btn-xs"
-                            onClick={this.removeAll}
-                            onMouseOver={(e) => {e.target.style.backgroundColor = '#ff9c81'}}
-                            onMouseLeave={(e) => {e.target.style.backgroundColor = 'white'}}
-                            style={styles.clearbtn}>Clear All</button>,
+            Header: <button className='btn btn-s'
+                            style={styles.removeselbtn}
+                            onMouseOver={(e) => {
+                                e.target.style.borderColor = '#ff6c60'
+                            }}
+                            onMouseOut={(e) => {
+                                e.target.style.borderColor = 'white'
+                            }}
+                            onClick={this.removeSelected}>
+                <i className="fa fa-remove" style={styles.removeicon}/>
+                Selected
+            </button>,
             sortable: false,
             resizable: false,
             width: 100,
             Cell: e => <button className="btn btn-xs" onClick={() => {
                 this.removeRow(e)
-            }} style={styles.trashbtn}><i className="fa fa-trash-o"/></button>
+            }} style={{background: 'transparent'}}><i className="fa fa-remove" style={styles.removerowbtn}/></button>
         });
         return columns;
     };
@@ -92,13 +100,18 @@ class WorkTray extends Component {
     };
 
     removeRow = (e) => {
-        let index = e.row._index;
+        let rowindex = e.row._index;
         let data = [...this.state.data];
-        let selection = [...this.state.selection];
+        let original = [...this.state.selection];
+        let selection = [];
 
-        selection.splice(-1,1);
-        data.splice(index, 1);
+        data.splice(rowindex, 1);
         data.forEach((item, index) => {
+            if (original.includes(item._id)) {
+                if (item._id >= rowindex)
+                    selection.push(index);
+                else selection.push(item._id);
+            }
            //recalculate index
            item._id = index;
         });
@@ -109,7 +122,7 @@ class WorkTray extends Component {
         //console.log(JSON.stringify(this.state.data));
 
         let stored = JSON.parse(sessionStorage.getItem("tray" + this.state.user.id));
-        stored.splice(index, 1);
+        stored.splice(rowindex, 1);
         sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(stored));
         //console.log(JSON.stringify(stored));
     };
@@ -224,7 +237,7 @@ class WorkTray extends Component {
     };
 
     render() {
-        const {toggleSelection, toggleAll, isSelected, removeSelected, deleteSelected} = this;
+        const {toggleSelection, toggleAll, isSelected, removeAll, deleteSelected} = this;
         const {data, columns, selectAll, selection, alertMsg} = this.state;
         const checkboxProps = {
             selectAll,
@@ -250,19 +263,31 @@ class WorkTray extends Component {
                     <h1>Work Tray</h1>
                     <div style={styles.btncontainer}>
                         <button className='btn btn-s'
-                                style={styles.removeselbtn}
-                                disabled={!selection.length}
-                                onClick={removeSelected}>
-                            <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
-                            Selected
-                        </button>
-                        <button className='btn btn-s'
                                 style={styles.delbtn}
-                            //disabled="true"
                                 disabled={!selection.length}
                                 onClick={deleteSelected}>
-                            <i className="fa fa-exclamation-triangle" style={{marginRight: '5px'}}/>
+                            <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
                             Delete
+                        </button>
+                        <button className='btn btn-s'
+                                style={styles.destroybtn}
+                                disabled={!selection.length}
+                                onClick={deleteSelected}>
+                            <i className="fa fa-flag" style={{marginRight: '5px'}}/>
+                            Destroy
+                        </button>
+                        <button className='btn btn-s'
+                                style={styles.bluebtn}
+                                disabled={!selection.length}
+                                onClick={deleteSelected}>
+                            <MdCreateNewFolder style={styles.volumeicon}/>
+                            Volume
+                        </button>
+                        <button className='btn btn-s'
+                                style={styles.clearbtn}
+                                onClick={removeAll}>
+                            <i className="fa fa-remove" style={styles.removeiconwhite}/>
+                            All
                         </button>
                     </div>
                     <div style={styles.tablestyle}>
@@ -290,38 +315,75 @@ let styles = {
         //border: '5px solid gray'
         marginTop: '5px',
     },
-
-    trashbtn: {
-        backgroundColor: '#ff6c60',
-        borderColor: '#ff6c60',
-        color: 'white'
-    },
     btncontainer: {
         //border: '2px solid blue',
         alignItems: 'center',
+        verticalAlign: 'baseline',
         height: '1cm'
-    },
-    clearbtn: {
-        //backgroundColor: '#ff9c81',
-        backgroundColor: 'white',
-        borderColor: '#ff9c81',
-    },
-    removeselbtn: {
-        float: 'left',
-        width: 'auto',
-        backgroundColor: '#ff6c60',
-        borderColor: '#FFFFFF',
-        color: 'white',
-        fontSize: '13px',
     },
     delbtn: {
         float: 'left',
-        width: 'auto',
-        marginLeft: '0.5cm',
-        backgroundColor: '#ffea65',
-        borderColor: '#FFFFFF',
+        marginRight: '0.5cm',
+        backgroundColor: '#ff6c60',
+        borderColor: 'white',
+        color: 'white',
         fontSize: '13px',
-    }
+    },
+    destroybtn: {
+        float: 'left',
+        marginRight: '0.5cm',
+        backgroundColor: '#ffea65',
+        borderColor: 'white',
+        color: 'black',
+        fontSize: '13px',
+    },
+    bluebtn: {
+        float: 'left',
+        marginRight: '0.5cm',
+        backgroundColor: '#2f8bff',
+        borderColor: 'white',
+        color: 'white',
+        fontSize: '13px',
+    },
+    clearbtn: {
+        float: 'right',
+        marginRight: '0.5cm',
+        width: 'auto',
+        background: '#ff4e44',
+        borderColor: 'white',
+        color: 'white',
+        fontSize: '13px',
+    },
+    removerowbtn: {
+        color: '#ff6c60',
+        transform: 'scale(2,2)',
+    },
+    removeselbtn: {
+        height: '25px',
+        padding: '4px',
+        width: 'auto',
+        backgroundColor: 'white',
+    },
+    removeicon: {
+        color: '#ff6c60',
+        background: 'inherit',
+        backgroundColor: 'inherit',
+        transform: 'scale(1.5,1.5)',
+        verticalAlign: 'top',
+        marginRight: '5px',
+    },
+    removeiconwhite: {
+        color: 'white',
+        background: 'inherit',
+        backgroundColor: 'inherit',
+        transform: 'scale(1.5,1.5)',
+        marginRight: '5px',
+    },
+    volumeicon: {
+        marginRight: '5px',
+        transform: 'scale(1.55, 1.45)',
+        verticalAlign: 'baseline',
+    },
 };
 
 export default WorkTray;
