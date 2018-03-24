@@ -49,11 +49,10 @@ class App extends Component {
             resultsData: [],
             resultsColumns: [],
             selectedItemIndexes: [],
-            confirmAction: () => {},
+            confirmActionProps: {},
             userData: null,
             userAuthenticated: false
         };
-
     }
 
     componentWillMount() {
@@ -143,7 +142,7 @@ class App extends Component {
     };
 
     setConfirmAction = (confirmAction) => {
-        this.setState({confirmAction});
+        this.setState({confirmActionProps: confirmAction});
     };
 
     render() {
@@ -221,6 +220,7 @@ class App extends Component {
                                       component={SelectTable}
                                       onItemSelect={this.setselectedItemIndexes}
                                       onDataUpdate={this.setResultsStates}
+                                      onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}
                         />
@@ -228,6 +228,7 @@ class App extends Component {
                                       component={WorkTray}
                                       onItemSelect={this.setselectedItemIndexes}
                                       onDataUpdate={this.setResultsStates}
+                                      onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}
                         />
@@ -260,7 +261,7 @@ class App extends Component {
                                       resultsData={this.state.resultsData}
                                       resultsColumns={this.state.resultsColumns}
                                       component={ConfirmAction}
-                                      action={this.state.confirmAction}
+                                      actionProps={this.state.confirmActionProps}
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}/>
                         <Route component={NotFound}/>

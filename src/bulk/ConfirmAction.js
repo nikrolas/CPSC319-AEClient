@@ -13,34 +13,34 @@ class ConfirmAction extends Component {
                 alertMsg: "",
                 success: false,
                 data: [],
-                columns: props.resultsColumns,
+                columns: [],
                 header: "",
                 prompt: "",
-                action: null
+                valid: true
             };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentWillMount() {
         let data = getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
-        let action = this.props.confirmAction;
-        this.setState({data, action});
+        let {header, prompt, action} = this.props.actionProps;
+        let columns = this.props.resultsColumns;
+
+        this.setState({data, columns, header, prompt, action});
     };
 
     enableAction = () => {
-        return this.state.action != null;
+        return this.state.valid && this.state.action;
     };
 
     handleSubmit = () => {
-        if (this.state.action != null) {
-            this.state.action(this, this.state.data)
-                .then(result => {
-                    this.setState({alertMsg: result, success: true});
-                })
-                .catch(error => {
-                    this.setState({alertMsg: error, success: false});
-                });
-        }
+        this.state.action(this.state.data)
+            .then(result => {
+                this.setState({alertMsg: result, success: true});
+            })
+            .catch(error => {
+                this.setState({alertMsg: error, success: false});
+            });
     };
 
     onCancel = () => {
@@ -61,6 +61,7 @@ class ConfirmAction extends Component {
                     : null
                 }
                 <h1>{this.state.header}</h1>
+                <h3>{this.state.prompt}</h3>
                 <br/>
                 <br/>
                 <Grid>
@@ -82,7 +83,8 @@ class ConfirmAction extends Component {
                     <Row>
                         <ButtonToolbar style={btnStyle}>
                             <Button bsStyle="primary" onClick={this.onCancel}> Cancel </Button>
-                            <Button bsStyle="danger" disabled={!this.enableAction()} onClick={this.handleSubmit()}>Confirm</Button>
+                            <Button bsStyle="danger" disabled={!this.enableAction()}
+                                    onClick={this.handleSubmit}>Confirm</Button>
                         </ButtonToolbar>
                     </Row>
                 </Grid>

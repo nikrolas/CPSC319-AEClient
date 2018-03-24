@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {isARecordItem} from "../utilities/Items";
 import {MdCreateNewFolder, MdRemoveCircle} from 'react-icons/lib/md';
+import {deleteAction, destroyAction, removeRecordsFromContainerAction} from "../bulk/Action";
 
 export function goTo(props, url) {
     props.history.push(url);
@@ -80,6 +81,11 @@ class ContextualActions extends Component {
             return true;
         }
         else return false;
+    };
+
+    bulkAction = (action) => {
+        this.props.onSelectAction(action);
+        goTo(this.props, "/confirmAction");
     };
 
 
@@ -193,19 +199,21 @@ class ContextualActions extends Component {
                 <button className='btn btn-s'
                         style={styles.bluebtn}
                         disabled={!this.recordsOnly()}
-                        onClick={() => this.props.onSelectAction("RemoveFromContainer")}>
+                        onClick={() => this.bulkAction(removeRecordsFromContainerAction)}>
                     <MdRemoveCircle style={styles.volumeicon}/>
                     Remove from container
                 </button>
                 <button className='btn btn-s'
                         style={styles.destroybtn}
-                        disabled={!this.anySelection()}>
+                        disabled={!this.anySelection()}
+                        onClick={() => this.bulkAction(destroyAction)}>
                     <i className="fa fa-flag" style={{marginRight: '5px'}}/>
                     Destroy
                 </button>
                 <button className='btn btn-s'
                         style={styles.delbtn}
-                        disabled={!this.anySelection()}>
+                        disabled={!this.anySelection()}
+                        onClick={() => this.bulkAction(deleteAction)}>
                     <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
                     Delete
                 </button>
