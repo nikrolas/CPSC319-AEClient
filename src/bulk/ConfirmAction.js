@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Row, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
+import {Row, Grid, Button, ButtonToolbar, Alert, Form, Checkbox} from 'react-bootstrap'
 import ReactTable from "react-table";
 import {getSelectedItems} from "../utilities/Items";
 
@@ -16,17 +16,18 @@ class ConfirmAction extends Component {
                 columns: [],
                 header: "",
                 prompt: "",
-                valid: true
+                valid: true,
+                checked: false
             };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentWillMount() {
         let data = getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
-        let {header, prompt, action} = this.props.actionProps;
+        let {header, prompt, option, action} = this.props.actionProps;
         let columns = this.props.resultsColumns;
 
-        this.setState({data, columns, header, prompt, action});
+        this.setState({data, columns, header, prompt, option, action});
     };
 
     enableAction = () => {
@@ -34,7 +35,7 @@ class ConfirmAction extends Component {
     };
 
     handleSubmit = () => {
-        this.state.action(this.state.data)
+        this.state.action(this.state.data, this.state.checked)
             .then(result => {
                 this.setState({alertMsg: result, success: true});
             })
@@ -48,6 +49,17 @@ class ConfirmAction extends Component {
     };
 
     render() {
+        let option = null;
+        if (this.state.option) {
+            option =
+                <Form>
+                    <Checkbox
+                        checked={this.state.checked}
+                        onChange={(e) => this.setState({checked: e.target.checked})}>
+                        {this.state.option}
+                    </Checkbox>
+                </Form>
+        }
 
         let btnStyle = {
             display: "flex",
@@ -79,6 +91,9 @@ class ConfirmAction extends Component {
                                 />
                             </div>
                         </div>
+                    </Row>
+                    <Row>
+                        {option}
                     </Row>
                     <Row>
                         <ButtonToolbar style={btnStyle}>

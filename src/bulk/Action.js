@@ -23,9 +23,10 @@ export var removeRecordsFromContainerAction = {
 export var destroyAction = {
     header: "Destroy",
     prompt: "The following items will be destroyed.",
-    action: (items) => {
+    option: "Delete empty containers",
+    action: (items, option) => {
         return new Promise((resolve, reject) => {
-            resolve("destroyed");
+            resolve("destroyed" + option);
         });
     }
 };
