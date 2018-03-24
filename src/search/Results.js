@@ -3,10 +3,10 @@ import ReactTable from 'react-table';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
-import {getRecordsByNumber} from "../APIs/RecordsApi";
-import {getContainersByNumber} from "../APIs/ContainersApi";
+import {getRecordsByNumber} from "../api/RecordsApi";
+import {getContainersByNumber} from "../api/ContainersApi";
 import Search from "./Search";
-import {getColumns, setData, setTableState} from "../Utilities/ReactTable";
+import {getColumns, setData, setTableState} from "../utilities/ReactTable";
 import ContextualActions from '../context/ContextualActions';
 
 const CheckboxTable = checkboxHOC(ReactTable);

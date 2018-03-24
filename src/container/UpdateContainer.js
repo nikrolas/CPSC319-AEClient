@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
-import {getRecordStates, getUser} from "../APIs/RecordsApi";
-import {getContainerById, updateContainer} from "../APIs/ContainersApi";
-import {getDateTimeString} from "../Utilities/DateTime";
+import {getRecordStates, getUser} from "../api/RecordsApi";
+import {getContainerById, updateContainer} from "../api/ContainersApi";
+import {getDateTimeString} from "../utilities/DateTime";
 
 class UpdateContainer extends Component {
 

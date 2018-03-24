@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import ReactTable from "react-table";
-import {getSelectedItems} from "../Utilities/Items";
+import {getSelectedItems} from "../utilities/Items";
 
 
 class ConfirmAction extends Component {

@@ -7,9 +7,9 @@ import {
     getRetentionSchedule,
     getRecordStates,
     updateRecord
-} from "../APIs/RecordsApi";
+} from "../api/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
-import {getDateTimeString} from "../Utilities/DateTime";
+import {getDateTimeString} from "../utilities/DateTime";
 
 class UpdateRecord extends Component {
 

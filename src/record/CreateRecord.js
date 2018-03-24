@@ -11,7 +11,7 @@ import {
     Popover
 } from 'react-bootstrap'
 //import {createRecord, getClassifications, getRecordType,getRetentionSchedule, getUser} from "../APIs/RecordsApi";
-import {createRecord, getClassifications, getRecordType, getRetentionSchedule} from "../APIs/RecordsApi";
+import {createRecord, getClassifications, getRecordType, getRetentionSchedule} from "../api/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
 
 class CreateRecord extends Component {

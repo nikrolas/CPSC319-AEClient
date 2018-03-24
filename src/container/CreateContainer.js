@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {Button, FormGroup, ControlLabel, FormControl, Alert, HelpBlock} from 'react-bootstrap'
-import {createContainer} from "../APIs/ContainersApi";
+import {createContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
 import AlertDismissable from "../AlertDismissable";
-import {isARecordItem} from "../Utilities/Items";
+import {isARecordItem} from "../utilities/Items";
 
 class CreateContainer extends Component {
 

@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {getRecordById, deleteRecordByIds, updateRecord} from "../APIs/RecordsApi";
+import {getRecordById, deleteRecordByIds, updateRecord} from "../api/RecordsApi";
 import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
-import {getDateTimeString} from "../Utilities/DateTime";
+import {getDateTimeString} from "../utilities/DateTime";
 import {recordsResultsAccessors} from "../search/Results";
-import {getColumns} from "../Utilities/ReactTable";
+import {getColumns} from "../utilities/ReactTable";
 
 
 class ViewRecord extends Component {

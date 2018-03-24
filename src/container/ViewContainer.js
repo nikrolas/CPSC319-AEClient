@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import {Confirm} from 'react-confirm-bootstrap'
-import {deleteContainers, getContainerById} from "../APIs/ContainersApi";
-import {getRecordById} from "../APIs/RecordsApi";
+import {deleteContainers, getContainerById} from "../api/ContainersApi";
+import {getRecordById} from "../api/RecordsApi";
 import ReactTable from "react-table";
-import {getColumns, setData} from "../Utilities/ReactTable";
-import {getDateString, getDateTimeString, transformDates} from "../Utilities/DateTime";
+import {getColumns, setData} from "../utilities/ReactTable";
+import {getDateString, getDateTimeString, transformDates} from "../utilities/DateTime";
 import {Link} from 'react-router-dom';
 
 

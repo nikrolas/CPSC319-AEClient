@@ -3,11 +3,12 @@ import ReactTable from 'react-table';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
-import {getColumns} from "../Utilities/ReactTable";
+import {getColumns} from "../utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
 //import {deleteRecordByIds} from "../APIs/RecordsApi";
 import {Alert} from 'react-bootstrap';
 import {MdCreateNewFolder} from 'react-icons/lib/md';
+import ContextualActions from "../context/ContextualActions";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -112,8 +113,8 @@ class WorkTray extends Component {
                     selection.push(index);
                 else selection.push(item._id);
             }
-           //recalculate index
-           item._id = index;
+            //recalculate index
+            item._id = index;
         });
         this.setState({selection, data}, () => {
             this.state.onItemSelectCallback(this.state.selection);
@@ -262,27 +263,8 @@ class WorkTray extends Component {
                 <div style={styles.container}>
                     <h1>Work Tray</h1>
                     <div style={styles.btncontainer}>
-                        <button className='btn btn-s'
-                                style={styles.delbtn}
-                                disabled={!selection.length}
-                                onClick={deleteSelected}>
-                            <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
-                            Delete
-                        </button>
-                        <button className='btn btn-s'
-                                style={styles.destroybtn}
-                                disabled={!selection.length}
-                                onClick={deleteSelected}>
-                            <i className="fa fa-flag" style={{marginRight: '5px'}}/>
-                            Destroy
-                        </button>
-                        <button className='btn btn-s'
-                                style={styles.bluebtn}
-                                disabled={!selection.length}
-                                onClick={deleteSelected}>
-                            <MdCreateNewFolder style={styles.volumeicon}/>
-                            Volume
-                        </button>
+                        <ContextualActions {...this.props} selectedItemIndexes={selection}
+                                           resultsData={data} columns={columns}/>
                         <button className='btn btn-s'
                                 style={styles.clearbtn}
                                 onClick={removeAll}>
@@ -312,38 +294,13 @@ let styles = {
         padding: '2% 5% 5% 5%'
     },
     tablestyle: {
-        //border: '5px solid gray'
         marginTop: '5px',
     },
     btncontainer: {
-        //border: '2px solid blue',
         alignItems: 'center',
         verticalAlign: 'baseline',
-        height: '1cm'
-    },
-    delbtn: {
-        float: 'left',
-        marginRight: '0.5cm',
-        backgroundColor: '#ff6c60',
-        borderColor: 'white',
-        color: 'white',
-        fontSize: '13px',
-    },
-    destroybtn: {
-        float: 'left',
-        marginRight: '0.5cm',
-        backgroundColor: '#ffea65',
-        borderColor: 'white',
-        color: 'black',
-        fontSize: '13px',
-    },
-    bluebtn: {
-        float: 'left',
-        marginRight: '0.5cm',
-        backgroundColor: '#2f8bff',
-        borderColor: 'white',
-        color: 'white',
-        fontSize: '13px',
+        height: '1cm',
+        display: 'flex'
     },
     clearbtn: {
         float: 'right',
@@ -378,12 +335,7 @@ let styles = {
         backgroundColor: 'inherit',
         transform: 'scale(1.5,1.5)',
         marginRight: '5px',
-    },
-    volumeicon: {
-        marginRight: '5px',
-        transform: 'scale(1.55, 1.45)',
-        verticalAlign: 'baseline',
-    },
+    }
 };
 
 export default WorkTray;

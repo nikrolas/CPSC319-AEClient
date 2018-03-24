@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {Alert, Grid, Row, Col, ButtonToolbar, Button} from 'react-bootstrap'
-import {addRecordsToContainer} from "../APIs/ContainersApi";
+import {addRecordsToContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
-import {isARecordItem} from "../Utilities/Items";
+import {isARecordItem} from "../utilities/Items";
 import AlertDismissable from "../AlertDismissable";
-import {getColumns} from "../Utilities/ReactTable";
-import {getDateString, transformDates} from "../Utilities/DateTime";
+import {getColumns} from "../utilities/ReactTable";
+import {getDateString, transformDates} from "../utilities/DateTime";
 
 class AddToContainer extends Component {
 

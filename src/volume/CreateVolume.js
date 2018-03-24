@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Alert} from 'react-bootstrap';
-import {getVolumesByNumber, createVolume} from "../APIs/VolumesApi";
+import {getVolumesByNumber, createVolume} from "../api/VolumesApi";
 import {MdCreateNewFolder} from 'react-icons/lib/md';
 import PropTypes from 'prop-types';
 

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {isARecordItem} from "../Utilities/Items";
-import {MdCreateNewFolder} from 'react-icons/lib/md';
+import {isARecordItem} from "../utilities/Items";
+import {MdCreateNewFolder, MdRemoveCircle} from 'react-icons/lib/md';
 
 export function goTo(props, url) {
     props.history.push(url);
@@ -40,17 +40,12 @@ class ContextualActions extends Component {
         this.updateCounts(newProps);
     }
 
-
     updateCounts = (newProps) => {
         let newCounts = this.countItemTypes(newProps.selectedItemIndexes, newProps.resultsData);
         this.setState(newCounts);
     };
 
-    enableContainRecords = () => {
-        return this.state.records > 0 && this.state.containers === 0;
-    };
-
-    enableAddToContainer = () => {
+    recordsWithAContainer = () => {
         return this.state.records > 0 && this.state.containers === 1;
     };
 
@@ -94,12 +89,10 @@ class ContextualActions extends Component {
                 padding: '2% 5% 5% 5%'
             },
             tablestyle: {
-                //border: '5px solid gray'
                 marginTop: '5px',
             },
             btncontainer: {
-                //border: '2px solid blue',
-                alignItems: 'center',
+                marginRight: 'auto',
                 verticalAlign: 'baseline',
                 height: '1cm'
             },
@@ -181,12 +174,28 @@ class ContextualActions extends Component {
                 </button>
                 <button className='btn btn-s'
                         style={styles.bluebtn}
-                        disabled={!this.enableContainRecords()}
+                        disabled={!this.recordsOnly()}
                         onClick={() => {
                             goTo(this.props, "/createContainer")
                         }}>
                     <MdCreateNewFolder style={styles.volumeicon}/>
                     Contain Records
+                </button>
+                <button className='btn btn-s'
+                        style={styles.bluebtn}
+                        disabled={!this.recordsWithAContainer()}
+                        onClick={() => {
+                            goTo(this.props, "/addToContainer")
+                        }}>
+                    <MdCreateNewFolder style={styles.volumeicon}/>
+                    Add to container
+                </button>
+                <button className='btn btn-s'
+                        style={styles.bluebtn}
+                        disabled={!this.recordsOnly()}
+                        onClick={() => this.props.onSelectAction("RemoveFromContainer")}>
+                    <MdRemoveCircle style={styles.volumeicon}/>
+                    Remove from container
                 </button>
                 <button className='btn btn-s'
                         style={styles.destroybtn}

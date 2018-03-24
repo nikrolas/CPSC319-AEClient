@@ -1,5 +1,5 @@
-import {isARecordItem} from "../Utilities/Items";
-import {removeRecordsFromContainer} from "../APIs/ContainersApi";
+import {isARecordItem} from "../utilities/Items";
+import {removeRecordsFromContainer} from "../api/ContainersApi";
 
 export function removeRecordsFromContainerAction(context, items) {
     let records = items.filter(item => isARecordItem(item));

@@ -15,7 +15,7 @@ import UpdateContainer from "./container/UpdateContainer";
 import ConfirmAction from "./bulk/ConfirmAction";
 import NotAuthenticated from "./errors/NotAuthenticated"
 import NotFound from "./errors/NotFound"
-import {serviceRoot} from "./APIs/ServiceRoot";
+import {serviceRoot} from "./api/ServiceRoot";
 import {LoadingOverlay} from 'react-load-overlay'
 import EmptyNavigationBar from "./banner/EmptyNavigationBar";
 
