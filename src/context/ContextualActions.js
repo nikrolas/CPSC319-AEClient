@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import {isARecordItem} from "../Utilities/Items";
 import {MdCreateNewFolder} from 'react-icons/lib/md';
-import {Link} from 'react-router-dom';
 
 export function goTo(props, url) {
     props.history.push(url);
-};
+}
 
 class ContextualActions extends Component {
 
@@ -87,7 +86,6 @@ class ContextualActions extends Component {
         }
         else return false;
     };
-
 
 
     render() {
@@ -173,10 +171,22 @@ class ContextualActions extends Component {
         return (
             <div style={styles.btncontainer}>
                 <button className='btn btn-s'
-                        style={styles.delbtn}
-                        disabled={!this.anySelection()}>
-                    <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
-                    Delete
+                        style={styles.bluebtn}
+                        disabled={!this.enableCreateVolume()}
+                        onClick={() => {
+                            goTo(this.props, "/createVolume")
+                        }}>
+                    <MdCreateNewFolder style={styles.volumeicon}/>
+                    Volume
+                </button>
+                <button className='btn btn-s'
+                        style={styles.bluebtn}
+                        disabled={!this.enableContainRecords()}
+                        onClick={() => {
+                            goTo(this.props, "/createContainer")
+                        }}>
+                    <MdCreateNewFolder style={styles.volumeicon}/>
+                    Contain Records
                 </button>
                 <button className='btn btn-s'
                         style={styles.destroybtn}
@@ -185,11 +195,10 @@ class ContextualActions extends Component {
                     Destroy
                 </button>
                 <button className='btn btn-s'
-                        style={styles.bluebtn}
-                        disabled={!this.enableCreateVolume()}
-                        onClick={() =>{goTo(this.props, "/createVolume")}}>
-                    <MdCreateNewFolder style={styles.volumeicon}/>
-                    Volume
+                        style={styles.delbtn}
+                        disabled={!this.anySelection()}>
+                    <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
+                    Delete
                 </button>
             </div>
 
