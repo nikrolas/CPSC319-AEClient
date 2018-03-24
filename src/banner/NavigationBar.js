@@ -117,20 +117,6 @@ class NavigationBar extends Component {
                              to="/createRecord">
                         New Record
                     </NavItem>;
-                containRecords =
-                    <NavItem componentClass={Link}
-                             disabled={!this.enableContainRecords()}
-                             href="/createContainer"
-                             to="/createContainer">
-                        Contain Records
-                    </NavItem>
-                createVolume =
-                    <NavItem componentClass={Link}
-                             disabled={!this.enableCreateVolume()}
-                             href="/createVolume"
-                             to="/createVolume">
-                        Create Volume
-                    </NavItem>;
                 removeFromContainer =
                     <NavItem componentClass={Link}
                              disabled={!this.recordsOnly()}
@@ -138,6 +124,25 @@ class NavigationBar extends Component {
                              href="/confirmAction" to="/confirmAction">
                         Remove from Container
                     </NavItem>;
+                if (!this.enableAddToContainer()) {
+                    containRecords =
+                        <NavItem componentClass={Link} disabled={!this.enableContainRecords()} href="/createContainer"
+                                 to="/createContainer">
+                            Contain Records
+                        </NavItem>
+                } else {
+                    containRecords =
+                        <NavItem componentClass={Link} href="/addToContainer" to="/addToContainer">
+                            Contain Records
+                        </NavItem>
+                }
+                createVolume =
+                    <NavItem componentClass={Link}
+                                        disabled={!this.enableCreateVolume()}
+                                        href="/createVolume"
+                                        to="/createVolume">
+                    Create Volume
+                </NavItem>;
             }
         }
         return (
