@@ -5,9 +5,7 @@ import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getColumns} from "../utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
-//import {deleteRecordByIds} from "../APIs/RecordsApi";
 import {Alert} from 'react-bootstrap';
-import {MdCreateNewFolder} from 'react-icons/lib/md';
 import ContextualActions from "../context/ContextualActions";
 
 const CheckboxTable = checkboxHOC(ReactTable);
@@ -200,45 +198,8 @@ class WorkTray extends Component {
         return this.state.selection.includes(key);
     };
 
-    deleteSelected = () => {
-        let data = [...this.state.data];
-        let selection = [...this.state.selection];
-        let recordIds = [];
-        selection.forEach((i) => {
-            recordIds.push(data[i].id);
-        });
-
-        this.setState({alertMsg: "WIP"});
-        window.scrollTo(0, 0);
-
-        /*deleteRecordByIds(recordIds, this.state.user.id)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    let msg = data.status + ": " + data.error;
-                    this.setState({alertMsg: msg});
-                    window.scrollTo(0, 0)
-                }
-                else if(data.status && data.status !== 200) {
-                    //console.log(JSON.stringify(data));
-                    this.setState({alertMsg: data.message});
-                    window.scrollTo(0, 0)
-                }
-                else if (data.status === 500) {
-                    this.setState({alertMsg: data.message});
-                    window.scrollTo(0, 0)
-                }
-                else {
-                    this.removeSelected();
-                }
-            })
-            .catch(error => console.log('Error: ', error));*/
-    };
-
     render() {
-        const {toggleSelection, toggleAll, isSelected, removeAll, deleteSelected} = this;
+        const {toggleSelection, toggleAll, isSelected, removeAll} = this;
         const {data, columns, selectAll, selection, alertMsg} = this.state;
         const checkboxProps = {
             selectAll,
