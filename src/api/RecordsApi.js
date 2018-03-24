@@ -49,18 +49,6 @@ export function deleteRecordByIds(recordIds, userId) {
 }
 
 export function createRecord(state) {
-    let classpath = "";
-    if(state.classificationParentHistory.length >= 1) {
-        for(let i = 1; state.classificationParentHistory.length > i; i++) {
-            if(i===1) {
-                classpath += state.classificationParentHistory[i];
-
-            }
-            else {
-                classpath += "/" + state.classificationParentHistory[i];
-            }
-        }
-    }
     return fetch(serviceRoot + '/record?userId=' + state.user.id, {
         method: 'POST',
         headers: {
@@ -75,7 +63,7 @@ export function createRecord(state) {
             consignmentCode: state.consignmentCode,
             containerId: state.container,
             locationId: state.location,
-            classifications: classpath,
+            classIds: state.classificationBack,
             notes: state.notes,
         })
     })
