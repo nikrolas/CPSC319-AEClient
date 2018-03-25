@@ -10,6 +10,7 @@ class ConfirmAction extends Component {
         super(props);
         this.state =
             {
+                user: props.userData,
                 alertMsg: "",
                 success: false,
                 data: [],
@@ -31,16 +32,16 @@ class ConfirmAction extends Component {
     };
 
     enableAction = () => {
-        return this.state.valid && this.state.action;
+        return this.state.valid && this.state.action && !this.state.success;
     };
 
     handleSubmit = () => {
-        this.state.action(this.state.data, this.state.checked)
+        this.state.action(this.state.data, this.state.checked, this.state.user.id)
             .then(result => {
                 this.setState({alertMsg: result, success: true});
             })
             .catch(error => {
-                this.setState({alertMsg: error, success: false});
+                this.setState({alertMsg: "Failed to complete action: " + error, success: false});
             });
     };
 
@@ -61,15 +62,16 @@ class ConfirmAction extends Component {
                 </Form>
         }
 
-        let btnStyle = {
+        let btnToolbarStyle = {
             display: "flex",
-            justifyContent: "center"
+            justifyContent: "center",
+            marginTop: "30px"
         };
 
         return (
             <div>
-                {this.state.alertMsg.length !== 0
-                    ? <Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                {this.state.alertMsg && this.state.alertMsg.length !== 0
+                    ? <Alert bsStyle={this.state.success ? "success":"danger"}><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
                 <h1>{this.state.header}</h1>
@@ -96,9 +98,9 @@ class ConfirmAction extends Component {
                         {option}
                     </Row>
                     <Row>
-                        <ButtonToolbar style={btnStyle}>
-                            <Button bsStyle="primary" onClick={this.onCancel}> Cancel </Button>
-                            <Button bsStyle="danger" disabled={!this.enableAction()}
+                        <ButtonToolbar style={btnToolbarStyle}>
+                            <Button onClick={this.onCancel}> {this.state.success ? "Go Back" : "Cancel"} </Button>
+                            <Button bsStyle="warning" disabled={!this.enableAction()}
                                     onClick={this.handleSubmit}>Confirm</Button>
                         </ButtonToolbar>
                     </Row>

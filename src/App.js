@@ -264,6 +264,7 @@ class App extends Component {
                                       actionProps={this.state.confirmActionProps}
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}/>
+                        <Route path='/notFound' component={NotFound}/>
                         <Route component={NotFound}/>
                     </Switch>
                 </div>

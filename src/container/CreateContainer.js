@@ -13,6 +13,7 @@ class CreateContainer extends Component {
         let selectedItems = this.getSelectedItems(props.resultsData, props.selectedItemIndexes);
         this.state =
             {
+                user: props.userData,
                 success: false,
                 alertMsg: "",
                 title: "",
@@ -154,7 +155,7 @@ class CreateContainer extends Component {
             });
             formData.selectedRecords = selectedRecordIds;
 
-            createContainer(formData).then(response => {
+            createContainer(formData, this.state.user.id).then(response => {
                 if (response.status !== 201) {
                     throw new Error(response.message);
                 } else {

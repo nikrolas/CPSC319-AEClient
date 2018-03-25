@@ -3,17 +3,16 @@ import {serviceRoot} from "./ServiceRoot";
 let containersPath = "/containers";
 let containerPath = "/container";
 let removeRecordsPath = "/removeRecords";
-let userId = "500";
 
-export function getContainersByNumber(containerNumber) {
+export function getContainersByNumber(containerNumber, userId) {
     return fetch(serviceRoot + containersPath + "?num=" + containerNumber + "&userId=" + userId);
 }
 
-export function getContainerById(containerId) {
+export function getContainerById(containerId, userId) {
     return fetch(serviceRoot + containersPath + "/" + containerId + "?userId=" + userId);
 }
 
-export function createContainer(data) {
+export function createContainer(data, userId) {
     let path = serviceRoot + containerPath + "?userId=" + userId;
     return fetch(path, {
         method: 'post',
@@ -25,7 +24,7 @@ export function createContainer(data) {
     });
 }
 
-export function updateContainer(containerId, data) {
+export function updateContainer(containerId, data, userId) {
     return fetch(serviceRoot + containerPath + containerId + '?userId=' + userId, {
         method: 'PUT',
         headers: {
@@ -36,14 +35,14 @@ export function updateContainer(containerId, data) {
     })
 }
 
-export function deleteContainers(ids) {
+export function deleteContainers(ids, userId) {
     let path = serviceRoot + containersPath + "?ids=" + ids + "&userId=" + userId;
     return fetch(path, {
         method: 'delete'
     });
 }
 
-export function removeRecordsFromContainer(recordIds) {
+export function removeRecordsFromContainer(recordIds, userId) {
     let path = serviceRoot + containerPath + removeRecordsPath + "?userId=" + userId;
     return fetch(path, {
         method: 'post',
@@ -55,7 +54,7 @@ export function removeRecordsFromContainer(recordIds) {
     });
 }
 
-export function addRecordsToContainer(containerId, data) {
+export function addRecordsToContainer(containerId, data, userId) {
     let path = serviceRoot + containerPath + containerId + "?userId=" + userId;
     return fetch(path, {
         method: 'post',

@@ -28,7 +28,7 @@ export function getClassifications(parentId = "") {
 }
 
 export function getUser(userId) {
-    return fetch(serviceRoot + "/users/"+userId);
+    return fetch(serviceRoot + "/users/" + userId);
 }
 
 export function getRecordStates() {
@@ -45,14 +45,14 @@ export function deleteRecordByIds(recordIds, userId) {
         body: JSON.stringify({
             recordIds: recordIds
         })
-    })
+    });
 }
 
 export function createRecord(state) {
     let classpath = "";
-    if(state.classificationParentHistory.length >= 1) {
-        for(let i = 1; state.classificationParentHistory.length > i; i++) {
-            if(i===1) {
+    if (state.classificationParentHistory.length >= 1) {
+        for (let i = 1; state.classificationParentHistory.length > i; i++) {
+            if (i === 1) {
                 classpath += state.classificationParentHistory[i];
 
             }
@@ -67,39 +67,50 @@ export function createRecord(state) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body:JSON.stringify({
+        body: JSON.stringify({
             title: state.title,
             number: state.recordNumber,
             scheduleId: state.retentionSchedule[0].id,
-            typeId:state.recordType,
+            typeId: state.recordType,
             consignmentCode: state.consignmentCode,
             containerId: state.container,
             locationId: state.location,
             classifications: classpath,
             notes: state.notes,
         })
-    })
+    });
 }
 
-export function updateRecord(recordId,state) {
+export function updateRecord(recordId, state) {
     return fetch(serviceRoot + '/records/' + recordId + '?userId=' + state.user.id, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body:JSON.stringify({
+        body: JSON.stringify({
             title: state.title,
             scheduleId: state.retentionSchedule,
             //TODO temporary state b/c end point not complete
-            classifications : state.responseJson.classifications,
+            classifications: state.responseJson.classifications,
             consignmentCode: state.consignmentCode,
             notes: state.notes,
-            stateId : state.stateId,
-            containerId : state.container
+            stateId: state.stateId,
+            containerId: state.container
         })
-    })
+    });
 }
 
 
-
+export function destroyRecords(recordIds, userId) {
+    return fetch(serviceRoot + '/destroyrecords?userId=' + userId, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            recordIds: recordIds
+        })
+    });
+}

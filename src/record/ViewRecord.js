@@ -50,7 +50,13 @@ class ViewRecord extends Component {
         let setData = this.setData;
         let that = this;
         getRecordById(this.props.match.params.recordId, this.state.user.id)
-            .then(response => response.json())
+            .then(response => {
+                if (response.status === 404) {
+                    this.props.history.push("/notFound");
+                } else {
+                   return response.json();
+                }
+            })
             .then(data => {
                 if (data && !data.exception) {
                     setData(that, data);
@@ -79,13 +85,13 @@ class ViewRecord extends Component {
     }
 
     handleSubmit() {
-        deleteRecordByIds(this.props.match.params.recordId)
+        deleteRecordByIds([this.props.match.params.recordId], this.state.user.id)
             .then(response => {
                 return response.json();
             })
             .then(data => {
-                if (data.status === 500) {
-                    this.setState({alertMsg: data.message});
+                if (data.status !== 200) {
+                    this.setState({alertMsg: data.message, success: false});
                     window.scrollTo(0, 0)
                 }
                 else {
@@ -150,7 +156,7 @@ class ViewRecord extends Component {
 
         return (
             <div>
-                {this.state.alertMsg.length !== 0
+                {this.state.alertMsg && this.state.alertMsg.length !== 0
                     ? <Alert bsStyle={this.alertStyle()}><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }

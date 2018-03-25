@@ -17,6 +17,7 @@ class ViewContainer extends Component {
         let columns = getColumns(this, accessors);
         this.state =
             {
+                user: props.userData,
                 alertMsg: "",
                 location: "Mock",
                 state: "Mock",
@@ -53,7 +54,7 @@ class ViewContainer extends Component {
         if (!this.props.match.params.containerId) {
             this.props.history.push("/");
         }
-        getContainerById(this.props.match.params.containerId)
+        getContainerById(this.props.match.params.containerId, this.state.user.id)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
@@ -92,7 +93,7 @@ class ViewContainer extends Component {
         let that = this;
         let promises = [];
         recordIds.forEach((record) => {
-            promises.push(getRecordById(record)
+            promises.push(getRecordById(record, this.state.user.id)
                 .then((result) => {
                     return result.json();
                 })
@@ -117,9 +118,9 @@ class ViewContainer extends Component {
     }
 
     handleSubmit() {
-        deleteContainers(this.props.match.params.containerId)
+        deleteContainers(this.props.match.params.containerId, this.state.user.id)
             .then(response => {
-                if(response.status !== 200) {
+                if (response.status !== 200) {
                     this.setState({alertMsg: response.statusText + ": Container must be empty."});
                     window.scrollTo(0, 0)
                 }

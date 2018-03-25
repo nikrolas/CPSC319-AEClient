@@ -9,10 +9,11 @@ import {getDateString, transformDates} from "../utilities/DateTime";
 
 class AddToContainer extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state =
             {
+                user: props.userData,
                 success: false,
                 alertMsg: "",
                 title: "",
@@ -136,7 +137,7 @@ class AddToContainer extends Component {
     handleSubmit = (event) => {
         let recordIds = [];
         this.state.selectedRecords.forEach(record => recordIds.push(record.id));
-        addRecordsToContainer(this.state.selectedContainers[0], recordIds).then(response => {
+        addRecordsToContainer(this.state.selectedContainers[0], recordIds, this.state.user.id).then(response => {
             if (response.status !== 201) {
                 throw new Error(response.message);
             } else {

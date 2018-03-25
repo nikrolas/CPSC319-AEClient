@@ -10,6 +10,7 @@ class UpdateContainer extends Component {
         super(props, context);
         this.state =
             {
+                user: props.userData,
                 alertMsg: "",
 
                 containerNumber: null,
@@ -58,7 +59,7 @@ class UpdateContainer extends Component {
     componentWillMount() {
         let setData = this.setData;
         let that = this;
-        getContainerById(this.props.match.params.containerId)
+        getContainerById(this.props.match.params.containerId, this.state.user.id)
             .then(response => response.json())
             .then(data => {
                 this.setState({title: data.title});
@@ -76,8 +77,7 @@ class UpdateContainer extends Component {
                 console.error("Error loading container: " + err.message);
             });
 
-        //TODO: get current user
-        getUser(500)
+        getUser(this.stat.user.id)
             .then(response => response.json())
             .then(data => {
                 this.setState({userLocations: data.locations});
@@ -185,7 +185,7 @@ class UpdateContainer extends Component {
         }
         if (!failValidation) {
             console.log(this.state);
-            updateContainer(this.props.match.params.containerId, this.state)
+            updateContainer(this.props.match.params.containerId, this.state.user.id)
                 .then(response => {
                     return response.json();
                 })
