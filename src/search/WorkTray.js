@@ -224,8 +224,10 @@ class WorkTray extends Component {
                 <div style={styles.container}>
                     <h1>Work Tray</h1>
                     <div style={styles.btncontainer}>
-                        <ContextualActions {...this.props} selectedItemIndexes={selection}
-                                           resultsData={data} columns={columns}/>
+                        <ContextualActions {...this.props}
+                                           selectedItemIndexes={selection}
+                                           resultsData={data}
+                                           columns={columns}/>
                         <button className='btn btn-s'
                                 style={styles.clearbtn}
                                 onClick={removeAll}>
@@ -233,7 +235,7 @@ class WorkTray extends Component {
                             All
                         </button>
                     </div>
-                    <div style={styles.tablestyle}>
+                    <div style={styles.tablecontainer}>
                         <CheckboxTable
                             ref={(r) => this.checkboxTable = r}
                             data={data}
@@ -254,7 +256,7 @@ let styles = {
     container: {
         padding: '2% 5% 5% 5%'
     },
-    tablestyle: {
+    tablecontainer: {
         marginTop: '5px',
     },
     btncontainer: {

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {isARecordItem} from "../utilities/Items";
-import {MdCreateNewFolder, MdRemoveCircle} from 'react-icons/lib/md';
+import {MdCreateNewFolder, MdLibraryAdd, MdIndeterminateCheckBox} from 'react-icons/lib/md';
 import {deleteAction, destroyAction, removeRecordsFromContainerAction} from "../bulk/Action";
 
 export function goTo(props, url) {
@@ -91,13 +91,8 @@ class ContextualActions extends Component {
 
     render() {
         let styles = {
-            container: {
-                padding: '2% 5% 5% 5%'
-            },
-            tablestyle: {
-                marginTop: '5px',
-            },
             btncontainer: {
+                float: 'left',
                 marginRight: 'auto',
                 verticalAlign: 'baseline',
                 height: '1cm'
@@ -126,44 +121,9 @@ class ContextualActions extends Component {
                 color: 'white',
                 fontSize: '13px',
             },
-            clearbtn: {
-                float: 'right',
-                marginRight: '0.5cm',
-                width: 'auto',
-                background: '#ff4e44',
-                borderColor: 'white',
-                color: 'white',
-                fontSize: '13px',
-            },
-            removerowbtn: {
-                color: '#ff6c60',
-                transform: 'scale(2,2)',
-            },
-            removeselbtn: {
-                height: '25px',
-                padding: '4px',
-                width: 'auto',
-                backgroundColor: 'white',
-            },
-            removeicon: {
-                color: '#ff6c60',
-                background: 'inherit',
-                backgroundColor: 'inherit',
-                transform: 'scale(1.5,1.5)',
-                verticalAlign: 'top',
+            icons: {
                 marginRight: '5px',
-            },
-            removeiconwhite: {
-                color: 'white',
-                background: 'inherit',
-                backgroundColor: 'inherit',
-                transform: 'scale(1.5,1.5)',
-                marginRight: '5px',
-            },
-            volumeicon: {
-                marginRight: '5px',
-                transform: 'scale(1.55, 1.45)',
-                verticalAlign: 'baseline',
+                transform: 'scale(1.5, 1.5)',
             },
         };
 
@@ -175,7 +135,7 @@ class ContextualActions extends Component {
                         onClick={() => {
                             goTo(this.props, "/createVolume")
                         }}>
-                    <MdCreateNewFolder style={styles.volumeicon}/>
+                    <MdCreateNewFolder style={styles.icons}/>
                     Volume
                 </button>
                 <button className='btn btn-s'
@@ -184,8 +144,8 @@ class ContextualActions extends Component {
                         onClick={() => {
                             goTo(this.props, "/createContainer")
                         }}>
-                    <MdCreateNewFolder style={styles.volumeicon}/>
-                    Contain Records
+                    <i className='fa fa-dropbox' style={styles.icons}/>
+                    Contain
                 </button>
                 <button className='btn btn-s'
                         style={styles.bluebtn}
@@ -193,14 +153,14 @@ class ContextualActions extends Component {
                         onClick={() => {
                             goTo(this.props, "/addToContainer")
                         }}>
-                    <MdCreateNewFolder style={styles.volumeicon}/>
+                    <MdLibraryAdd style={styles.icons}/>
                     Add to container
                 </button>
                 <button className='btn btn-s'
                         style={styles.bluebtn}
                         disabled={!this.recordsOnly()}
                         onClick={() => this.bulkAction(removeRecordsFromContainerAction)}>
-                    <MdRemoveCircle style={styles.volumeicon}/>
+                    <MdIndeterminateCheckBox style={styles.icons}/>
                     Remove from container
                 </button>
                 <button className='btn btn-s'

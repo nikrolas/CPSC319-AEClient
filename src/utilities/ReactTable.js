@@ -35,7 +35,7 @@ export function getColumns(context, accessors) {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
-                    maxWidth: 120,
+                    maxWidth: 150,
                     Cell: e => <a onClick={() => {
                         context.handleClick(accessor, e.row._original.containerId, 'container')
                     }}> {e.value} </a>
@@ -47,17 +47,24 @@ export function getColumns(context, accessors) {
                     Header: accessorHeaderMapping[accessor],
                     Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>{e.value}</div>
                 });
+            } else if (accessor === "type") {
+                columns.push({
+                    accessor: accessor,
+                    Header: accessorHeaderMapping[accessor],
+                    minWidth: 140,
+                    Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>{e.value}</div>
+                });
             } else if (accessor === "consignmentCode") {
                 columns.push({
                     accessor: accessor,
-                    Header: accessorHeaderMapping[accessor]
+                    Header: accessorHeaderMapping[accessor],
+                    minWidth: 140,
                 });
-            }
-            else {
+            } else {
                 columns.push({
                     accessor: accessor,
-                    maxWidth: 100,
-                    Header: accessorHeaderMapping[accessor]
+                    Header: accessorHeaderMapping[accessor],
+                    maxWidth: 130,
                 });
             }
         });
@@ -92,12 +99,15 @@ export function setTableState(context, data, columns, callback) {
 }
 
 export function setData(context, data, columns, callback) {
-    const rowdata = data.map((item, index) => {
-        const _id = index;
-        return {
-            _id,
-            ...item,
-        }
-    });
+    let rowdata = [];
+    if (data) {
+        rowdata = data.map((item, index) => {
+            const _id = index;
+            return {
+                _id,
+                ...item,
+            }
+        });
+    }
     setTableState(context, rowdata, columns, callback);
 }
