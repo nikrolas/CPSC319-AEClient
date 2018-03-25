@@ -8,6 +8,7 @@ import {getContainersByNumber} from "../api/ContainersApi";
 import Search from "./Search";
 import {getColumns, setData, setTableState} from "../utilities/ReactTable";
 import ContextualActions from '../context/ContextualActions';
+import {searchByNumber} from "../api/SearchApi";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -22,6 +23,10 @@ class SelectTable extends Component {
             data: [],
             rdata: [],
             cdata: [],
+            pages: -1,
+            page: 1,
+            pageSize: 10,
+            loading: false,
             columns: [],
             selection: [],
             selectAll: false,
@@ -47,7 +52,7 @@ class SelectTable extends Component {
             //console.log("tray: "+JSON.stringify(this.state.tray));
         }
         //this.setData(getMockData());
-        this.search(this.props.match.params.searchString);
+        // this.search(this.props.match.params.searchString);
     }
 
     componentWillUnmount() {
@@ -90,12 +95,11 @@ class SelectTable extends Component {
     };
 
     componentWillReceiveProps(newProps) {
-        let searchString = newProps.match.params.searchString;
-        if (searchString !== this.props.match.params.searchString) {
-            this.search(searchString);
-        }
+        // let searchString = newProps.match.params.searchString;
+        // if (searchString !== this.props.match.params.searchString) {
+        //     this.search(searchString);
+        // }
     }
-    ;
 
     toggleSelection = (key) => {
         // start off with the existing state
@@ -218,7 +222,8 @@ class SelectTable extends Component {
                 <div style={{marginBottom: '1cm'}}>
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
-                <ContextualActions {...this.props} selectedItemIndexes={this.state.selection} resultsData={this.state.data} columns={columns}/>
+                <ContextualActions {...this.props} selectedItemIndexes={this.state.selection}
+                                   resultsData={this.state.data} columns={columns}/>
                 <div style={styles.btncontainer}>
                     <button className='btn btn-s'
                             style={this.addStyle()}
@@ -237,10 +242,42 @@ class SelectTable extends Component {
                     <CheckboxTable
                         ref={(r) => this.checkboxTable = r}
                         data={data}
+                        pages={this.state.pages}
+                        loading={this.state.loading}
+                        manual
                         columns={columns}
-                        defaultPageSize={10}
+                        defaultPageSize={this.state.pageSize}
                         className="-striped -highlight"
+                        onFetchData={(state, instance) => {
+                            this.setState({loading: true});
 
+                            let searchOptions = {record: true, container: true};
+
+                            searchByNumber(
+                                this.props.match.params.searchString,
+                                searchOptions,
+                                state.page,
+                                state.pageSize,
+                                this.state.user.id
+                            )
+                                .then(response => {
+                                    return response.json()
+                                })
+                                .then((res) => {
+                                    // Update react-table
+                                    let selectvalue = 'none';
+                                    this.setState({selectvalue});
+                                    let columns = getColumns(this, recordsResultsAccessors);
+                                    setData(this, res.results, columns, () => {
+                                        this.tableDataAndSelectionCallback();
+                                    });
+
+                                    this.setState({
+                                        pages: res.pageCount,
+                                        loading: false
+                                    })
+                                })
+                        }}
                         {...checkboxProps}
                     />
                 </div>
