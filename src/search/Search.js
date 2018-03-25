@@ -37,6 +37,7 @@ class Search extends Component {
                     <i className="fa fa-search" style={styles.searchicon}/>
                     <input type="text"
                            id="search"
+                           className="form-control"
                            defaultValue={this.state.searchValue}
                            value={this.state.value}
                            onChange={this.handleInputChange}

@@ -3,10 +3,8 @@ import ReactTable from 'react-table';
 import "react-table/react-table.css";
 import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
-import {getRecordsByNumber} from "../api/RecordsApi";
-import {getContainersByNumber} from "../api/ContainersApi";
 import Search from "./Search";
-import {getColumns, setData, setTableState} from "../utilities/ReactTable";
+import {getColumns, setData} from "../utilities/ReactTable";
 import ContextualActions from '../context/ContextualActions';
 import {searchByNumber} from "../api/SearchApi";
 
@@ -231,7 +229,7 @@ class SelectTable extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, updateTray} = this;
-        const {data, columns, selectAll, selection} = this.state;
+        const {data, columns, selectAll, selection, selectvalue, addbtntext, loading, pages, pageSize} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -248,14 +246,17 @@ class SelectTable extends Component {
                     <button className='btn btn-s'
                             style={this.addStyle()}
                             disabled={!selection.length}
-                            onClick={updateTray}>{this.state.addbtntext}</button>
+                            onClick={updateTray}>{addbtntext}</button>
                     <ContextualActions {...this.props}
-                                       selectedItemIndexes={this.state.selection}
-                                       resultsData={this.state.data}
+                                       selectedItemIndexes={selection}
+                                       resultsData={data}
                                        columns={columns}/>
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>
-                        <select style={styles.sel} onChange={this.handleSelectChange} value={this.state.selectvalue}>
+                        <select style={styles.sel}
+                                className="form-control"
+                                onChange={this.handleSelectChange}
+                                value={selectvalue}>
                             <option value='none' selected>None</option>
                             <option value='records'>Records</option>
                             <option value='containers'>Containers</option>
@@ -267,11 +268,11 @@ class SelectTable extends Component {
                         manual
                         className="-striped -highlight"
                         ref={(r) => this.checkboxTable = r}
-                        data={this.state.data}
-                        columns={this.state.columns}
-                        loading={this.state.loading}
-                        pages={this.state.pages}
-                        defaultPageSize={this.state.pageSize}
+                        data={data}
+                        columns={columns}
+                        loading={loading}
+                        pages={pages}
+                        defaultPageSize={pageSize}
                         onPageChange={(page) => this.setState({page})}
                         onPageSizeChange={(pageSize, page) => this.setState({pageSize, page})}
                         onFetchData={(state) => this.search(state, true, true)}
@@ -316,7 +317,7 @@ let styles = {
             marginRight: '0.5cm'
         },
         filter: {
-            marginRight: '0.5cm',
+            //marginRight: '0.5cm',
             float: 'right',
             height: '100%',
         },
@@ -325,6 +326,7 @@ let styles = {
             marginTop: '3px',
             float: 'left',
             height: '85%',
+            width: 'auto',
         },
     };
 
