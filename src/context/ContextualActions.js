@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {isARecordItem} from "../utilities/Items";
-import {MdCreateNewFolder, MdLibraryAdd, MdIndeterminateCheckBox} from 'react-icons/lib/md';
-import {deleteAction, destroyAction, removeRecordsFromContainerAction} from "../bulk/Action";
+import {MdCreateNewFolder, MdLibraryAdd} from 'react-icons/lib/md';
+import {deleteAction, destroyAction} from "../bulk/Action";
 
 export function goTo(props, url) {
     props.history.push(url);
@@ -155,13 +155,6 @@ class ContextualActions extends Component {
                         }}>
                     <MdLibraryAdd style={styles.icons}/>
                     Add to container
-                </button>
-                <button className='btn btn-s'
-                        style={styles.bluebtn}
-                        disabled={!this.recordsOnly()}
-                        onClick={() => this.bulkAction(removeRecordsFromContainerAction)}>
-                    <MdIndeterminateCheckBox style={styles.icons}/>
-                    Remove from container
                 </button>
                 <button className='btn btn-s'
                         style={styles.destroybtn}

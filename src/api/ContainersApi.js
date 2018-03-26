@@ -1,12 +1,8 @@
 import {serviceRoot} from "./ServiceRoot";
+import {updateRecord} from "./RecordsApi";
 
 let containersPath = "/containers";
 let containerPath = "/container";
-let removeRecordsPath = "/removeRecords";
-
-export function getContainersByNumber(containerNumber, userId) {
-    return fetch(serviceRoot + containersPath + "?num=" + containerNumber + "&userId=" + userId);
-}
 
 export function getContainerById(containerId, userId) {
     return fetch(serviceRoot + containersPath + "/" + containerId + "?userId=" + userId);
@@ -42,26 +38,18 @@ export function deleteContainers(ids, userId) {
     });
 }
 
-export function removeRecordsFromContainer(recordIds, userId) {
-    let path = serviceRoot + containerPath + removeRecordsPath + "?userId=" + userId;
-    return fetch(path, {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(recordIds)
+export function addRecordsToContainer(containerId, records, userId) {
+    let promises = [];
+    records.forEach(record => {
+        let state = record;
+        state.containerId = containerId;
+        state.user = {id: userId};
+        promises.push(
+            updateRecord(record.id, state)
+                .then(response => {
+                    return response.json();
+                }));
     });
-}
 
-export function addRecordsToContainer(containerId, data, userId) {
-    let path = serviceRoot + containerPath + containerId + "?userId=" + userId;
-    return fetch(path, {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    });
+    return Promise.all(promises);
 }

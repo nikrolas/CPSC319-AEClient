@@ -102,11 +102,11 @@ class ViewRecord extends Component {
     }
 
     handleRemoveFromContainer = () => {
-        //TODO: use remove from containers API instead of update record
         let recordState = JSON.parse(JSON.stringify(this.state.recordJson));
         recordState.responseJson = {classifications: recordState.classifications};
         recordState.containerNumber = "";
         recordState.retentionSchedule = recordState.scheduleId;
+        recordState.user = JSON.parse(JSON.stringify(this.state.user));
 
         updateRecord(this.props.match.params.recordId, recordState)
             .then(response => response.json())

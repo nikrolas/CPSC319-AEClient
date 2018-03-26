@@ -30,8 +30,11 @@ class AddToContainer extends Component {
     }
 
     componentWillMount() {
-        let locations = this.getUserLocations();
-        let location = locations[0];
+        let locations = this.props.userData.locations;
+        let location = "";
+        if (locations && locations.length > 0) {
+            location = locations[0];
+        }
 
         let selectedItems = this.getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
 
@@ -92,11 +95,6 @@ class AddToContainer extends Component {
         return {selectedRecords, selectedContainers};
     };
 
-    getUserLocations = () => {
-        //TODO: retreive user locations
-        return ["Burnaby", "Vancouver", "Richmond"];
-    };
-
     handleChange(e) {
         e.persist();
         this.setState({[e.target.name]: e.target.value}, () => {
@@ -135,15 +133,10 @@ class AddToContainer extends Component {
     };
 
     handleSubmit = (event) => {
-        let recordIds = [];
-        this.state.selectedRecords.forEach(record => recordIds.push(record.id));
-        addRecordsToContainer(this.state.selectedContainers[0], recordIds, this.state.user.id).then(response => {
-            if (response.status !== 201) {
+        addRecordsToContainer(this.state.selectedContainers[0].id, this.state.selectedRecords, this.state.user.id).then(data => {
+            if (data.status !== 201) {
                 throw new Error(response.message);
-            } else {
-                return response.json();
             }
-        }).then(data => {
             this.setState({success: true});
             this.props.history.push("/viewContainer/" + data.containerId);
         }).catch(err => {
@@ -205,7 +198,7 @@ class AddToContainer extends Component {
                                 <p style={title}>
                                     <b>Location</b>
                                     <br/>
-                                    {container.location}
+                                    {container.locationName}
                                 </p>
                                 <p style={title}>
                                     <b>State</b>
@@ -220,14 +213,9 @@ class AddToContainer extends Component {
                                     {container.consignmentCode}
                                 </p>
                                 <p style={title}>
-                                    <b>Closed At:</b>
-                                    <br/>
-                                    {container.closedAt}
-                                </p>
-                                <p style={title}>
                                     <b>Schedule:</b>
                                     <br/>
-                                    {container.schedule}
+                                    {container.scheduleName}
                                 </p>
                             </Col>
                         </Row>
