@@ -125,7 +125,6 @@ class UpdateRecord extends Component {
                 if (data && !data.exception) {
                     setData(that, data);
                 }
-                console.log(this.state);
             })
             .catch(err => {
             console.error("Error loading record: " + err.message);
@@ -401,7 +400,6 @@ class UpdateRecord extends Component {
                 }
             });
         document.getElementById("formClassification").value = "0";*/
-        console.log(this.state);
     }
 
     render() {
