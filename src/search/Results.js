@@ -25,6 +25,8 @@ class SelectTable extends Component {
             tray: [],
             addbtntext: 'Add to Tray',
             selectvalue: 'none',
+            record: true,
+            container: true,
             loading: false,
             page: 0,
             pages: -1,
@@ -49,7 +51,9 @@ class SelectTable extends Component {
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
         if (searchString !== this.props.match.params.searchString) {
-            this.search(this.state, true, true, searchString);
+            this.setState({selectvalue: 'none', record: true, container: true,}, () =>
+                this.search(this.state.page, this.state.pageSize, searchString)
+            );
         }
     }
 
@@ -58,63 +62,26 @@ class SelectTable extends Component {
         this.state.onDataUpdateCallback(this.state.data, this.state.columns);
     };
 
-
-    /*search = (searchString) => {
-        let recordsPromise = getRecordsByNumber(searchString, this.state.user.id)
-            .then(response => {
-                return response.json()
-            });
-        let containersPromise = getContainersByNumber(searchString, this.state.user.id)
-            .then(response => {
-                //console.log(response);
-                return response.json()
-            });
-        let recordsAndContainers = [recordsPromise, containersPromise];
-        Promise.all(recordsAndContainers)
-            .then(data => {
-                if (data && data.length === 2) {
-                    let rdata = data[0];
-                    let cdata = data[1];
-                    let selectvalue = 'none';
-                    this.setState({rdata, cdata, selectvalue});
-                    let columns = getColumns(this, recordsResultsAccessors);
-                    setData(this, rdata.concat(cdata), columns, this.tableDataAndSelectionCallback);
-                } else {
-                    setTableState(this, [], [], this.tableDataAndSelectionCallback);
-                }
-            })
-            .catch(err => {
-                setTableState(this, [], [], this.tableDataAndSelectionCallback);
-            });
-    };*/
-    search(state, record, container, str) {
-        this.setState({loading: true});
+    search(page, pageSize, str) {
         let searchString = str ? str : this.props.match.params.searchString;
-        let searchOptions = {record: record, container: container};
-        searchByNumber(
-            searchString,
-            searchOptions,
-            state.page + 1,
-            state.pageSize,
-            this.state.user.id
-        )
-            .then(response => {
-                return response.json()
-            })
-            .then((res) => {
-                let accessor = !record ? containersResultsAccessors : recordsResultsAccessors;
-                let columns = getColumns(this, accessor);
-                setData(this, res.results, columns, () => {
-                    this.tableDataAndSelectionCallback();
-                });
+        let searchOptions = {record: this.state.record, container: this.state.container};
+        this.setState({loading: true,}, () => {
+                searchByNumber(searchString, searchOptions, page + 1, pageSize, this.state.user.id)
+                    .then(response => {
+                        return response.json()
+                    })
+                    .then((res) => {
+                        let accessor = !this.state.record ? containersResultsAccessors : recordsResultsAccessors;
+                        let columns = getColumns(this, accessor);
+                        setData(this, res.results, columns, () => {
+                            this.tableDataAndSelectionCallback();
+                        });
 
-                let selectvalue = str ? 'none' : this.state.selectvalue;
-                this.setState({
-                    pages: res.pageCount,
-                    loading: false,
-                    selectvalue
-                });
-            })
+                        let selectvalue = str ? 'none' : this.state.selectvalue;
+                        this.setState({loading: false, pages: res.pageCount, selectvalue, page, pageSize});
+                    })
+            }
+        );
     }
 
     toggleSelection = (key) => {
@@ -222,9 +189,9 @@ class SelectTable extends Component {
                 break;
             }
         }
-        this.setState({
-            selectvalue: e.target.value
-        }, this.search(this.state, record, container));
+        this.setState({selectvalue: e.target.value, record, container}, () => {
+            this.search(this.state.page, this.state.pageSize)
+        });
     };
 
     render() {
@@ -275,7 +242,7 @@ class SelectTable extends Component {
                         defaultPageSize={pageSize}
                         onPageChange={(page) => this.setState({page})}
                         onPageSizeChange={(pageSize, page) => this.setState({pageSize, page})}
-                        onFetchData={(state) => this.search(state, true, true)}
+                        onFetchData={(state) => this.search(state.page, state.pageSize)}
                         {...checkboxProps}
                     />
                 </div>
