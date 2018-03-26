@@ -482,7 +482,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.recordNumberValidationState === "error"
                             ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -499,7 +499,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.titleValidationState === "error"
                             ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -518,7 +518,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.locationValidationState === "error"
                             ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     {/* TODO Classifications */}
@@ -536,14 +536,14 @@ class UpdateRecord extends Component {
                             {listClassificationJson}
                         </FormControl>
                         <FormControl.Feedback/>
-                        { this.state.classificationValidationState === "error"
-                            ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
-                            :null
-                        }
                         <ButtonGroup>
                             <Button onClick={this.backClassification}>Back</Button>
                             <Button onClick={this.resetClassification}>Reset</Button>
                         </ButtonGroup>
+                        { this.state.classificationValidationState === "error"
+                            ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
+                            :<p>&nbsp;</p>
+                        }
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect"
                                validationState={this.state.retentionValidationState}>
@@ -552,7 +552,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -572,7 +572,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -589,7 +589,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -606,7 +606,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.consignmentCodeValidationState === "error"
                             ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -623,7 +623,7 @@ class UpdateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.notesValidationState === "error"
                             ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <Button type="submit">Submit</Button>

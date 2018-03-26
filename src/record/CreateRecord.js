@@ -506,7 +506,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.recordTypeValidationState === "error"
                             ?<HelpBlock>{this.state.recordTypeValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -525,7 +525,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.locationValidationState === "error"
                             ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -553,7 +553,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.recordNumberValidationState === "error"
                             ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                         </FormGroup>
                     <FormGroup
@@ -570,7 +570,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.titleValidationState === "error"
                             ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                    {/* TODO Classifications */}
@@ -596,15 +596,15 @@ class CreateRecord extends Component {
                             <option style={classificationDefault} value="0" disabled selected>{this.state.classificationParent}</option>
                             {listClassificationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
-                        { this.state.classificationValidationState === "error"
-                            ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
-                            :null
-                        }
                         <ButtonGroup>
                         <Button onClick={this.backClassification}>Back</Button>
                         <Button onClick={this.resetClassification}>Reset</Button>
                         </ButtonGroup>
+                        { this.state.classificationValidationState === "error"
+                            ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
+                            :<p>&nbsp;</p>
+                        }
+                        <FormControl.Feedback/>
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect"
                                validationState={this.state.retentionValidationState}>
@@ -613,7 +613,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -630,7 +630,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
 
@@ -648,7 +648,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.consignmentCodeValidationState === "error"
                             ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -665,7 +665,7 @@ class CreateRecord extends Component {
                         <FormControl.Feedback/>
                         { this.state.notesValidationState === "error"
                             ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <Button type="submit">Submit</Button>
