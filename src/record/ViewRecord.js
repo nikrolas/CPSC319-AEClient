@@ -58,7 +58,11 @@ class ViewRecord extends Component {
                 }
             })
             .then(data => {
-                if (data && !data.exception) {
+                if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
+                    this.setState({alertMsg: data.message, success: false});
+                    window.scrollTo(0, 0)
+                }
+                else if (data && !data.exception) {
                     setData(that, data);
                     that.state.onItemSelectCallback([0]);
                     that.state.onDataUpdateCallback([that.state.recordJson], getColumns(this, recordsResultsAccessors));
@@ -90,7 +94,7 @@ class ViewRecord extends Component {
                 return response.json();
             })
             .then(data => {
-                if (data.status !== 200) {
+                if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
                     this.setState({alertMsg: data.message, success: false});
                     window.scrollTo(0, 0)
                 }

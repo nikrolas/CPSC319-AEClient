@@ -321,6 +321,7 @@ class CreateRecord extends Component {
     }
 
     handleSubmit(event) {
+        console.log(this.state);
         const regexValidationState = /^.*ValidationState$/;
         var keys = Object.keys(this.state);
         var failValidation = false;
@@ -348,7 +349,8 @@ class CreateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    if (data.status === 401) {
+
+                    if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }

@@ -347,7 +347,7 @@ class UpdateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    if (data.status === 401) {
+                    if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }
