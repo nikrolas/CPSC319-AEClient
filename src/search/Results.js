@@ -63,25 +63,27 @@ class SelectTable extends Component {
     };
 
     search(page, pageSize, str) {
-        let searchString = str ? str : this.props.match.params.searchString;
         let searchOptions = {record: this.state.record, container: this.state.container};
-        this.setState({loading: true,}, () => {
-                searchByNumber(searchString, searchOptions, page + 1, pageSize, this.state.user.id)
-                    .then(response => {
-                        return response.json()
-                    })
-                    .then((res) => {
-                        let accessor = !this.state.record ? containersResultsAccessors : recordsResultsAccessors;
-                        let columns = getColumns(this, accessor);
-                        setData(this, res.results, columns, () => {
-                            this.tableDataAndSelectionCallback();
-                        });
+        let searchString = str ? str : this.props.match.params.searchString;
+        if (searchString) {
+            this.setState({loading: true,}, () => {
+                    searchByNumber(searchString, searchOptions, page + 1, pageSize, this.state.user.id)
+                        .then(response => {
+                            return response.json()
+                        })
+                        .then((res) => {
+                            let accessor = !this.state.record ? containersResultsAccessors : recordsResultsAccessors;
+                            let columns = getColumns(this, accessor);
+                            setData(this, res.results, columns, () => {
+                                this.tableDataAndSelectionCallback();
+                            });
 
-                        let selectvalue = str ? 'none' : this.state.selectvalue;
-                        this.setState({loading: false, pages: res.pageCount, selectvalue, page, pageSize});
-                    })
-            }
-        );
+                            let selectvalue = str ? 'none' : this.state.selectvalue;
+                            this.setState({loading: false, pages: res.pageCount, selectvalue, page, pageSize});
+                        })
+                }
+            );
+        }
     }
 
     toggleSelection = (key) => {
