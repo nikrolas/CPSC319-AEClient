@@ -132,7 +132,7 @@ class CreateRecord extends Component {
             this.setState({[e.target.name]: e.target.value}, ()=> {
                 //Validation handling here
                 if(e.target.name === "recordType") {
-                    this.setState({recordNumberPattern: this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]});
+                    this.numberPatternRules(this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]);
                     const length = this.state.recordType.length;
                     if (length >= 1) {
                         this.setState({recordTypeValidationState: 'success'});
@@ -292,6 +292,31 @@ class CreateRecord extends Component {
                     }
                 }
             });
+        }
+    }
+
+    numberPatternRules(pattern) {
+        let finalPattern = pattern;
+        if(finalPattern.includes("KKK")){
+            let capitalizedData = this.state.user.locations[0].locationCode.toUpperCase();
+            finalPattern = finalPattern.replace(/^.{3}/g,capitalizedData);
+        }
+        if(finalPattern.includes("yyyy")){
+            finalPattern = finalPattern.replace("yyyy", new Date().getFullYear().toString());
+        }
+
+        if(finalPattern.includes("ggg")) {
+            let concat_pattern = finalPattern.substring(0, pattern.length-4);
+            if(concat_pattern[concat_pattern.length -1] === "."){
+                let concat_pattern_client  = concat_pattern.substring(0,concat_pattern.length-1);
+                this.setState({recordNumberPattern: concat_pattern_client});
+            }
+            else {
+                this.setState({recordNumberPattern: concat_pattern});
+            }
+        }
+        else {
+            this.setState({recordNumberPattern: finalPattern});
         }
     }
 
