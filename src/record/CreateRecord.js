@@ -503,7 +503,6 @@ class CreateRecord extends Component {
                             <option value="" disabled selected>(Select a record type)</option>
                             {listRecordTypeJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.recordTypeValidationState === "error"
                             ?<HelpBlock>{this.state.recordTypeValidationMsg}</HelpBlock>
                             :<br/>
@@ -522,7 +521,6 @@ class CreateRecord extends Component {
                         >
                         {listLocationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.locationValidationState === "error"
                             ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
                             :<br/>
@@ -550,7 +548,6 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.recordNumberValidationState === "error"
                             ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
                             :<br/>
@@ -567,13 +564,11 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.titleValidationState === "error"
                             ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
                             :<br/>
                         }
                     </FormGroup>
-                   {/* TODO Classifications */}
                     <FormGroup
                         controlId="formClassification"
                         onChange={this.handleChange}
@@ -604,13 +599,11 @@ class CreateRecord extends Component {
                             ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
                             :<p>&nbsp;</p>
                         }
-                        <FormControl.Feedback/>
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect"
                                validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
                             {retentionForm}
-                        <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
                             :<br/>
@@ -627,7 +620,6 @@ class CreateRecord extends Component {
                             placeholder="Enter digits"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
                             :<br/>
@@ -645,7 +637,6 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.consignmentCodeValidationState === "error"
                             ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
                             :<br/>
@@ -662,7 +653,6 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.notesValidationState === "error"
                             ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
                             :<br/>

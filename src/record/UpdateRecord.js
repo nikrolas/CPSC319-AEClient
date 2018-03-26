@@ -477,7 +477,6 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.recordNumberValidationState === "error"
                             ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
                             :<br/>
@@ -494,7 +493,6 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.titleValidationState === "error"
                             ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
                             :<br/>
@@ -513,7 +511,6 @@ class UpdateRecord extends Component {
                         >
                             {listLocationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.locationValidationState === "error"
                             ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
                             :<br/>
@@ -533,7 +530,6 @@ class UpdateRecord extends Component {
                             <option style={classificationDefault} value="0" disabled selected>{this.state.classificationParent}</option>
                             {listClassificationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         <ButtonGroup>
                             <Button onClick={this.backClassification}>Back</Button>
                             <Button onClick={this.resetClassification}>Reset</Button>
@@ -547,7 +543,6 @@ class UpdateRecord extends Component {
                                validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
                         {retentionForm}
-                        <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
                             :<br/>
@@ -567,7 +562,6 @@ class UpdateRecord extends Component {
                         >
                             {listRecordStatesJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
                             :<br/>
@@ -584,7 +578,6 @@ class UpdateRecord extends Component {
                             placeholder="Enter digits"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
                             :<br/>
@@ -601,7 +594,6 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.consignmentCodeValidationState === "error"
                             ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
                             :<br/>
@@ -618,7 +610,6 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.notesValidationState === "error"
                             ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
                             :<br/>
