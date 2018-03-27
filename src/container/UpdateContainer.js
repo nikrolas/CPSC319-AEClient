@@ -77,7 +77,7 @@ class UpdateContainer extends Component {
                 console.error("Error loading container: " + err.message);
             });
 
-        getUser(this.stat.user.id)
+        getUser(this.state.user.id)
             .then(response => response.json())
             .then(data => {
                 this.setState({userLocations: data.locations});
@@ -184,8 +184,7 @@ class UpdateContainer extends Component {
             }
         }
         if (!failValidation) {
-            console.log(this.state);
-            updateContainer(this.props.match.params.containerId, this.state.user.id)
+            updateContainer(this.props.match.params.containerId, this.state, this.state.user.id)
                 .then(response => {
                     return response.json();
                 })

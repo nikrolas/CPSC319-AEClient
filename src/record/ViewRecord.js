@@ -54,7 +54,7 @@ class ViewRecord extends Component {
                 if (response.status === 404) {
                     this.props.history.push("/notFound");
                 } else {
-                   return response.json();
+                    return response.json();
                 }
             })
             .then(data => {
@@ -106,28 +106,32 @@ class ViewRecord extends Component {
     }
 
     handleRemoveFromContainer = () => {
-        //TODO: use remove from containers API instead of update record
         let recordState = JSON.parse(JSON.stringify(this.state.recordJson));
-        recordState.responseJson = {classifications: recordState.classifications};
+        recordState.responseJson = {classifications: recordState.classIds};
         recordState.containerNumber = "";
         recordState.retentionSchedule = recordState.scheduleId;
+        recordState.user = JSON.parse(JSON.stringify(this.state.user));
 
         updateRecord(this.props.match.params.recordId, recordState)
             .then(response => response.json())
             .then(data => {
                 if (data && !data.exception) {
                     this.setData(this, data, () => {
-                        if(!this.isInContainer()) {
+                        if (!this.isInContainer()) {
                             this.setState({alertMsg: "Record has been removed from its container.", success: true});
                         } else {
                             this.setState({alertMsg: "Unable to remove record from its container.", success: false});
                         }
                     });
 
+                } else if (data.status !== 201) {
+                    this.setState({alertMsg: data.message, success: false});
+                } else {
+                    throw new Error();
                 }
             })
             .catch(err => {
-                console.error("Error loading record: " + err.message);
+                console.error("Error updating record: " + err.message);
             });
     };
 

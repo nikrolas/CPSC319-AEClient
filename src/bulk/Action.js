@@ -1,28 +1,6 @@
 import {isAContainerItem, isARecordItem} from "../utilities/Items";
-import {deleteContainers, removeRecordsFromContainer} from "../api/ContainersApi";
+import {deleteContainers} from "../api/ContainersApi";
 import {deleteRecordByIds, destroyRecords} from "../api/RecordsApi";
-
-export let removeRecordsFromContainerAction = {
-    header: "Remove from container",
-    prompt: "The following items will be removed from their container.",
-    action: (items, option, userId) => {
-        let records = items.filter(item => isARecordItem(item));
-        let recordIds = records.map(record => record.id);
-        return removeRecordsFromContainer(recordIds, userId)
-            .then(response => {
-                return response.json();
-            })
-            .then(result => {
-                if (result.status !== 200) {
-                    throw new Error (result.message);
-                }
-                return "Successfully removed records from their container."
-            })
-            .catch(error => {
-                throw new Error("Unable to remove one or more records from their container. " + error);
-            });
-    }
-};
 
 function getRecordsAndContainersIds(items) {
     let records = items.filter(item => isARecordItem(item));

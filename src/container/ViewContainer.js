@@ -19,9 +19,9 @@ class ViewContainer extends Component {
             {
                 user: props.userData,
                 alertMsg: "",
-                location: "Mock",
-                state: "Mock",
-                schedule: "Mock",
+                location: "N/A",
+                state: "N/A",
+                schedule: "N/A",
                 closedAt: "N/A",
                 data: [],
                 columns: columns,
@@ -43,7 +43,7 @@ class ViewContainer extends Component {
                     createdAt: "",
                     updatedAt: "",
                     childRecordIds: [],
-                    notes: "Container Note"
+                    notes: ""
                 },
             };
         this.handleChange = this.handleChange.bind(this);
