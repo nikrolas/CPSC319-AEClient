@@ -80,7 +80,7 @@ export function updateRecord(recordId, state) {
             title: state.title,
             scheduleId: state.retentionSchedule,
             //TODO temporary state b/c end point not complete
-            classifications: state.responseJson.classifications,
+            classifications: state.classificationBack,
             consignmentCode: state.consignmentCode,
             notes: state.notes,
             stateId: state.stateId,

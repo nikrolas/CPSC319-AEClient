@@ -10,7 +10,6 @@ import {
     OverlayTrigger,
     Popover
 } from 'react-bootstrap'
-//import {createRecord, getClassifications, getRecordType,getRetentionSchedule, getUser} from "../APIs/RecordsApi";
 import {createRecord, getClassifications, getRecordType, getRetentionSchedule} from "../api/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
 
@@ -321,7 +320,6 @@ class CreateRecord extends Component {
     }
 
     handleSubmit(event) {
-        console.log(this.state);
         const regexValidationState = /^.*ValidationState$/;
         var keys = Object.keys(this.state);
         var failValidation = false;
@@ -392,6 +390,7 @@ class CreateRecord extends Component {
     }
 
     resetClassification(){
+        console.log(this.state);
         getClassifications()
             .then(response => response.json())
             .then(data => {

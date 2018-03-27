@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
+import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Popover,OverlayTrigger} from 'react-bootstrap'
 //import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
 import {
     getClassifications,
@@ -36,8 +36,6 @@ class UpdateRecord extends Component {
                 locationValidationState:"success",
                 location: null,
 
-
-                //TODO Classifications
                 classificationValidationMsg:"",
                 classificationValidationState:"success",
                 classification: null,
@@ -46,14 +44,11 @@ class UpdateRecord extends Component {
                 classificationParent:"(Select Record Type)",
                 classificationAtLeaf: false,
 
-                //TODO RetentionSechdule
                 retentionValidationMsg:"",
                 retentionValidationState:"success",
                 retentionSchedule:null,
                 retentionScheduleName:"",
 
-
-                //TODO State
                 stateValidationMsg:"",
                 stateValidationState:"success",
                 stateId:null,
@@ -115,13 +110,30 @@ class UpdateRecord extends Component {
                 this.setState({recordNumber: data.number});
                 this.setState({title: data.title});
                 this.setState({location: data.locationId});
-                //Classification
                 this.setState({retentionSchedule: data.scheduleId});
                 this.setState({retentionScheduleName:data.schedule});
                 this.setState({stateId: data.stateId});
                 this.setState({container:data.container});
                 this.setState({consignmentCode:data.consignmentCode});
                 this.setState({notes:data.notes});
+                data.classIds.forEach( id => {
+                   this.state.classificationBack.push(id.toString());
+                });
+
+                let classificationPath = data.classifications.split("/");
+                classificationPath.forEach( path => {
+                    this.state.classificationParentHistory.push(path);
+                });
+                this.setState({classificationParent: classificationPath[classificationPath.length-1]});
+                getClassifications(data.classIds[data.classIds.length -1])
+                    .then(response => response.json())
+                    .then(data => {
+                        this.setState({classificationResponse: data});
+                    })
+                    .catch(err => {
+                        console.error("Error loading record: " + err.message);
+                        this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+                    });
                 if (data && !data.exception) {
                     setData(that, data);
                 }
@@ -129,15 +141,6 @@ class UpdateRecord extends Component {
             .catch(err => {
             console.error("Error loading record: " + err.message);
         });
-        getClassifications()
-            .then(response => response.json())
-            .then(data => {
-                this.setState({classificationResponse: data});
-            })
-            .catch(err => {
-                console.error("Error loading record: " + err.message);
-                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
-            });
         getRetentionSchedule()
             .then(response => response.json())
             .then(data => {
@@ -388,7 +391,8 @@ class UpdateRecord extends Component {
     }
 
     resetClassification(){
-/*        getClassifications()
+        console.log(this.state);
+        getClassifications()
             .then(response => response.json())
             .then(data => {
                 if(data.length >0) {
@@ -399,7 +403,7 @@ class UpdateRecord extends Component {
                     this.setState({classificationResponse: data});
                 }
             });
-        document.getElementById("formClassification").value = "0";*/
+        document.getElementById("formClassification").value = "0";
     }
 
     render() {
@@ -445,6 +449,15 @@ class UpdateRecord extends Component {
 
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
 
+        const popoverRightClassification = (
+            <Popover
+                id="popover-positioned-scrolling-right"
+                title="How to use"
+            >
+                The dropdown will update on each selection. Keep selecting until you receive a green checkmark.
+            </Popover>
+        );
+
         let formStyle = {
             margin: 'auto',
             width: '50%',
@@ -453,6 +466,13 @@ class UpdateRecord extends Component {
         }
         let classificationDefault = {
             color:'red',
+        }
+
+        let tooltipStyle = {
+            padding: '0',
+            background: 'white',
+            border: 'none',
+            float: 'right',
         }
 
         return (
@@ -523,6 +543,15 @@ class UpdateRecord extends Component {
                         validationState={this.state.classificationValidationState}
                     >
                         <ControlLabel>Classification {requiredLabel} <br/> {classificationPath} </ControlLabel>
+                        <OverlayTrigger
+                            trigger="click"
+                            placement="right"
+                            overlay={popoverRightClassification}
+                        >
+                            <Button style={tooltipStyle}>
+                                <i className="fa fa-question-circle"></i>
+                            </Button>
+                        </OverlayTrigger>
                         <FormControl name="classification"
                                      componentClass="select"
                                      placeholder="select"
