@@ -461,10 +461,14 @@ class UpdateRecord extends Component {
                 id="popover-positioned-scrolling-right"
                 title="How to use"
             >
-                The dropdown will update on each selection. Keep selecting until you receive a green checkmark.
+                The dropdown will dynamically update on each selection. Please keep selecting until there are at least two classifications in the path and the box turns green.
+                <br/>
+                <br/>
+                <i className="fa fa-arrow-left"/>&nbsp;&nbsp;Back to parent selection
+                <br/>
+                <i className="fa fa-refresh"/>&nbsp;&nbsp;Refresh classification
             </Popover>
         );
-
         let formStyle = {
             margin: 'auto',
             width: '50%',
@@ -567,8 +571,12 @@ class UpdateRecord extends Component {
                             {listClassificationJson}
                         </FormControl>
                         <ButtonGroup>
-                            <Button onClick={this.backClassification}>Back</Button>
-                            <Button onClick={this.resetClassification}>Reset</Button>
+                            <Button onClick={this.backClassification}>
+                                <i className="fa fa-arrow-left"/>
+                            </Button>
+                            <Button onClick={this.resetClassification}>
+                                <i className="fa fa-refresh"/>
+                            </Button>
                         </ButtonGroup>
                         { this.state.classificationValidationState === "error"
                             ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
