@@ -81,7 +81,7 @@ class App extends Component {
 
     userExists(userJson) {
         this.setState({userData: userJson});
-        if (userJson.role === "Administrator" || userJson.role === "RMC") {
+        if (userJson.role === "Administrator" || userJson.role === "RMC" || userJson.role === "General") {
             this.setState({
                 userAuthenticated: true,
             });
@@ -111,7 +111,7 @@ class App extends Component {
                         this.setState({
                             userData: data,
                         });
-                        if (data.role === "Administrator" || data.role === "RMC") {
+                        if (data.role === "Administrator" || data.role === "RMC"|| data.role ==="General") {
                             this.setState({
                                 userAuthenticated: true,
                             });

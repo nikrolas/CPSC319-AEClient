@@ -144,23 +144,21 @@ class ViewRecord extends Component {
     };
 
     render() {
-        /*let buttons = {
-            display: "none"
-        };
-        if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
-            buttons = {
-                display: "block"
-            }
-        }*/
+
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         let title = {
             textAlign: "left",
         };
         let btnStyle = {
-            display: "flex",
-            justifyContent: "left"
+            display: "none",
         };
+        if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+            btnStyle = {
+                display: "flex",
+                justifyContent: "left"
+            }
+        }
 
         return (
             <div>

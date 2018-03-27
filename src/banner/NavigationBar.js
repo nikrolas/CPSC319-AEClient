@@ -26,6 +26,16 @@ class NavigationBar extends Component {
                         Location: {this.state.user.locations[0].locationName}
                     </NavItem>
                 </Nav>;
+
+            if (this.state.user.role === "General") {
+                search =
+                    <NavItem componentClass={Link}
+                             href="/results"
+                             to="/results">
+                        Search
+                    </NavItem>;
+            }
+
             if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
                 search =
                     <NavItem componentClass={Link}
