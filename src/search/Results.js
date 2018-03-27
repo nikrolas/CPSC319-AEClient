@@ -44,6 +44,7 @@ class SelectTable extends Component {
             let tray = JSON.parse(stored);
             this.setState({tray});
         }
+        this.search(this.state.page, this.state.pageSize)
     }
 
     componentWillUnmount() {
@@ -53,7 +54,7 @@ class SelectTable extends Component {
     componentWillReceiveProps(newProps) {
         let searchString = newProps.match.params.searchString;
         if (searchString !== this.props.match.params.searchString) {
-            this.setState({selectvalue: 'none', record: true, container: true,}, () =>
+            this.setState({selectvalue: 'none', record: true, container: true, page: 0}, () =>
                 this.search(this.state.page, this.state.pageSize, searchString)
             );
         }
@@ -68,7 +69,7 @@ class SelectTable extends Component {
         let searchOptions = {record: this.state.record, container: this.state.container};
         let searchString = num ? num : this.props.match.params.searchString;
         if (searchString && page >= 0) {
-            this.setState({loading: true,}, () => {
+            this.setState({loading: true, page, pageSize}, () => {
                     searchByNumber(searchString, searchOptions, page + 1, pageSize, this.state.user.id)
                         .then(response => {
                             return response.json()
@@ -210,14 +211,14 @@ class SelectTable extends Component {
                 break;
             }
         }
-        this.setState({selectvalue: e.target.value, record, container}, () => {
+        this.setState({selectvalue: e.target.value, record, container, page: 0}, () => {
             this.search(this.state.page, this.state.pageSize)
         });
     };
 
     render() {
         const {toggleSelection, toggleAll, isSelected, updateTray} = this;
-        const {data, columns, selectAll, selection, selectvalue, addbtntext, loading, pages, pageSize, alertMsg} = this.state;
+        const {data, columns, selectAll, selection, selectvalue, addbtntext, loading, page, pages, pageSize, alertMsg} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -269,11 +270,11 @@ class SelectTable extends Component {
                         data={data}
                         columns={columns}
                         loading={loading}
+                        page={page}
                         pages={pages}
                         defaultPageSize={pageSize}
-                        onPageChange={(page) => this.setState({page})}
-                        onPageSizeChange={(pageSize, page) => this.setState({pageSize, page})}
-                        onFetchData={(state) => this.search(state.page, state.pageSize)}
+                        onPageChange={(page) => this.setState({page}, () => this.search(page, pageSize))}
+                        onPageSizeChange={(pageSize) => this.setState({pageSize}, () => this.search(page, pageSize))}
                         {...checkboxProps}
                     />
                 </div>
