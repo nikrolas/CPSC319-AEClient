@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Button, Alert} from 'react-bootstrap';
 import {getVolumesByNumber, createVolume} from "../api/VolumesApi";
 import {MdCreateNewFolder} from 'react-icons/lib/md';
-import PropTypes from 'prop-types';
 
 class CreateVolume extends Component {
 
@@ -25,9 +24,6 @@ class CreateVolume extends Component {
         this.handleCancel = this.handleCancel.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-    static contextTypes = {
-        router: PropTypes.object
-    };
 
     componentWillMount() {
         if (!this.state.success) {
@@ -38,7 +34,7 @@ class CreateVolume extends Component {
                     this.setState({
                             alertMsg: "Nothing selected. Redirecting..",
                             timeout: setTimeout(() => {
-                                this.context.router.history.goBack();
+                                this.props.history.goBack();
                             }, 2000)
                         }
                     );
@@ -54,13 +50,12 @@ class CreateVolume extends Component {
                 return response.json()
             })
             .then(data => {
-                if (data.error) {
-                    let msg = data.status + ": " + data.error;
-                    this.setState({alertMsg: msg});
-                    window.scrollTo(0, 0)
-                }
-                else if (data.status && data.status !== 200) {
-                    this.setState({alertMsg: data.message});
+                if (data.error || (data.status && data.status !== 200)) {
+                    let status = data.status ? data.status : "";
+                    let err = data.error ? " " + data.error : "";
+                    let msg = data.message ? ": " + data.message : "";
+                    let alertMsg = status + err + msg;
+                    this.setState({alertMsg});
                     window.scrollTo(0, 0)
                 }
                 else if (data && data.length > 0) {
@@ -98,7 +93,7 @@ class CreateVolume extends Component {
         if (!this.state.timeout) {
             this.setState({
                 timeout: setTimeout(() => {
-                    this.context.router.history.goBack();
+                    this.props.history.goBack();
                 }, 1500),
                 success: false,
                 alertMsg: "Cancelled. Redirecting..",
@@ -123,14 +118,12 @@ class CreateVolume extends Component {
             return response.json();
         })
         .then(data => {
-            if (data.error) {
-                let msg = data.status + ": " + data.error;
-                this.setState({alertMsg: msg});
-                window.scrollTo(0, 0)
-            }
-            else if(data.status && data.status !== 200) {
-                //console.log(JSON.stringify(data));
-                this.setState({alertMsg: data.message});
+            if (data.error || (data.status && data.status !== 200)) {
+                let status = data.status ? data.status : "";
+                let err = data.error ? " " + data.error : "";
+                let msg = data.message ? ": " + data.message : "";
+                let alertMsg = status + err + msg;
+                this.setState({alertMsg});
                 window.scrollTo(0, 0)
             }
             else {

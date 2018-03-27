@@ -59,7 +59,12 @@ class ViewRecord extends Component {
             })
             .then(data => {
                 if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
-                    this.setState({alertMsg: data.message, success: false});
+                    let status = data.status ? data.status : "";
+                    let err = data.error ? " " + data.error : "";
+                    let msg = data.message ? ": " + data.message : "";
+                    let alertMsg = status + err + msg;
+                    this.setState({alertMsg, success: false});
+                    //this.setState({alertMsg: data.message, success: false});
                     window.scrollTo(0, 0)
                 }
                 else if (data && !data.exception) {

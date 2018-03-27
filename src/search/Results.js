@@ -75,14 +75,12 @@ class SelectTable extends Component {
                             return response.json()
                         })
                         .then((res) => {
-                            if (res.error) {
-                                let msg = res.status + ": " + res.error;
-                                this.setState({alertMsg: msg});
-                                window.scrollTo(0, 0)
-                            }
-                            else if (res.status && res.status !== 200) {
-                                //console.log(JSON.stringify(data));
-                                this.setState({alertMsg: res.message});
+                            if (res.error || (res.status && res.status !== 200)) {
+                                let status = res.status ? res.status : "";
+                                let err = res.error ? " " + res.error : "";
+                                let msg = res.message ? ": " + res.message : "";
+                                let alertMsg = status + err + msg;
+                                this.setState({alertMsg});
                                 window.scrollTo(0, 0)
                             }
                             else {
@@ -98,7 +96,7 @@ class SelectTable extends Component {
                             this.setState({loading: false, pages, selectvalue, page, pageSize});
                         })
                         .catch(error => {
-                            this.setState({alertMsg: error, loading: false,});
+                            this.setState({alertMsg: error, loading: false});
                             window.scrollTo(0, 0)
                         });
                 }
