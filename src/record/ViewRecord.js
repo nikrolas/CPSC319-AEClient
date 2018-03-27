@@ -250,6 +250,9 @@ class ViewRecord extends Component {
                                     title="Deleting Record">
                                     <Button bsStyle="danger">Delete Record</Button>
                                 </Confirm>
+                                <Link to={'/createVolume'}>
+                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}> Create Volume </Button>
+                                </Link>
                             </ButtonToolbar>
                         </Col>
                     </Row>

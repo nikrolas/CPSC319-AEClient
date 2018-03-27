@@ -64,7 +64,6 @@ class CreateVolume extends Component {
                     window.scrollTo(0, 0)
                 }
                 else if (data && data.length > 0) {
-                    data.sort((a,b) => this.naturalCompare(a.number,b.number));
                     let numbers = [];
                     data.forEach((volume) => {
                         numbers.push(volume.number);
@@ -76,21 +75,6 @@ class CreateVolume extends Component {
             .catch(err => {
                 console.error("Error loading volumes: " + err.message);
             });
-    };
-    naturalCompare = (a, b) => {
-        let ax = [], bx = [];
-
-        a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || ""]) });
-        b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || ""]) });
-
-        while(ax.length && bx.length) {
-            let an = ax.shift();
-            let bn = bx.shift();
-            let nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
-            if(nn) return nn;
-        }
-
-        return ax.length - bx.length;
     };
 
     componentWillUnmount() {
@@ -303,7 +287,7 @@ let styles = {
     },
     notes2: {
         width: '75%',
-        height: '5cm',
+        height: '4cm',
         overflowY: 'auto',
         minWidth: '25%',
         maxWidth: '100%',
