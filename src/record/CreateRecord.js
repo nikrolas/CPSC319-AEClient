@@ -214,7 +214,6 @@ class CreateRecord extends Component {
                                     document.getElementById("formClassification").value = "0";
                                     this.setState({classificationResponse: data});
                                 }
-                                this.setState({classificationValidationState:null});
                                 this.setState({classificationAtLeaf:false});
 
                             }
@@ -232,7 +231,12 @@ class CreateRecord extends Component {
                                     this.setState({classificationBack: backHistory});
                                 }
                                 this.setState({classificationAtLeaf:true});
+                            }
+                            if(this.state.classificationBack.length >=2) {
                                 this.setState({classificationValidationState:"success"});
+                            }
+                            else{
+                                this.setState({classificationValidationState:null});
                             }
                         });
                 }
@@ -376,12 +380,16 @@ class CreateRecord extends Component {
             .then(data => {
                 if(data.length > 0) {
                     this.setState({classificationResponse: data});
-                    this.setState({classificationValidationState: null});
                     this.setState({classificationAtLeaf:false});
                 }
                 else {
                     this.setState({classificationAtLeaf:true});
-                    this.setState({classificationValidationState: "success"});
+                }
+                if(this.state.classificationBack.length >=2) {
+                    this.setState({classificationValidationState:"success"});
+                }
+                else{
+                    this.setState({classificationValidationState:null});
                 }
             })
             .catch(error => {

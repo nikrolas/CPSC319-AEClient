@@ -248,7 +248,6 @@ class UpdateRecord extends Component {
                                     document.getElementById("formClassification").value = "0";
                                     this.setState({classificationResponse: data});
                                 }
-                                this.setState({classificationValidationState:null});
                                 this.setState({classificationAtLeaf:false});
 
                             }
@@ -266,7 +265,12 @@ class UpdateRecord extends Component {
                                     this.setState({classificationBack: backHistory});
                                 }
                                 this.setState({classificationAtLeaf:true});
+                            }
+                            if(this.state.classificationBack.length >=2) {
                                 this.setState({classificationValidationState:"success"});
+                            }
+                            else{
+                                this.setState({classificationValidationState:null});
                             }
                         })
                         .catch(err => {
@@ -377,12 +381,16 @@ class UpdateRecord extends Component {
             .then(data => {
                 if(data.length > 0) {
                     this.setState({classificationResponse: data});
-                    this.setState({classificationValidationState: null});
                     this.setState({classificationAtLeaf:false});
                 }
                 else {
                     this.setState({classificationAtLeaf:true});
-                    this.setState({classificationValidationState: "success"});
+                }
+                if(this.state.classificationBack.length >=2) {
+                    this.setState({classificationValidationState:"success"});
+                }
+                else{
+                    this.setState({classificationValidationState:null});
                 }
             })
             .catch(error => {
@@ -391,7 +399,6 @@ class UpdateRecord extends Component {
     }
 
     resetClassification(){
-        console.log(this.state);
         getClassifications()
             .then(response => response.json())
             .then(data => {
