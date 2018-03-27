@@ -10,7 +10,6 @@ import {
     OverlayTrigger,
     Popover
 } from 'react-bootstrap'
-//import {createRecord, getClassifications, getRecordType,getRetentionSchedule, getUser} from "../APIs/RecordsApi";
 import {createRecord, getClassifications, getRecordType, getRetentionSchedule} from "../api/RecordsApi";
 import {Typeahead} from 'react-bootstrap-typeahead';
 
@@ -132,7 +131,7 @@ class CreateRecord extends Component {
             this.setState({[e.target.name]: e.target.value}, ()=> {
                 //Validation handling here
                 if(e.target.name === "recordType") {
-                    this.setState({recordNumberPattern: this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]});
+                    this.numberPatternRules(this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]);
                     const length = this.state.recordType.length;
                     if (length >= 1) {
                         this.setState({recordTypeValidationState: 'success'});
@@ -215,7 +214,6 @@ class CreateRecord extends Component {
                                     document.getElementById("formClassification").value = "0";
                                     this.setState({classificationResponse: data});
                                 }
-                                this.setState({classificationValidationState:null});
                                 this.setState({classificationAtLeaf:false});
 
                             }
@@ -233,7 +231,12 @@ class CreateRecord extends Component {
                                     this.setState({classificationBack: backHistory});
                                 }
                                 this.setState({classificationAtLeaf:true});
+                            }
+                            if(this.state.classificationBack.length >=2) {
                                 this.setState({classificationValidationState:"success"});
+                            }
+                            else{
+                                this.setState({classificationValidationState:null});
                             }
                         });
                 }
@@ -295,6 +298,31 @@ class CreateRecord extends Component {
         }
     }
 
+    numberPatternRules(pattern) {
+        let finalPattern = pattern;
+        if(finalPattern.includes("KKK")){
+            let capitalizedData = this.state.user.locations[0].locationCode.toUpperCase();
+            finalPattern = finalPattern.replace(/^.{3}/g,capitalizedData);
+        }
+        if(finalPattern.includes("yyyy")){
+            finalPattern = finalPattern.replace("yyyy", new Date().getFullYear().toString());
+        }
+
+        if(finalPattern.includes("ggg")) {
+            let concat_pattern = finalPattern.substring(0, pattern.length-4);
+            if(concat_pattern[concat_pattern.length -1] === "."){
+                let concat_pattern_client  = concat_pattern.substring(0,concat_pattern.length-1);
+                this.setState({recordNumberPattern: concat_pattern_client});
+            }
+            else {
+                this.setState({recordNumberPattern: concat_pattern});
+            }
+        }
+        else {
+            this.setState({recordNumberPattern: finalPattern});
+        }
+    }
+
     handleSubmit(event) {
         const regexValidationState = /^.*ValidationState$/;
         var keys = Object.keys(this.state);
@@ -323,7 +351,8 @@ class CreateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    if (data.status === 401) {
+
+                    if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }
@@ -351,12 +380,16 @@ class CreateRecord extends Component {
             .then(data => {
                 if(data.length > 0) {
                     this.setState({classificationResponse: data});
-                    this.setState({classificationValidationState: null});
                     this.setState({classificationAtLeaf:false});
                 }
                 else {
                     this.setState({classificationAtLeaf:true});
-                    this.setState({classificationValidationState: "success"});
+                }
+                if(this.state.classificationBack.length >=2) {
+                    this.setState({classificationValidationState:"success"});
+                }
+                else{
+                    this.setState({classificationValidationState:null});
                 }
             })
             .catch(error => {
@@ -435,7 +468,12 @@ class CreateRecord extends Component {
                 id="popover-positioned-scrolling-right"
                 title="How to use"
             >
-                The dropdown will update on each selection. Keep selecting until you receive a green checkmark.
+                The dropdown will dynamically update on each selection. Please keep selecting until there are at least two classifications in the path and the box turns green.
+                <br/>
+                <br/>
+                <i className="fa fa-arrow-left"/>&nbsp;&nbsp;Back to parent selection
+                <br/>
+                <i className="fa fa-refresh"/>&nbsp;&nbsp;Refresh classification
             </Popover>
         );
         //XXX and ZZZ is alphanumeric
@@ -478,10 +516,9 @@ class CreateRecord extends Component {
                             <option value="" disabled selected>(Select a record type)</option>
                             {listRecordTypeJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.recordTypeValidationState === "error"
                             ?<HelpBlock>{this.state.recordTypeValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -497,10 +534,9 @@ class CreateRecord extends Component {
                         >
                         {listLocationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.locationValidationState === "error"
                             ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -525,10 +561,9 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.recordNumberValidationState === "error"
                             ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                         </FormGroup>
                     <FormGroup
@@ -542,13 +577,11 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.titleValidationState === "error"
                             ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
-                   {/* TODO Classifications */}
                     <FormGroup
                         controlId="formClassification"
                         onChange={this.handleChange}
@@ -571,24 +604,26 @@ class CreateRecord extends Component {
                             <option style={classificationDefault} value="0" disabled selected>{this.state.classificationParent}</option>
                             {listClassificationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
+                        <ButtonGroup>
+                        <Button onClick={this.backClassification}>
+                            <i className="fa fa-arrow-left"/>
+                        </Button>
+                        <Button onClick={this.resetClassification}>
+                            <i className="fa fa-refresh"/>
+                        </Button>
+                        </ButtonGroup>
                         { this.state.classificationValidationState === "error"
                             ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
-                            :null
+                            :<p>&nbsp;</p>
                         }
-                        <ButtonGroup>
-                        <Button onClick={this.backClassification}>Back</Button>
-                        <Button onClick={this.resetClassification}>Reset</Button>
-                        </ButtonGroup>
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect"
                                validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
                             {retentionForm}
-                        <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -602,10 +637,9 @@ class CreateRecord extends Component {
                             placeholder="Enter digits"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
 
@@ -620,10 +654,9 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.consignmentCodeValidationState === "error"
                             ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -637,10 +670,9 @@ class CreateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.notesValidationState === "error"
                             ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <Button type="submit">Submit</Button>
