@@ -17,8 +17,8 @@ class CreateContainer extends Component {
                 success: false,
                 alertMsg: "",
                 title: "",
-                location: this.getUserLocations()[0], //TODO://set user default location
-                locations: this.getUserLocations(),
+                location: {},
+                locations: [],
                 destructionDate: this.getDestructionDate(),
                 notes: "",
                 selectedRecords: selectedItems.selectedRecords,
@@ -40,13 +40,19 @@ class CreateContainer extends Component {
     }
 
     componentDidMount() {
+        let locations = this.props.userData.locations;
+        let location;
+        if (locations && locations.length > 0) {
+            location = locations[0];
+        }
+
         let invalidStateErrors = [];
 
         if (!this.state.selectedRecords || !this.state.selectedRecords.length > 0) {
             invalidStateErrors.push("At least one record must be selected.");
         }
 
-        this.setState({invalidStateErrors});
+        this.setState({location, locations, invalidStateErrors});
     }
 
 
@@ -62,11 +68,6 @@ class CreateContainer extends Component {
             }
         });
         return {selectedRecords, selectedContainers};
-    };
-
-    getUserLocations = () => {
-        //TODO: retreive user locations
-        return ["Burnaby", "Vancouver", "Richmond"];
     };
 
     getDestructionDate = () => {
@@ -153,7 +154,7 @@ class CreateContainer extends Component {
             formData.selectedRecords.forEach(record => {
                 selectedRecordIds.push(record.id);
             });
-            formData.selectedRecords = selectedRecordIds;
+            formData.records = selectedRecordIds;
 
             createContainer(formData, this.state.user.id).then(response => {
                 if (response.status !== 201) {
@@ -174,8 +175,7 @@ class CreateContainer extends Component {
     }
 
     render() {
-        const listLocationsJson = this.state.locations.map((item, i) =>
-            <option key={i} value={item}>{item}</option>);
+        let listLocationJson = null;
         const destructionDate = <div>{this.state.destructionDate}</div>;
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
         const {selectedRecords, columns} = this.state;
@@ -188,6 +188,11 @@ class CreateContainer extends Component {
 
         if (this.state.invalidStateErrors.length > 0) {
             return <AlertDismissable handleAction={handleAction} alertMessage={alertMessage}/>
+        }
+
+        if (this.state.userLocations !== null) {
+            listLocationJson = this.state.locations.map((item, i) =>
+                <option key={i} value={item.locationId}>{item.locationName}</option>);
         }
 
         return (
@@ -223,21 +228,21 @@ class CreateContainer extends Component {
                     </FormGroup>
                     <FormGroup
                         controlId="formLocation"
+                        onChange={this.handleChange}
                         validationState={this.state.locationValidationState}
                     >
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
                         <FormControl
                             name="location"
                             componentClass="select"
-                            value={this.state.location}
-                            onChange={this.handleChange}
+                            value = {this.state.location}
                         >
-                            {listLocationsJson}
+                            {listLocationJson}
                         </FormControl>
                         <FormControl.Feedback/>
-                        {this.state.locationValidationState === "error"
-                            ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            : null
+                        { this.state.locationValidationState === "error"
+                            ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
+                            :null
                         }
                     </FormGroup>
                     <FormGroup

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert} from 'react-bootstrap'
+import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Popover,OverlayTrigger} from 'react-bootstrap'
 //import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
 import {
     getClassifications,
@@ -36,8 +36,6 @@ class UpdateRecord extends Component {
                 locationValidationState:"success",
                 location: null,
 
-
-                //TODO Classifications
                 classificationValidationMsg:"",
                 classificationValidationState:"success",
                 classification: null,
@@ -46,14 +44,11 @@ class UpdateRecord extends Component {
                 classificationParent:"(Select Record Type)",
                 classificationAtLeaf: false,
 
-                //TODO RetentionSechdule
                 retentionValidationMsg:"",
                 retentionValidationState:"success",
                 retentionSchedule:null,
                 retentionScheduleName:"",
 
-
-                //TODO State
                 stateValidationMsg:"",
                 stateValidationState:"success",
                 stateId:null,
@@ -115,30 +110,37 @@ class UpdateRecord extends Component {
                 this.setState({recordNumber: data.number});
                 this.setState({title: data.title});
                 this.setState({location: data.locationId});
-                //Classification
                 this.setState({retentionSchedule: data.scheduleId});
                 this.setState({retentionScheduleName:data.schedule});
                 this.setState({stateId: data.stateId});
                 this.setState({container:data.container});
                 this.setState({consignmentCode:data.consignmentCode});
                 this.setState({notes:data.notes});
+                data.classIds.forEach( id => {
+                   this.state.classificationBack.push(id.toString());
+                });
+
+                let classificationPath = data.classifications.split("/");
+                classificationPath.forEach( path => {
+                    this.state.classificationParentHistory.push(path);
+                });
+                this.setState({classificationParent: classificationPath[classificationPath.length-1]});
+                getClassifications(data.classIds[data.classIds.length -1])
+                    .then(response => response.json())
+                    .then(data => {
+                        this.setState({classificationResponse: data});
+                    })
+                    .catch(err => {
+                        console.error("Error loading record: " + err.message);
+                        this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+                    });
                 if (data && !data.exception) {
                     setData(that, data);
                 }
-                console.log(this.state);
             })
             .catch(err => {
             console.error("Error loading record: " + err.message);
         });
-        getClassifications()
-            .then(response => response.json())
-            .then(data => {
-                this.setState({classificationResponse: data});
-            })
-            .catch(err => {
-                console.error("Error loading record: " + err.message);
-                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
-            });
         getRetentionSchedule()
             .then(response => response.json())
             .then(data => {
@@ -246,7 +248,6 @@ class UpdateRecord extends Component {
                                     document.getElementById("formClassification").value = "0";
                                     this.setState({classificationResponse: data});
                                 }
-                                this.setState({classificationValidationState:null});
                                 this.setState({classificationAtLeaf:false});
 
                             }
@@ -264,7 +265,12 @@ class UpdateRecord extends Component {
                                     this.setState({classificationBack: backHistory});
                                 }
                                 this.setState({classificationAtLeaf:true});
+                            }
+                            if(this.state.classificationBack.length >=2) {
                                 this.setState({classificationValidationState:"success"});
+                            }
+                            else{
+                                this.setState({classificationValidationState:null});
                             }
                         })
                         .catch(err => {
@@ -348,7 +354,7 @@ class UpdateRecord extends Component {
                     return response.json();
                 })
                 .then(data => {
-                    if (data.status === 401) {
+                    if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
                         this.setState({alertMsg: data.message});
                         window.scrollTo(0, 0)
                     }
@@ -375,12 +381,16 @@ class UpdateRecord extends Component {
             .then(data => {
                 if(data.length > 0) {
                     this.setState({classificationResponse: data});
-                    this.setState({classificationValidationState: null});
                     this.setState({classificationAtLeaf:false});
                 }
                 else {
                     this.setState({classificationAtLeaf:true});
-                    this.setState({classificationValidationState: "success"});
+                }
+                if(this.state.classificationBack.length >=2) {
+                    this.setState({classificationValidationState:"success"});
+                }
+                else{
+                    this.setState({classificationValidationState:null});
                 }
             })
             .catch(error => {
@@ -389,7 +399,7 @@ class UpdateRecord extends Component {
     }
 
     resetClassification(){
-/*        getClassifications()
+        getClassifications()
             .then(response => response.json())
             .then(data => {
                 if(data.length >0) {
@@ -400,8 +410,7 @@ class UpdateRecord extends Component {
                     this.setState({classificationResponse: data});
                 }
             });
-        document.getElementById("formClassification").value = "0";*/
-        console.log(this.state);
+        document.getElementById("formClassification").value = "0";
     }
 
     render() {
@@ -447,6 +456,19 @@ class UpdateRecord extends Component {
 
         const requiredLabel = <span style={{color:'red'}}>(Required)</span>;
 
+        const popoverRightClassification = (
+            <Popover
+                id="popover-positioned-scrolling-right"
+                title="How to use"
+            >
+                The dropdown will dynamically update on each selection. Please keep selecting until there are at least two classifications in the path and the box turns green.
+                <br/>
+                <br/>
+                <i className="fa fa-arrow-left"/>&nbsp;&nbsp;Back to parent selection
+                <br/>
+                <i className="fa fa-refresh"/>&nbsp;&nbsp;Refresh classification
+            </Popover>
+        );
         let formStyle = {
             margin: 'auto',
             width: '50%',
@@ -455,6 +477,13 @@ class UpdateRecord extends Component {
         }
         let classificationDefault = {
             color:'red',
+        }
+
+        let tooltipStyle = {
+            padding: '0',
+            background: 'white',
+            border: 'none',
+            float: 'right',
         }
 
         return (
@@ -479,10 +508,9 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.recordNumberValidationState === "error"
                             ?<HelpBlock>{this.state.recordNumberValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -496,10 +524,9 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.titleValidationState === "error"
                             ?<HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -515,10 +542,9 @@ class UpdateRecord extends Component {
                         >
                             {listLocationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.locationValidationState === "error"
                             ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     {/* TODO Classifications */}
@@ -528,6 +554,15 @@ class UpdateRecord extends Component {
                         validationState={this.state.classificationValidationState}
                     >
                         <ControlLabel>Classification {requiredLabel} <br/> {classificationPath} </ControlLabel>
+                        <OverlayTrigger
+                            trigger="click"
+                            placement="right"
+                            overlay={popoverRightClassification}
+                        >
+                            <Button style={tooltipStyle}>
+                                <i className="fa fa-question-circle"></i>
+                            </Button>
+                        </OverlayTrigger>
                         <FormControl name="classification"
                                      componentClass="select"
                                      placeholder="select"
@@ -535,24 +570,26 @@ class UpdateRecord extends Component {
                             <option style={classificationDefault} value="0" disabled selected>{this.state.classificationParent}</option>
                             {listClassificationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
+                        <ButtonGroup>
+                            <Button onClick={this.backClassification}>
+                                <i className="fa fa-arrow-left"/>
+                            </Button>
+                            <Button onClick={this.resetClassification}>
+                                <i className="fa fa-refresh"/>
+                            </Button>
+                        </ButtonGroup>
                         { this.state.classificationValidationState === "error"
                             ?<HelpBlock>{this.state.classificationValidationMsg}</HelpBlock>
-                            :null
+                            :<p>&nbsp;</p>
                         }
-                        <ButtonGroup>
-                            <Button onClick={this.backClassification}>Back</Button>
-                            <Button onClick={this.resetClassification}>Reset</Button>
-                        </ButtonGroup>
                     </FormGroup>
                     <FormGroup controlId="formControlsSelect"
                                validationState={this.state.retentionValidationState}>
                         <ControlLabel>Retention Schedule {requiredLabel}</ControlLabel>
                         {retentionForm}
-                        <FormControl.Feedback/>
                         { this.state.retentionValidationState === "error"
                             ?<HelpBlock>{this.state.retentionValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -569,10 +606,9 @@ class UpdateRecord extends Component {
                         >
                             {listRecordStatesJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -586,10 +622,9 @@ class UpdateRecord extends Component {
                             placeholder="Enter digits"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.containerValidationState === "error"
                             ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -603,10 +638,9 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.consignmentCodeValidationState === "error"
                             ?<HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <FormGroup
@@ -620,10 +654,9 @@ class UpdateRecord extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         { this.state.notesValidationState === "error"
                             ?<HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
-                            :null
+                            :<br/>
                         }
                     </FormGroup>
                     <Button type="submit">Submit</Button>

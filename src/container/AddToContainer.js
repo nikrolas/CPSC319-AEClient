@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Alert, Grid, Row, Col, ButtonToolbar, Button} from 'react-bootstrap'
-import {addRecordsToContainer} from "../api/ContainersApi";
+import {addRecordToContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
 import {isARecordItem} from "../utilities/Items";
 import AlertDismissable from "../AlertDismissable";
@@ -30,8 +30,11 @@ class AddToContainer extends Component {
     }
 
     componentWillMount() {
-        let locations = this.getUserLocations();
-        let location = locations[0];
+        let locations = this.props.userData.locations;
+        let location = "";
+        if (locations && locations.length > 0) {
+            location = locations[0];
+        }
 
         let selectedItems = this.getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
 
@@ -60,16 +63,13 @@ class AddToContainer extends Component {
                 return;
             }
 
-            if (record.locationId !== selectedContainer.locationId) {
-                alertMsg = "Records are in a different location. Expected: " + selectedContainer.location;
+            if (selectedContainer.locationId && record.locationId !== selectedContainer.locationId) {
+                alertMsg = "Records are in a different location. Expected: " + selectedContainer.locationName;
                 return;
             }
-            if (record.scheduleId !== selectedContainer.scheduleId) {
-                alertMsg = "Records have a different schedule. Expected: " + selectedContainer.schedule;
+            if (selectedContainer.scheduleId && record.scheduleId !== selectedContainer.scheduleId) {
+                alertMsg = "Records have a different schedule. Expected: " + selectedContainer.scheduleName;
                 return;
-            }
-            if (record.closedAt !== selectedContainer.closedAt) {
-                alertMsg = "Records are closed at a different date. Expected: " + transformDates(selectedContainer, getDateString).closedAt;
             }
         });
 
@@ -90,11 +90,6 @@ class AddToContainer extends Component {
         });
 
         return {selectedRecords, selectedContainers};
-    };
-
-    getUserLocations = () => {
-        //TODO: retreive user locations
-        return ["Burnaby", "Vancouver", "Richmond"];
     };
 
     handleChange(e) {
@@ -135,22 +130,22 @@ class AddToContainer extends Component {
     };
 
     handleSubmit = (event) => {
-        let recordIds = [];
-        this.state.selectedRecords.forEach(record => recordIds.push(record.id));
-        addRecordsToContainer(this.state.selectedContainers[0], recordIds, this.state.user.id).then(response => {
-            if (response.status !== 201) {
-                throw new Error(response.message);
-            } else {
+        addRecordToContainer(this.state.selectedContainers[0].id, this.state.selectedRecords[0], this.state.user.id)
+            .then(response => {
                 return response.json();
-            }
-        }).then(data => {
-            this.setState({success: true});
-            this.props.history.push("/viewContainer/" + data.containerId);
-        }).catch(err => {
-            this.setState({success: false});
-            this.setState({alertMsg: "Unable to create container: " + err.message});
-            window.scrollTo(0, 0);
-        });
+            })
+            .then(data => {
+                if (data.status !== 201) {
+                    throw new Error(data.message);
+                }
+                this.setState({success: true});
+                this.props.history.push("/viewContainer/" + data.containerId);
+            })
+            .catch(err => {
+                this.setState({success: false});
+                this.setState({alertMsg: "Unable to add to container: " + err.message});
+                window.scrollTo(0, 0);
+            });
         event.preventDefault();
     };
 
@@ -205,7 +200,7 @@ class AddToContainer extends Component {
                                 <p style={title}>
                                     <b>Location</b>
                                     <br/>
-                                    {container.location}
+                                    {container.locationName}
                                 </p>
                                 <p style={title}>
                                     <b>State</b>
@@ -220,14 +215,9 @@ class AddToContainer extends Component {
                                     {container.consignmentCode}
                                 </p>
                                 <p style={title}>
-                                    <b>Closed At:</b>
-                                    <br/>
-                                    {container.closedAt}
-                                </p>
-                                <p style={title}>
                                     <b>Schedule:</b>
                                     <br/>
-                                    {container.schedule}
+                                    {container.scheduleName}
                                 </p>
                             </Col>
                         </Row>
