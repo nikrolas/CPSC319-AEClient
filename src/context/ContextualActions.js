@@ -121,6 +121,14 @@ class ContextualActions extends Component {
                 color: 'white',
                 fontSize: '13px',
             },
+            greenbtn: {
+                float: 'left',
+                marginRight: '0.5cm',
+                backgroundColor: '#68d83b',
+                borderColor: 'white',
+                color: 'white',
+                fontSize: '13px',
+            },
             icons: {
                 marginRight: '5px',
                 transform: 'scale(1.5, 1.5)',
@@ -130,7 +138,7 @@ class ContextualActions extends Component {
         return (
             <div style={styles.btncontainer}>
                 <button className='btn btn-s'
-                        style={styles.bluebtn}
+                        style={styles.greenbtn}
                         disabled={!this.enableCreateVolume()}
                         onClick={() => {
                             goTo(this.props, "/createVolume")

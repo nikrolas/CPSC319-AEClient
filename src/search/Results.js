@@ -7,6 +7,7 @@ import Search from "./Search";
 import {getColumns, setData} from "../utilities/ReactTable";
 import ContextualActions from '../context/ContextualActions';
 import {searchByNumber} from "../api/SearchApi";
+import {Alert} from 'react-bootstrap';
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -18,6 +19,7 @@ class SelectTable extends Component {
         super(props);
         this.state = {
             user: props.userData,
+            alertMsg: "",
             data: [],
             columns: [],
             selection: [],
@@ -62,25 +64,42 @@ class SelectTable extends Component {
         this.state.onDataUpdateCallback(this.state.data, this.state.columns);
     };
 
-    search(page, pageSize, str) {
+    search(page, pageSize, num) {
         let searchOptions = {record: this.state.record, container: this.state.container};
-        let searchString = str ? str : this.props.match.params.searchString;
-        if (searchString) {
+        let searchString = num ? num : this.props.match.params.searchString;
+        if (searchString && page >= 0) {
             this.setState({loading: true,}, () => {
                     searchByNumber(searchString, searchOptions, page + 1, pageSize, this.state.user.id)
                         .then(response => {
                             return response.json()
                         })
                         .then((res) => {
-                            let accessor = !this.state.record ? containersResultsAccessors : recordsResultsAccessors;
-                            let columns = getColumns(this, accessor);
-                            setData(this, res.results, columns, () => {
-                                this.tableDataAndSelectionCallback();
-                            });
+                            if (res.error) {
+                                let msg = res.status + ": " + res.error;
+                                this.setState({alertMsg: msg});
+                                window.scrollTo(0, 0)
+                            }
+                            else if (res.status && res.status !== 200) {
+                                //console.log(JSON.stringify(data));
+                                this.setState({alertMsg: res.message});
+                                window.scrollTo(0, 0)
+                            }
+                            else {
+                                let accessor = !this.state.record ? containersResultsAccessors : recordsResultsAccessors;
+                                let columns = getColumns(this, accessor);
+                                setData(this, res.results, columns, () => {
+                                    this.tableDataAndSelectionCallback();
+                                });
+                            }
 
-                            let selectvalue = str ? 'none' : this.state.selectvalue;
-                            this.setState({loading: false, pages: res.pageCount, selectvalue, page, pageSize});
+                            let selectvalue = num ? 'none' : this.state.selectvalue;
+                            let pages = res.pageCount ? res.pageCount : -1;
+                            this.setState({loading: false, pages, selectvalue, page, pageSize});
                         })
+                        .catch(error => {
+                            this.setState({alertMsg: error, loading: false,});
+                            window.scrollTo(0, 0)
+                        });
                 }
             );
         }
@@ -198,7 +217,7 @@ class SelectTable extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, updateTray} = this;
-        const {data, columns, selectAll, selection, selectvalue, addbtntext, loading, pages, pageSize} = this.state;
+        const {data, columns, selectAll, selection, selectvalue, addbtntext, loading, pages, pageSize, alertMsg} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -208,6 +227,16 @@ class SelectTable extends Component {
         };
         return (
             <div style={styles.container}>
+                {alertMsg.length !== 0 && !this.state.success
+                    ? <Alert bsStyle="danger">
+                        <h3>{alertMsg}</h3>
+                        <button onClick={() => {
+                            this.setState({alertMsg: ""})
+                        }}>Close
+                        </button>
+                    </Alert>
+                    : null
+                }
                 <div style={{marginBottom: '1cm'}}>
                     <Search searchValue={this.props.match.params.searchString}/>
                 </div>
