@@ -5,7 +5,6 @@ import 'font-awesome/css/font-awesome.min.css';
 import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getColumns} from "../utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
-import {Alert} from 'react-bootstrap';
 import ContextualActions from "../context/ContextualActions";
 
 const CheckboxTable = checkboxHOC(ReactTable);
@@ -200,7 +199,7 @@ class WorkTray extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, removeAll} = this;
-        const {data, columns, selectAll, selection, alertMsg} = this.state;
+        const {data, columns, selectAll, selection} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -210,42 +209,30 @@ class WorkTray extends Component {
         };
 
         return (
-            <div>
-                {alertMsg.length !== 0 && !this.state.success
-                    ? <Alert bsStyle="danger">
-                        <h3>{alertMsg}</h3>
-                        <button onClick={() => {
-                            this.setState({alertMsg: ""})
-                        }}>Close
-                        </button>
-                    </Alert>
-                    : null
-                }
-                <div style={styles.container}>
-                    <h1>Work Tray</h1>
-                    <div style={styles.btncontainer}>
-                        <ContextualActions {...this.props}
-                                           selectedItemIndexes={selection}
-                                           resultsData={data}
-                                           columns={columns}/>
-                        <button className='btn btn-s'
-                                style={styles.clearbtn}
-                                onClick={removeAll}>
-                            <i className="fa fa-remove" style={styles.removeiconwhite}/>
-                            All
-                        </button>
-                    </div>
-                    <div style={styles.tablecontainer}>
-                        <CheckboxTable
-                            ref={(r) => this.checkboxTable = r}
-                            data={data}
-                            columns={columns}
-                            defaultPageSize={10}
-                            className="-striped -highlight"
+            <div style={styles.container}>
+                <h1>Work Tray</h1>
+                <div style={styles.btncontainer}>
+                    <ContextualActions {...this.props}
+                                       selectedItemIndexes={selection}
+                                       resultsData={data}
+                                       columns={columns}/>
+                    <button className='btn btn-s'
+                            style={styles.clearbtn}
+                            onClick={removeAll}>
+                        <i className="fa fa-remove" style={styles.removeiconwhite}/>
+                        All
+                    </button>
+                </div>
+                <div style={styles.tablecontainer}>
+                    <CheckboxTable
+                        ref={(r) => this.checkboxTable = r}
+                        data={data}
+                        columns={columns}
+                        defaultPageSize={10}
+                        className="-striped -highlight"
 
-                            {...checkboxProps}
-                        />
-                    </div>
+                        {...checkboxProps}
+                    />
                 </div>
             </div>
         );
