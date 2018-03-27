@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Alert, Grid, Row, Col, ButtonToolbar, Button} from 'react-bootstrap'
-import {addRecordsToContainer} from "../api/ContainersApi";
+import {addRecordToContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
 import {isARecordItem} from "../utilities/Items";
 import AlertDismissable from "../AlertDismissable";
@@ -63,16 +63,13 @@ class AddToContainer extends Component {
                 return;
             }
 
-            if (record.locationId !== selectedContainer.locationId) {
-                alertMsg = "Records are in a different location. Expected: " + selectedContainer.location;
+            if (selectedContainer.locationId && record.locationId !== selectedContainer.locationId) {
+                alertMsg = "Records are in a different location. Expected: " + selectedContainer.locationName;
                 return;
             }
-            if (record.scheduleId !== selectedContainer.scheduleId) {
-                alertMsg = "Records have a different schedule. Expected: " + selectedContainer.schedule;
+            if (selectedContainer.scheduleId && record.scheduleId !== selectedContainer.scheduleId) {
+                alertMsg = "Records have a different schedule. Expected: " + selectedContainer.scheduleName;
                 return;
-            }
-            if (record.closedAt !== selectedContainer.closedAt) {
-                alertMsg = "Records are closed at a different date. Expected: " + transformDates(selectedContainer, getDateString).closedAt;
             }
         });
 
@@ -133,17 +130,22 @@ class AddToContainer extends Component {
     };
 
     handleSubmit = (event) => {
-        addRecordsToContainer(this.state.selectedContainers[0].id, this.state.selectedRecords, this.state.user.id).then(data => {
-            if (data.status !== 201) {
-                throw new Error(response.message);
-            }
-            this.setState({success: true});
-            this.props.history.push("/viewContainer/" + data.containerId);
-        }).catch(err => {
-            this.setState({success: false});
-            this.setState({alertMsg: "Unable to create container: " + err.message});
-            window.scrollTo(0, 0);
-        });
+        addRecordToContainer(this.state.selectedContainers[0].id, this.state.selectedRecords[0], this.state.user.id)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.status !== 201) {
+                    throw new Error(data.message);
+                }
+                this.setState({success: true});
+                this.props.history.push("/viewContainer/" + data.containerId);
+            })
+            .catch(err => {
+                this.setState({success: false});
+                this.setState({alertMsg: "Unable to add to container: " + err.message});
+                window.scrollTo(0, 0);
+            });
         event.preventDefault();
     };
 

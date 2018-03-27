@@ -21,14 +21,22 @@ export function createContainer(data, userId) {
 }
 
 export function updateContainer(containerId, data, userId) {
-    return fetch(serviceRoot + containerPath + containerId + '?userId=' + userId, {
+    return fetch(serviceRoot + containerPath + "/" + containerId + '?userId=' + userId, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
-    })
+        body: JSON.stringify({
+            containerNumber: data.responseJson.containerNumber,
+            title: data.title,
+            location: data.location,
+            containerId: data.responseJson.containerId,
+            stateId: data.stateId,
+            consignmentCode: data.consignmentCode,
+            notes: data.notes
+        })
+    });
 }
 
 export function deleteContainers(ids, userId) {
@@ -38,18 +46,9 @@ export function deleteContainers(ids, userId) {
     });
 }
 
-export function addRecordsToContainer(containerId, records, userId) {
-    let promises = [];
-    records.forEach(record => {
-        let state = record;
-        state.containerId = containerId;
-        state.user = {id: userId};
-        promises.push(
-            updateRecord(record.id, state)
-                .then(response => {
-                    return response.json();
-                }));
-    });
-
-    return Promise.all(promises);
+export function addRecordToContainer(containerId, record, userId) {
+    let state = record;
+    state.containerId = containerId;
+    state.user = {id: userId};
+    return updateRecord(record.id, state);
 }

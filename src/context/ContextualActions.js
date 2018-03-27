@@ -46,8 +46,8 @@ class ContextualActions extends Component {
         this.setState(newCounts);
     };
 
-    recordsWithAContainer = () => {
-        return this.state.records > 0 && this.state.containers === 1;
+    recordWithAContainer = () => {
+        return this.state.records === 1 && this.state.containers === 1;
     };
 
     recordsOnly = () => {
@@ -149,7 +149,7 @@ class ContextualActions extends Component {
                 </button>
                 <button className='btn btn-s'
                         style={styles.bluebtn}
-                        disabled={!this.recordsWithAContainer()}
+                        disabled={!this.recordWithAContainer()}
                         onClick={() => {
                             goTo(this.props, "/addToContainer")
                         }}>
