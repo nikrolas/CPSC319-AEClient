@@ -260,8 +260,10 @@ class CreateContainer extends Component {
                             : null
                         }
                     </FormGroup>
-                    <Button type="submit">Cancel</Button>
-                    <Button type="submit">Submit</Button>
+                    <Button bsStyle="danger" style={{marginRight: '10px'}} onClick={() => {
+                        this.props.history.goBack()
+                    }}>Cancel</Button>
+                    <Button bsStyle="primary" type="submit">Submit</Button>
                 </form>
                 <div style={styles.container}>
                     <strong>Records to contain:</strong>
