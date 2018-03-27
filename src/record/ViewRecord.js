@@ -112,7 +112,7 @@ class ViewRecord extends Component {
 
     handleRemoveFromContainer = () => {
         let recordState = JSON.parse(JSON.stringify(this.state.recordJson));
-        recordState.responseJson = {classifications: recordState.classIds};
+        recordState.classificationBack = recordState.classIds;
         recordState.containerNumber = "";
         recordState.retentionSchedule = recordState.scheduleId;
         recordState.user = JSON.parse(JSON.stringify(this.state.user));

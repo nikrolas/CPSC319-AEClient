@@ -140,18 +140,23 @@ class CreateContainer extends Component {
             }
         }
         if (!failValidation) {
-            const formData = (({title, location, notes, selectedRecords}) => ({
-                title,
-                location,
-                notes,
-                selectedRecords
-            }))(this.state);
+            let state = JSON.parse(JSON.stringify(this.state));
 
+            let formData =
+                 {
+                    title: state.title,
+                    location: state.location,
+                    notes: state.notes
+                };
             //TODO: workaround - remove!
-            formData.containerNumber = "9999/999-ZZZ";
+            let code = "TOR";
+            if (this.state.locations[0] && this.state.locations[0].locationCode) {
+                code = this.state.locations[0].locationCode.toUpperCase();
+            }
+            formData.containerNumber = "2019/123-" + code;
 
             let selectedRecordIds = [];
-            formData.selectedRecords.forEach(record => {
+            state.selectedRecords.forEach(record => {
                 selectedRecordIds.push(record.id);
             });
             formData.records = selectedRecordIds;
@@ -235,14 +240,14 @@ class CreateContainer extends Component {
                         <FormControl
                             name="location"
                             componentClass="select"
-                            value = {this.state.location}
+                            value={this.state.location}
                         >
                             {listLocationJson}
                         </FormControl>
                         <FormControl.Feedback/>
-                        { this.state.locationValidationState === "error"
-                            ?<HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            :null
+                        {this.state.locationValidationState === "error"
+                            ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
+                            : null
                         }
                     </FormGroup>
                     <FormGroup

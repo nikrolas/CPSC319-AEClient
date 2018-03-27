@@ -19,10 +19,7 @@ class ViewContainer extends Component {
             {
                 user: props.userData,
                 alertMsg: "",
-                location: "N/A",
-                state: "N/A",
-                schedule: "N/A",
-                closedAt: "N/A",
+                closedAt: null,
                 data: [],
                 columns: columns,
                 records: [],
@@ -35,9 +32,9 @@ class ViewContainer extends Component {
                     locationName: "",
                     title: "",
                     type: "",
-                    location: "",
-                    stateName: "",
-                    scheduleName: "",
+                    location: null,
+                    state: null,
+                    scheduleName: null,
                     consignmentCode: "",
                     destructionDate: "",
                     createdAt: "",
@@ -55,16 +52,27 @@ class ViewContainer extends Component {
             this.props.history.push("/");
         }
         getContainerById(this.props.match.params.containerId, this.state.user.id)
-            .then(response => response.json())
+            .then(response => {
+                if (response.status === 404) {
+                    this.props.history.push("/notFound");
+                }
+                else if (response.status !== 200) {
+                    throw new Error(response.message);
+                } else {
+                    return response.json()
+                }
+            })
             .then(data => {
                 if (data && !data.exception) {
                     transformDates(data, getDateTimeString);
                     this.setState({containerJson: data});
-                }
 
-                let recordIds = data.childRecordIds;
-                if (recordIds && recordIds.length > 0) {
-                    this.setRecords(recordIds)
+                    let recordIds = data.childRecordIds;
+                    if (recordIds && recordIds.length > 0) {
+                        this.setRecords(recordIds)
+                    }
+                } else {
+                    throw new Error(data.message);
                 }
             })
             .catch(err => {
@@ -74,13 +82,18 @@ class ViewContainer extends Component {
 
 
     setRecordsState = (records) => {
-        let firstRecord = records[0];
+        let latestClosedAtRecord = records[0];
+
+        records.forEach(r => {
+            if (latestClosedAtRecord < r.closedAt) {
+                latestClosedAtRecord = r;
+            }
+        });
+
         let newState = {
             records: records,
-            location: firstRecord.location,
-            state: firstRecord.state,
-            closedAt: getDateTimeString(new Date(firstRecord.closedAt)),
-            schedule: firstRecord.schedule + " (" + firstRecord.scheduleYear + ")"
+            closedAt: getDateTimeString(new Date(latestClosedAtRecord.closedAt)),
+            scheduleYear: latestClosedAtRecord.scheduleYear
         };
 
         newState.records.forEach(record => {
@@ -176,17 +189,17 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Location</b>
                                 <br/>
-                                {this.state.location}
+                                {this.state.containerJson.location ? this.state.containerJson.location : "N/A"}
                             </p>
                             <p style={title}>
                                 <b>State</b>
                                 <br/>
-                                {this.state.state}
+                                {this.state.containerJson.state ? this.state.containerJson.state : "N/A"}
                             </p>
                             <p style={title}>
                                 <b>Consignment Code</b>
                                 <br/>
-                                {this.state.containerJson["consignmentCode"]}
+                                {this.state.containerJson["consignmentCode"] ? this.state.containerJson["consignmentCode"] : "(none)"}
                             </p>
                         </Col>
                         <Col md={5}>
@@ -203,12 +216,12 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Closed At:</b>
                                 <br/>
-                                {this.state.closedAt}
+                                {this.state.closedAt ? this.state.closedAt : "N/A"}
                             </p>
                             <p style={title}>
                                 <b>Retention Schedule:</b>
                                 <br/>
-                                {this.state.schedule}
+                                {this.state.containerJson.scheduleName ? this.state.containerJson.scheduleName + " (" + this.state.scheduleYear + ")" : "N/A"}
                             </p>
                         </Col>
                         <Col md={9} mdOffset={3}>
