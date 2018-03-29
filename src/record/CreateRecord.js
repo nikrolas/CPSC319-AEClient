@@ -31,6 +31,7 @@ class CreateRecord extends Component {
                 locationValidationMsg:"",
                 locationValidationState:"success",
                 location: null,
+                locationSelectedIndex: 0,
 
                 recordNumberValidationMsg:"",
                 recordNumberValidationState:null,
@@ -141,6 +142,7 @@ class CreateRecord extends Component {
                     }
                 }
                 if(e.target.name === "location") {
+                    this.setState({locationSelectedIndex: e.target.selectedIndex});
                     const length = this.state.location.length;
                     if (length >= 1) {
                         this.setState({locationValidationState: 'success'});
@@ -301,7 +303,7 @@ class CreateRecord extends Component {
     numberPatternRules(pattern) {
         let finalPattern = pattern;
         if(finalPattern.includes("KKK")){
-            let capitalizedData = this.state.user.locations[0].locationCode.toUpperCase();
+            let capitalizedData = this.state.user.locations[this.state.locationSelectedIndex].locationCode.toUpperCase();
             finalPattern = finalPattern.replace(/^.{3}/g,capitalizedData);
         }
         if(finalPattern.includes("yyyy")){
