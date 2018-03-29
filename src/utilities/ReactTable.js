@@ -17,6 +17,20 @@ export const accessorHeaderMapping = {
 
 export function getColumns(context, accessors) {
     const columns = [];
+    if (context.state && context.state.selectvalue && context.state.selectvalue === "none") {
+        columns.push({
+            accessor: "icon",
+            sortable: false,
+            resizable: false,
+            width: 25,
+            Cell: e => <div>{
+                e.value === "record" ?
+                    <i className="fa fa-folder-o" style={{color: '#6de23e'}}/> :
+                    <i className="fa fa-cube" style={{color: '#3cb5ff'}}/>
+            }</div>
+        });
+    }
+
     context.handleClick = handleClick;
     if (accessors) {
         accessors.forEach((accessor) => {
@@ -52,7 +66,7 @@ export function getColumns(context, accessors) {
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
                     minWidth: 140,
-                    Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>{e.value}</div>
+                    //Cell: e => <div style={{textAlign: 'left', paddingLeft: '3px'}}>{e.value}</div>
                 });
             } else if (accessor === "consignmentCode") {
                 columns.push({
@@ -60,7 +74,8 @@ export function getColumns(context, accessors) {
                     Header: accessorHeaderMapping[accessor],
                     minWidth: 140,
                 });
-            } else {
+            }
+            else {
                 columns.push({
                     accessor: accessor,
                     Header: accessorHeaderMapping[accessor],
@@ -103,8 +118,10 @@ export function setData(context, data, columns, callback) {
     if (data) {
         rowdata = data.map((item, index) => {
             const _id = index;
+            const icon = item.hasOwnProperty("number") ? "record" : "container";
             return {
                 _id,
+                icon,
                 ...item,
             }
         });
