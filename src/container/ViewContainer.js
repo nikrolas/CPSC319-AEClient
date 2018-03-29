@@ -7,6 +7,9 @@ import ReactTable from "react-table";
 import {getColumns, setData} from "../utilities/ReactTable";
 import {getDateString, getDateTimeString, transformDates} from "../utilities/DateTime";
 import {Link} from 'react-router-dom';
+import {destroyAction} from "../bulk/Action";
+import {containersResultsAccessors} from "../search/Results";
+import {goTo} from "../context/ContextualActions";
 
 
 class ViewContainer extends Component {
@@ -44,7 +47,7 @@ class ViewContainer extends Component {
                 },
             };
         this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentWillMount() {
@@ -65,7 +68,10 @@ class ViewContainer extends Component {
             .then(data => {
                 if (data && !data.exception) {
                     transformDates(data, getDateTimeString);
-                    this.setState({containerJson: data});
+                    this.setState({containerJson: data}, () => {
+                        this.props.onDataUpdate([data], getColumns(this, containersResultsAccessors));
+                        this.props.onItemSelect([0]);
+                    });
 
                     let recordIds = data.childRecordIds;
                     if (recordIds && recordIds.length > 0) {
@@ -79,6 +85,12 @@ class ViewContainer extends Component {
                 console.error("Error loading container: " + err.message);
             });
     };
+
+    bulkAction = (action) => {
+        this.props.onSelectAction(action);
+        goTo(this.props, "/confirmAction");
+    };
+
 
 
     setRecordsState = (records) => {
@@ -130,12 +142,15 @@ class ViewContainer extends Component {
 
     }
 
-    handleSubmit() {
-        deleteContainers(this.props.match.params.containerId, this.state.user.id)
+    handleDelete() {
+        deleteContainers([this.props.match.params.containerId], this.state.user.id)
             .then(response => {
-                if (response.status !== 200) {
-                    this.setState({alertMsg: response.statusText + ": Container must be empty."});
-                    window.scrollTo(0, 0)
+                return response.json();
+            })
+            .then(result => {
+                if (result.status !== 200) {
+                        this.setState({alertMsg: result.error + ": " + result.numbers});
+                        window.scrollTo(0, 0);
                 }
                 else {
                     this.props.history.goBack();
@@ -152,35 +167,29 @@ class ViewContainer extends Component {
         };
         let btnStyle = {
             display: "flex",
-            justifyContent: "center"
+            justifyContent: "left",
+            marginTop: "20px"
+        };
+        let table = {
+            marginTop: "20px"
         };
 
         let containerNumber = this.state.containerJson["containerNumber"];
 
         return (
             <div>
-                {this.state.alertMsg.length !== 0
+                {this.state.alertMsg && this.state.alertMsg.length !== 0
                     ? <Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
-                <h1>{containerNumber}</h1>
-                <ButtonToolbar style={btnStyle}>
-                    <Link to={updateContainerLink}>
-                        <Button bsStyle="primary"> Edit Container </Button>
-                    </Link>
-                    <Confirm
-                        onConfirm={this.handleSubmit}
-                        body={"Are you sure you want to delete " + containerNumber + "?"}
-                        confirmText="Confirm Delete"
-                        title="Deleting Container">
-                        <Button bsStyle="danger">Delete Container</Button>
-                    </Confirm>
-                </ButtonToolbar>
-                <br/>
-                <br/>
                 <Grid>
                     <Row>
-                        <Col md={4} mdOffset={3}>
+                        <Col md={10} mdOffset={2}>
+                            <h1 style={title}>{containerNumber}</h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={4} mdOffset={2}>
                             <p style={title}>
                                 <b>Title</b>
                                 <br/>
@@ -202,7 +211,7 @@ class ViewContainer extends Component {
                                 {this.state.containerJson["consignmentCode"] ? this.state.containerJson["consignmentCode"] : "(none)"}
                             </p>
                         </Col>
-                        <Col md={5}>
+                        <Col md={4}>
                             <p style={title}>
                                 <b>Created At:</b>
                                 <br/>
@@ -224,7 +233,7 @@ class ViewContainer extends Component {
                                 {this.state.containerJson.scheduleName ? this.state.containerJson.scheduleName + " (" + this.state.scheduleYear + ")" : "N/A"}
                             </p>
                         </Col>
-                        <Col md={9} mdOffset={3}>
+                        <Col md={10} mdOffset={2}>
                             <p style={title}>
                                 <b>Notes</b>
                                 <br/>
@@ -233,23 +242,45 @@ class ViewContainer extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <div>
-                            <strong>Contained Records:</strong>
-                            <div>
-                                <ReactTable
-                                    data={this.state.data}
-                                    columns={this.state.columns}
-                                    className="-striped -highlight"
-                                    minRows={5}
-                                    showPagination={true}
-                                    defaultPageSize={5}
-                                />
+                        <Col md={9} mdOffset={2}>
+                            <div style={table}>
+                                <strong>Contained Records:</strong>
+                                <div>
+                                    <ReactTable
+                                        data={this.state.data}
+                                        columns={this.state.columns}
+                                        className="-striped -highlight"
+                                        minRows={5}
+                                        showPagination={true}
+                                        defaultPageSize={5}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={9} mdOffset={2}>
+                            <ButtonToolbar style={btnStyle}>
+                                <Link to={updateContainerLink}>
+                                    <Button bsStyle="primary"> Edit Container </Button>
+                                </Link>
+                                <Button bsStyle="warning"
+                                        onClick={() => this.bulkAction(destroyAction)}>
+                                    Destroy
+                                </Button>
+                                <Confirm
+                                    onConfirm={this.handleDelete}
+                                    body={"Are you sure you want to delete " + containerNumber + "?"}
+                                    confirmText="Confirm Delete"
+                                    title="Deleting Container">
+                                    <Button bsStyle="danger">Delete</Button>
+                                </Confirm>
+                            </ButtonToolbar>
+                        </Col>
                     </Row>
                 </Grid>
             </div>
-        )
+        );
     }
 }
 

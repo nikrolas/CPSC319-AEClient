@@ -143,7 +143,7 @@ class CreateContainer extends Component {
             let state = JSON.parse(JSON.stringify(this.state));
 
             let formData =
-                 {
+                {
                     title: state.title,
                     location: state.location,
                     notes: state.notes
@@ -160,21 +160,37 @@ class CreateContainer extends Component {
                 selectedRecordIds.push(record.id);
             });
             formData.records = selectedRecordIds;
+            formData.locationId = this.state.location.locationId;
 
-            createContainer(formData, this.state.user.id).then(response => {
-                if (response.status !== 201) {
-                    throw new Error(response.message);
-                } else {
+            let success = false;
+            createContainer(formData, this.state.user.id)
+                .then(response => {
+                    if (response.ok) {
+                        success = true;
+                    }
                     return response.json();
-                }
-            }).then(data => {
-                this.setState({success: true});
-                this.props.history.push("/viewContainer/" + data.containerId);
-            }).catch(err => {
-                this.setState({success: false});
-                this.setState({alertMsg: "Unable to create container: " + err.message});
-                window.scrollTo(0, 0);
-            });
+                })
+                .then(data => {
+                    if (success) {
+                        this.setState({success: true});
+                        this.props.history.push("/viewContainer/" + data.containerId);
+                    } else {
+                        this.setState({success: false});
+                        window.scrollTo(0, 0);
+
+                        if (data.exception) {
+                            this.setState({alertMsg: data.message});
+                        }
+                        else {
+                            this.setState({alertMsg: data.error + ": " + data.number});
+                        }
+                    }
+                })
+                .catch(err => {
+                    this.setState({success: false});
+                    this.setState({alertMsg: "An unexpected error occured. Please try again later. " + err});
+                    window.scrollTo(0, 0);
+                });
         }
         event.preventDefault();
     }

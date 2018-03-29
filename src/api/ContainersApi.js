@@ -11,7 +11,7 @@ export function getContainerById(containerId, userId) {
 export function createContainer(data, userId) {
     let path = serviceRoot + containerPath + "?userId=" + userId;
     return fetch(path, {
-        method: 'post',
+        method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export function updateContainer(containerId, data, userId) {
         body: JSON.stringify({
             containerNumber: data.responseJson.containerNumber,
             title: data.title,
-            location: data.location,
+            locationId: data.location.locationId,
             containerId: data.responseJson.containerId,
             stateId: data.stateId,
             consignmentCode: data.consignmentCode,
@@ -40,9 +40,16 @@ export function updateContainer(containerId, data, userId) {
 }
 
 export function deleteContainers(ids, userId) {
-    let path = serviceRoot + containersPath + "?ids=" + ids + "&userId=" + userId;
+    let path = serviceRoot + containersPath + "?userId=" + userId;
     return fetch(path, {
-        method: 'delete'
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            containerIds: ids
+        })
     });
 }
 

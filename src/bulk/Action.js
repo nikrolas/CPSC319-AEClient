@@ -9,7 +9,7 @@ function getRecordsAndContainersIds(items) {
     let containerIds = [];
     let containedRecordsIds = [];
     containers.forEach(c => {
-        containerIds.push(c.id);
+        containerIds.push(c.containerId);
         containedRecordsIds = containedRecordsIds.concat(c.childRecordIds)
     });
 
@@ -80,9 +80,7 @@ function deleteContainersOfSelectedRecords(items, containerIds, uniqueRecordIds,
     });
 
     containerIdsOfSelectedRecords = new Set(containerIdsOfSelectedRecords);
-
     let uniqueContainerIdsOfSelectedRecords = Array.from(containerIdsOfSelectedRecords);
-    return {containerIds, uniqueRecordIds};
 
     return new Promise((resolve, reject) => {
 
@@ -130,13 +128,14 @@ export let destroyAction = {
 
         return new Promise((resolve, reject) => {
             let success = false;
+            let cIds = containerIds;
             if (uniqueRecordIds && uniqueRecordIds.length > 0) {
                 destroySelectedRecords(uniqueRecordIds, userId)
                     .then((destroyMsg) => {
-                        if (containerIds && containerIds.length > 0 && option) {
+                        if (cIds && cIds.length > 0 && option) {
                             let promises = [
-                                deleteSelectedContainers(containerIds, userId),
-                                deleteContainersOfSelectedRecords(items, containerIds, uniqueRecordIds, userId)
+                                deleteSelectedContainers(cIds, userId),
+                                deleteContainersOfSelectedRecords(items, cIds, uniqueRecordIds, userId)
                             ];
                             Promise.all(promises)
                                 .then((deleteMsg) => {
@@ -166,7 +165,7 @@ export let destroyAction = {
             } else if (containerIds.length === 0 && uniqueRecordIds.length === 0) {
                 reject("No items were selected.");
             } else {
-                console.error("Unknown bulk action state.");
+                console.error("Unexpected bulk action state.");
                 reject("An unexpected error occurred. Please try again later.");
             }
         });
@@ -183,38 +182,41 @@ export let deleteAction = {
             if (uniqueRecordIds.length > 0) {
                 deleteRecordByIds(uniqueRecordIds, userId)
                     .then(response => {
-                        if (response.status !== 200) {
-                            reject("Failed to delete records.");
+                        response.json();
+                    })
+                    .then(result => {
+                        if (result.status !== 200) {
+                            reject("Failed to delete records. " + result.error + " Items: " + result.numbers);
                         }
                         if (containerIds.length > 0) {
-                            deleteContainers(containerIds, userId)
-                                .then(response => {
-                                    if (response.status !== 200) {
-                                        reject("Failed to delete containers.");
-                                    }
-                                    resolve("Successfully deleted the records and containers.")
+                            deleteSelectedContainers(containerIds, userId)
+                                .then(result => {
+                                    resolve(result);
                                 })
                                 .catch(error => {
                                     reject(error);
-                                })
+                                });
                         } else {
                             resolve("Successfully deleted the records.")
                         }
                     })
                     .catch(error => {
-                        reject(error);
+                        console.error(error);
+                        reject("An unexpected error occurred while deleting records. Please try again later.");
                     });
             } else if (containerIds.length > 0) {
-                deleteContainers(containerIds, userId)
-                    .then(response => {
-                        if (response.status !== 200) {
-                            reject("Failed to delete containers.");
-                        }
-                        resolve("Successfully deleted the containers.")
+                deleteSelectedContainers(containerIds, userId)
+                    .then(result => {
+                        resolve(result);
                     })
                     .catch(error => {
                         reject(error);
-                    })
+                    });
+            } else if (containerIds.length === 0 && uniqueRecordIds.length === 0) {
+                reject("No items were selected.");
+            } else {
+                console.error("Unexpected bulk action state.");
+                reject("An unexpected error occurred. Please try again later.");
             }
         });
     }

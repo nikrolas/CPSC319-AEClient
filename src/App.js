@@ -193,6 +193,7 @@ class App extends Component {
                                       component={ViewRecord}
                                       onItemSelect={this.setselectedItemIndexes}
                                       onDataUpdate={this.setResultsStates}
+                                      onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}
                         />
@@ -203,6 +204,9 @@ class App extends Component {
                         />
                         <PrivateRoute path='/viewContainer/:containerId?'
                                       component={ViewContainer}
+                                      onItemSelect={this.setselectedItemIndexes}
+                                      onDataUpdate={this.setResultsStates}
+                                      onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
                                       authenticated={this.state.userAuthenticated}
                         />

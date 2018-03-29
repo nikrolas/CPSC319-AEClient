@@ -6,6 +6,8 @@ import {Confirm} from 'react-confirm-bootstrap'
 import {getDateTimeString} from "../utilities/DateTime";
 import {recordsResultsAccessors} from "../search/Results";
 import {getColumns} from "../utilities/ReactTable";
+import {destroyAction} from "../bulk/Action";
+import {goTo} from "../context/ContextualActions";
 
 
 class ViewRecord extends Component {
@@ -58,7 +60,7 @@ class ViewRecord extends Component {
                 }
             })
             .then(data => {
-                if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
+                if (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500) {
                     let status = data.status ? data.status : "";
                     let err = data.error ? " " + data.error : "";
                     let msg = data.message ? ": " + data.message : "";
@@ -78,6 +80,10 @@ class ViewRecord extends Component {
             });
     }
 
+    bulkAction = (action) => {
+        this.props.onSelectAction(action);
+        goTo(this.props, "/confirmAction");
+    };
 
     setData = (context, data, callback) => {
         let keys = Object.keys(data);
@@ -99,7 +105,7 @@ class ViewRecord extends Component {
                 return response.json();
             })
             .then(data => {
-                if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
+                if (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500) {
                     this.setState({alertMsg: data.message, success: false});
                     window.scrollTo(0, 0)
                 }
@@ -254,6 +260,10 @@ class ViewRecord extends Component {
                                     <Button bsStyle="warning" disabled={!this.isInContainer()}>Remove From
                                         Container</Button>
                                 </Confirm>
+                                <Button bsStyle="warning"
+                                        onClick={() => this.bulkAction(destroyAction)}>
+                                    Destroy
+                                </Button>
                                 <Confirm
                                     onConfirm={this.handleSubmit}
                                     body="Are you sure you want to delete this?"
