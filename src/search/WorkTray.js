@@ -27,7 +27,7 @@ class WorkTray extends Component {
 
     componentDidMount() {
         //const data = this.props.location.state.traydata;
-        let stored = sessionStorage.getItem("tray" + this.state.user.id);
+        let stored = localStorage.getItem("tray" + this.state.user.id);
         if (stored) {
             //console.log("stored: " + stored);
             const data = JSON.parse(stored).map((item, index) => {
@@ -119,14 +119,14 @@ class WorkTray extends Component {
         });
         //console.log(JSON.stringify(this.state.data));
 
-        let stored = JSON.parse(sessionStorage.getItem("tray" + this.state.user.id));
+        let stored = JSON.parse(localStorage.getItem("tray" + this.state.user.id));
         stored.splice(rowindex, 1);
-        sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(stored));
+        localStorage.setItem("tray" + this.state.user.id, JSON.stringify(stored));
         //console.log(JSON.stringify(stored));
     };
 
     removeAll = () => {
-        sessionStorage.removeItem("tray" + this.state.user.id);
+        localStorage.removeItem("tray" + this.state.user.id);
         this.setState({data: [], columns: [], selection: [], selectAll: false}, () => {
             this.state.onItemSelectCallback(this.state.selection);
             this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
@@ -135,10 +135,10 @@ class WorkTray extends Component {
 
     removeSelected = () => {
         let selection = [...this.state.selection];
-        let stored = [...JSON.parse(sessionStorage.getItem("tray" + this.state.user.id))];
+        let stored = [...JSON.parse(localStorage.getItem("tray" + this.state.user.id))];
 
         let data = stored.filter((item, index) => selection.indexOf(index) < 0);
-        sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(data));
+        localStorage.setItem("tray" + this.state.user.id, JSON.stringify(data));
 
         data.forEach((item, index) => {
             //recalculate index
@@ -208,34 +208,36 @@ class WorkTray extends Component {
             selectType: 'checkbox',
         };
 
-        return (
-            <div style={styles.container}>
-                <h1>Work Tray</h1>
-                <div style={styles.btncontainer}>
-                    <ContextualActions {...this.props}
-                                       selectedItemIndexes={selection}
-                                       resultsData={data}
-                                       columns={columns}/>
-                    <button className='btn btn-s'
-                            style={styles.clearbtn}
-                            onClick={removeAll}>
-                        <i className="fa fa-remove" style={styles.removeiconwhite}/>
-                        All
-                    </button>
-                </div>
-                <div style={styles.tablecontainer}>
-                    <CheckboxTable
-                        ref={(r) => this.checkboxTable = r}
-                        data={data}
-                        columns={columns}
-                        defaultPageSize={10}
-                        className="-striped -highlight"
+        if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "" && this.state.user.role !== "General")
+            return (
+                <div style={styles.container}>
+                    <h1>Work Tray</h1>
+                    <div style={styles.btncontainer}>
+                        <ContextualActions {...this.props}
+                                           selectedItemIndexes={selection}
+                                           resultsData={data}
+                                           columns={columns}/>
+                        <button className='btn btn-s'
+                                style={styles.clearbtn}
+                                onClick={removeAll}>
+                            <i className="fa fa-remove" style={styles.removeiconwhite}/>
+                            All
+                        </button>
+                    </div>
+                    <div style={styles.tablecontainer}>
+                        <CheckboxTable
+                            ref={(r) => this.checkboxTable = r}
+                            data={data}
+                            columns={columns}
+                            defaultPageSize={10}
+                            className="-striped -highlight"
 
-                        {...checkboxProps}
-                    />
+                            {...checkboxProps}
+                        />
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        else return null;
     }
 }
 

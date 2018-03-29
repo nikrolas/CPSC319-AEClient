@@ -135,52 +135,54 @@ class ContextualActions extends Component {
             },
         };
 
-        return (
-            <div style={styles.btncontainer}>
-                <button className='btn btn-s'
-                        style={styles.greenbtn}
-                        disabled={!this.enableCreateVolume()}
-                        onClick={() => {
-                            goTo(this.props, "/createVolume")
-                        }}>
-                    <MdCreateNewFolder style={styles.icons}/>
-                    Volume
-                </button>
-                <button className='btn btn-s'
-                        style={styles.bluebtn}
-                        disabled={!this.recordsOnly()}
-                        onClick={() => {
-                            goTo(this.props, "/createContainer")
-                        }}>
-                    <i className='fa fa-dropbox' style={styles.icons}/>
-                    Contain
-                </button>
-                <button className='btn btn-s'
-                        style={styles.bluebtn}
-                        disabled={!this.recordWithAContainer()}
-                        onClick={() => {
-                            goTo(this.props, "/addToContainer")
-                        }}>
-                    <MdLibraryAdd style={styles.icons}/>
-                    Add to container
-                </button>
-                <button className='btn btn-s'
-                        style={styles.destroybtn}
-                        disabled={!this.anySelection()}
-                        onClick={() => this.bulkAction(destroyAction)}>
-                    <i className="fa fa-flag" style={{marginRight: '5px'}}/>
-                    Destroy
-                </button>
-                <button className='btn btn-s'
-                        style={styles.delbtn}
-                        disabled={!this.anySelection()}
-                        onClick={() => this.bulkAction(deleteAction)}>
-                    <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
-                    Delete
-                </button>
-            </div>
-
-        );
+        if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "" && this.state.user.role !== "General") {
+            return (
+                <div style={styles.btncontainer}>
+                    <button className='btn btn-s'
+                            style={styles.greenbtn}
+                            disabled={!this.enableCreateVolume()}
+                            onClick={() => {
+                                goTo(this.props, "/createVolume")
+                            }}>
+                        <MdCreateNewFolder style={styles.icons}/>
+                        Volume
+                    </button>
+                    <button className='btn btn-s'
+                            style={styles.bluebtn}
+                            disabled={!this.recordsOnly()}
+                            onClick={() => {
+                                goTo(this.props, "/createContainer")
+                            }}>
+                        <i className='fa fa-dropbox' style={styles.icons}/>
+                        Contain
+                    </button>
+                    <button className='btn btn-s'
+                            style={styles.bluebtn}
+                            disabled={!this.recordWithAContainer()}
+                            onClick={() => {
+                                goTo(this.props, "/addToContainer")
+                            }}>
+                        <MdLibraryAdd style={styles.icons}/>
+                        Add to container
+                    </button>
+                    <button className='btn btn-s'
+                            style={styles.destroybtn}
+                            disabled={!this.anySelection()}
+                            onClick={() => this.bulkAction(destroyAction)}>
+                        <i className="fa fa-flag" style={{marginRight: '5px'}}/>
+                        Destroy
+                    </button>
+                    <button className='btn btn-s'
+                            style={styles.delbtn}
+                            disabled={!this.anySelection()}
+                            onClick={() => this.bulkAction(deleteAction)}>
+                        <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
+                        Delete
+                    </button>
+                </div>
+            )
+        }
+        else return null;
     }
 }
 
