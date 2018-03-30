@@ -17,13 +17,24 @@ class NavigationBar extends Component {
         let search = null;
         let workTray = null;
         let newRecord = null;
+        let locations = "";
+        if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "") {
+            for (let i = 0; i < this.state.user.locations.length; i ++ ){
+                if (i === 0) {
+                    locations += this.state.user.locations[i].locationName
+                }
+                else {
+                    locations += ", " + this.state.user.locations[i].locationName
+                }
+            }
+        }
         if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "") {
             userInfo =
                 <Nav pullRight={true}>
                     <NavItem>
-                        Signed in as: {this.state.user.firstName} {this.state.user.lastName} ({this.state.user.role})
+                        {this.state.user.firstName} {this.state.user.lastName} ({this.state.user.role})
                         <br/>
-                        Location: {this.state.user.locations[0].locationName}
+                        Location: {locations}
                     </NavItem>
                 </Nav>;
 

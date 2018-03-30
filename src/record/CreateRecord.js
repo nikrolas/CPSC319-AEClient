@@ -27,6 +27,7 @@ class CreateRecord extends Component {
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
                 recordType: null,
+                recordTypeSelectionIndex:0,
 
                 locationValidationMsg:"",
                 locationValidationState:"success",
@@ -133,6 +134,7 @@ class CreateRecord extends Component {
                 //Validation handling here
                 if(e.target.name === "recordType") {
                     this.numberPatternRules(this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]);
+                    this.setState({recordTypeSelectionIndex:e.target.selectedIndex-1});
                     const length = this.state.recordType.length;
                     if (length >= 1) {
                         this.setState({recordTypeValidationState: 'success'});
@@ -142,7 +144,9 @@ class CreateRecord extends Component {
                     }
                 }
                 if(e.target.name === "location") {
-                    this.setState({locationSelectedIndex: e.target.selectedIndex});
+                    this.setState({locationSelectedIndex: e.target.selectedIndex}, ()=> {
+                        this.numberPatternRules(this.state.recordTypeResponse[this.state.recordTypeSelectionIndex]["numberPattern"]);
+                    });
                     const length = this.state.location.length;
                     if (length >= 1) {
                         this.setState({locationValidationState: 'success'});
