@@ -192,7 +192,7 @@ class UpdateRecord extends Component {
             this.setState({[e.target.name]: e.target.value}, ()=> {
                 //Validation handling here
                 if(e.target.name === "recordNumber") {
-                    const length = this.state.responseJson["number"];
+                    const length = this.state.recordNumber.length;
                     if (length >= 1) {
                         this.setState({recordNumberValidationState: 'success'});
                     }
@@ -202,7 +202,7 @@ class UpdateRecord extends Component {
                     }
                 }
                 if(e.target.name === "title") {
-                    const length = this.state.responseJson["title"].length;
+                    const length = this.state.title.length;
                     if (length >= 1 && length < 256) {
                         this.setState({titleValidationState:'success'});
                     }
@@ -216,7 +216,7 @@ class UpdateRecord extends Component {
                 }
 
                 if(e.target.name === "location") {
-                    const length = this.state.responseJson["location"].length;
+                    const length = this.state.location.length;
                     if (length >= 1) {
                         this.setState({locationValidationState: 'success'});
                     }
