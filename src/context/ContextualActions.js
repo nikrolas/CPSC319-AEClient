@@ -7,6 +7,11 @@ export function goTo(props, url) {
     props.history.push(url);
 }
 
+export function bulkAction(context, action) {
+    context.props.onSelectAction(action);
+    goTo(context.props, "/confirmAction");
+}
+
 class ContextualActions extends Component {
 
     constructor(props) {
@@ -82,12 +87,6 @@ class ContextualActions extends Component {
         }
         else return false;
     };
-
-    bulkAction = (action) => {
-        this.props.onSelectAction(action);
-        goTo(this.props, "/confirmAction");
-    };
-
 
     render() {
         let styles = {
@@ -167,14 +166,14 @@ class ContextualActions extends Component {
                 <button className='btn btn-s'
                         style={styles.destroybtn}
                         disabled={!this.anySelection()}
-                        onClick={() => this.bulkAction(destroyAction)}>
+                        onClick={() => bulkAction(this, destroyAction)}>
                     <i className="fa fa-flag" style={{marginRight: '5px'}}/>
                     Destroy
                 </button>
                 <button className='btn btn-s'
                         style={styles.delbtn}
                         disabled={!this.anySelection()}
-                        onClick={() => this.bulkAction(deleteAction)}>
+                        onClick={() => bulkAction(this, deleteAction)}>
                     <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
                     Delete
                 </button>

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Row, Grid, Button, ButtonToolbar, Alert, Form, Checkbox} from 'react-bootstrap'
+import {Row, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import ReactTable from "react-table";
 import {getSelectedItems} from "../utilities/Items";
 
@@ -18,30 +18,31 @@ class ConfirmAction extends Component {
                 header: "",
                 prompt: "",
                 valid: true,
-                checked: false
+                actionsComplete: false
             };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentWillMount() {
         let data = getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
-        let {header, prompt, option, action} = this.props.actionProps;
+        let {header, prompt, action, onActionComplete} = this.props.actionProps;
         let columns = this.props.resultsColumns;
 
-        this.setState({data, columns, header, prompt, option, action});
+        this.setState({data, columns, header, prompt, action, onActionComplete});
     };
 
     enableAction = () => {
-        return this.state.valid && this.state.action && !this.state.success;
+        return this.state.valid && this.state.action && !this.state.actionsComplete;
     };
 
     handleSubmit = () => {
-        this.state.action(this.state.data, this.state.checked, this.state.user.id)
+        this.state.action(this.state.data, this.state.user.id)
             .then(result => {
-                this.setState({alertMsg: result, success: true});
+                this.setState({alertMsg: result, success: true, actionsComplete: true});
+                this.state.onActionComplete(this);
             })
             .catch(error => {
-                this.setState({alertMsg: "Failed to complete action: " + error, success: false});
+                this.setState({alertMsg: "Failed to complete action: " + error, success: false, actionsComplete: true});
             });
     };
 
@@ -50,22 +51,18 @@ class ConfirmAction extends Component {
     };
 
     render() {
-        let option = null;
-        if (this.state.option) {
-            option =
-                <Form>
-                    <Checkbox
-                        checked={this.state.checked}
-                        onChange={(e) => this.setState({checked: e.target.checked})}>
-                        {this.state.option}
-                    </Checkbox>
-                </Form>
-        }
-
         let btnToolbarStyle = {
             display: "flex",
             justifyContent: "center",
             marginTop: "30px"
+        };
+
+        let cancelButtonText = () => {
+            if (this.state.success) {
+                return "Done";
+            } else if (!this.state.success) {
+                return "Go Back"
+            }
         };
 
         return (
@@ -95,11 +92,8 @@ class ConfirmAction extends Component {
                         </div>
                     </Row>
                     <Row>
-                        {option}
-                    </Row>
-                    <Row>
                         <ButtonToolbar style={btnToolbarStyle}>
-                            <Button onClick={this.onCancel}> {this.state.success ? "Go Back" : "Cancel"} </Button>
+                            <Button onClick={this.onCancel}> {cancelButtonText()} </Button>
                             <Button bsStyle="warning" disabled={!this.enableAction()}
                                     onClick={this.handleSubmit}>Confirm</Button>
                         </ButtonToolbar>

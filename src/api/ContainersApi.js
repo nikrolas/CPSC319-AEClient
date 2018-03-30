@@ -8,6 +8,10 @@ export function getContainerById(containerId, userId) {
     return fetch(serviceRoot + containersPath + "/" + containerId + "?userId=" + userId);
 }
 
+export function getContainersByIds(containerIds, userId) {
+    return fetch(serviceRoot + containersPath + "?ids=" + containerIds + "?userId=" + userId);
+}
+
 export function createContainer(data, userId) {
     let path = serviceRoot + containerPath + "?userId=" + userId;
     return fetch(path, {
