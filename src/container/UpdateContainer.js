@@ -14,6 +14,7 @@ class UpdateContainer extends Component {
                 alertMsg: "",
 
                 containerNumber: null,
+                records: [],
 
                 titleValidationMsg: "",
                 titleValidationState: "success",
@@ -24,7 +25,7 @@ class UpdateContainer extends Component {
                 locationValidationMsg: "",
                 locationValidationState: "success",
                 location: null,
-
+                locationId: null,
 
                 //TODO State
                 stateValidationMsg: "",
@@ -63,11 +64,12 @@ class UpdateContainer extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({title: data.title});
-                this.setState({location: data.locationId});
+                this.setState({locationId: data.locationId});
                 this.setState({stateId: data.stateId});
                 this.setState({containerNumber: data.containerNumber});
                 this.setState({consignmentCode: data.consignmentCode});
                 this.setState({notes: data.notes});
+                this.setState({records: data.childRecordIds});
                 if (data && !data.exception) {
                     setData(that, data);
                 }

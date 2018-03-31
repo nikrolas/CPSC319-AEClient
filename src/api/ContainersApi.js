@@ -8,9 +8,9 @@ export function getContainerById(containerId, userId) {
     return fetch(serviceRoot + containersPath + "/" + containerId + "?userId=" + userId);
 }
 
-export function getContainersByIds(containerIds, userId) {
-    let stringContainerIds = containerIds.join(",");
-    return fetch(serviceRoot + containersPath + "?ids=" + stringContainerIds + "&userId=" + userId);
+
+export function getContainersByIds(ids, userId) {
+    return fetch(serviceRoot + containersPath + "?ids=" + ids + "&userId=" + userId);
 }
 
 export function createContainer(data, userId) {
@@ -33,13 +33,13 @@ export function updateContainer(containerId, data, userId) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            containerNumber: data.responseJson.containerNumber,
+            containerNumber: data.containerNumber,
             title: data.title,
-            locationId: data.location.locationId,
-            containerId: data.responseJson.containerId,
+            locationId: data.locationId,
             stateId: data.stateId,
             consignmentCode: data.consignmentCode,
-            notes: data.notes
+            notes: data.notes,
+            records: data.childRecordIds
         })
     });
 }

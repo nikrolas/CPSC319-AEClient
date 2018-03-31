@@ -6,6 +6,10 @@ export function getRecordById(recordId, userId) {
     return fetch(serviceRoot + recordsPath + "/" + recordId + "?userId=" + userId);
 }
 
+export function getRecordsByIds(ids, userId) {
+    return fetch(serviceRoot + recordsPath + "?ids=" + ids + "&userId=" + userId);
+}
+
 export function getRecordType() {
     return fetch(serviceRoot + "/recordtypes");
 }

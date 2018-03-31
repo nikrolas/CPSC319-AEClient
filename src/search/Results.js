@@ -141,8 +141,6 @@ class SelectTable extends Component {
     };
 
     updateTray = () => {
-        //console.log('selection: ', this.state.selection);
-        //console.log("tray: "+JSON.stringify(this.state.tray));
         let tray = [...this.state.tray];
         let updated = false;
         this.state.selection.forEach((id) => {
@@ -158,7 +156,6 @@ class SelectTable extends Component {
         });
         if (updated) {
             this.setState({tray, addbtntext: 'Success'});
-            console.log(this.state.user.id);
             localStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
             setTimeout(() => {
                 this.setState({addbtntext: 'Add to Tray'});
