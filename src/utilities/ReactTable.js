@@ -17,19 +17,17 @@ export const accessorHeaderMapping = {
 
 export function getColumns(context, accessors) {
     const columns = [];
-    if (context.state && context.state.selectvalue && context.state.selectvalue === "none") {
-        columns.push({
-            accessor: "icon",
-            sortable: false,
-            resizable: false,
-            width: 25,
-            Cell: e => <div>{
-                e.value === "record" ?
-                    <i className="fa fa-folder-o" style={{color: '#6de23e'}}/> :
-                    <i className="fa fa-cube" style={{color: '#3cb5ff'}}/>
-            }</div>
-        });
-    }
+    columns.push({
+        accessor: "icon",
+        sortable: false,
+        resizable: false,
+        width: 25,
+        Cell: e => <div>{
+            e.value === "record" ?
+                <i className="fa fa-folder-o" style={{color: '#6de23e'}}/> :
+                <i className="fa fa-cube" style={{color: '#3cb5ff'}}/>
+        }</div>
+    });
 
     context.handleClick = handleClick;
     if (accessors) {

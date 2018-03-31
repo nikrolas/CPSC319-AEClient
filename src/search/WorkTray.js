@@ -6,6 +6,9 @@ import checkboxHOC from 'react-table/lib/hoc/selectTable';
 import {getColumns} from "../utilities/ReactTable";
 import {recordsResultsAccessors} from "./Results";
 import ContextualActions from "../context/ContextualActions";
+import {Alert} from 'react-bootstrap';
+import {getRecordsByIds} from "../api/RecordsApi";
+import {getContainersByIds} from "../api/ContainersApi";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -14,7 +17,7 @@ class WorkTray extends Component {
         super(props);
         this.state = {
             success: false,
-            alertMsg: "",
+            alertMsgs: [],
             data: [],
             columns: [],
             selection: [],
@@ -25,24 +28,81 @@ class WorkTray extends Component {
         };
     }
 
-    componentDidMount() {
-        //const data = this.props.location.state.traydata;
+    componentWillMount() {
         let stored = localStorage.getItem("tray" + this.state.user.id);
-        if (stored) {
-            //console.log("stored: " + stored);
-            const data = JSON.parse(stored).map((item, index) => {
-                const _id = index;
-                return {
-                    _id,
-                    ...item,
-                }
+        if (stored && stored.length > 0) {
+            stored = JSON.parse(stored);
+            let ids = {records: [], containers: []};
+            stored.forEach((item) => {
+                let type = item.icon + "s";
+                let id = item.icon === "record" ? "id" : "containerId";
+                ids[type].push(item[id]);
             });
-            const columns = this.getWorkTrayColumns();
-            this.setState({data, columns}, () => {
-                this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
-            });
+            this.searchandupdate(ids);
         }
     }
+
+    searchandupdate = (ids) => {
+        //console.log(JSON.stringify(ids));
+        if (ids) {
+            let r = (ids.records && ids.records.length > 0) ? JSON.stringify(ids.records) : "";
+            let c = (ids.containers && ids.containers.length > 0) ? JSON.stringify(ids.containers) : "";
+            let recordsIds = r ? r.substring(1, r.length - 1) : "";
+            let containersIds = c ? c.substring(1, c.length - 1) : "";
+            let recordsPromise = recordsIds
+                ? getRecordsByIds(recordsIds, this.state.user.id)
+                    .then(response => response.json())
+                    .then(res => {
+                        if (res.error || (res.status && res.status !== 200)) {
+                            let status = res.status ? res.status : "";
+                            let err = res.error ? " " + res.error : "";
+                            let msg = res.message ? ": " + res.message : "";
+                            let alertMsgs = [...this.state.alertMsgs];
+                            alertMsgs.push("Record: " + status + err + msg);
+                            this.setState({alertMsgs});
+                            window.scrollTo(0, 0)
+                        }
+                        else return res;
+                    })
+                : [];
+            let containersPromise = containersIds
+                ? getContainersByIds(containersIds, this.state.user.id)
+                    .then(response => response.json())
+                    .then(res => {
+                        if (res.error || (res.status && res.status !== 200)) {
+                            let status = res.status ? res.status : "";
+                            let err = res.error ? " " + res.error : "";
+                            let msg = res.message ? ": " + res.message : "";
+                            let alertMsgs = [...this.state.alertMsgs];
+                            alertMsgs.push("Container: " + status + err + msg);
+                            this.setState({alertMsgs});
+                            window.scrollTo(0, 0)
+                        }
+                        else return res;
+                    })
+                : [];
+            Promise.all([recordsPromise, containersPromise])
+                .then(res => {
+                    let data = res[0].concat(res[1]).map((item, index) => {
+                        const _id = index;
+                        const icon = item.hasOwnProperty("number") ? "record" : "container";
+                        return {
+                            _id,
+                            icon,
+                            ...item,
+                        }
+                    });
+                    let columns = this.getWorkTrayColumns();
+                    this.setState({data, columns}, () => {
+                        this.state.onDataUpdateCallback(this.state.data, this.removeDeleteColumn(this.state.columns));
+                        //let data = this.state.data.map((item) => {delete item._id; return item;});
+                        localStorage.setItem("tray" + this.state.user.id, JSON.stringify(data));
+                        //console.log(localStorage.getItem("tray" + this.state.user.id));
+                    });
+                })
+                .catch(err => console.log(".catch err: " + JSON.stringify(err)));
+        }
+    };
 
     componentWillUnmount() {
         this.state.onItemSelectCallback([]);
@@ -199,7 +259,7 @@ class WorkTray extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, removeAll} = this;
-        const {data, columns, selectAll, selection} = this.state;
+        const {data, columns, selectAll, selection, alertMsgs} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -207,10 +267,28 @@ class WorkTray extends Component {
             toggleAll,
             selectType: 'checkbox',
         };
+        let displaymsgs = () => {
+            console.log(JSON.stringify(alertMsgs));
+            if (alertMsgs.length > 0)
+                return alertMsgs.map((msg, index) => {
+                    return <h3 key={index}>{msg}</h3>;
+                });
+        };
+
 
         if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "" && this.state.user.role !== "General")
             return (
                 <div style={styles.container}>
+                    {alertMsgs.length !== 0 && !this.state.success
+                        ? <Alert bsStyle="danger">
+                            {displaymsgs()}
+                            <button onClick={() => {
+                                this.setState({alertMsgs: []})
+                            }}>Close
+                            </button>
+                        </Alert>
+                        : null
+                    }
                     <h1>Work Tray</h1>
                     <div style={styles.btncontainer}>
                         <ContextualActions {...this.props}
