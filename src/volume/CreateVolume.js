@@ -94,7 +94,7 @@ class CreateVolume extends Component {
             this.setState({
                 timeout: setTimeout(() => {
                     this.props.history.goBack();
-                }, 1500),
+                }, 1000),
                 success: false,
                 alertMsg: "Cancelled. Redirecting..",
             });
