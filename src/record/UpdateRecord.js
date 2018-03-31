@@ -437,7 +437,7 @@ class UpdateRecord extends Component {
                         defaultInputValue = {this.state.retentionScheduleName}
                         labelKey={option => `${option.name} ${option.code.trim()}`}
                         options={this.state.retentionScheduleResponse}
-                        placeholder="Choose a state..."/>
+                        placeholder="Type in and select a retention schedule..."/>
             }
         }
         if (this.state.classificationParentHistory.length > 1) {

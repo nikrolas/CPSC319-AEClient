@@ -448,7 +448,7 @@ class CreateRecord extends Component {
                         onChange={this.handleChange}
                         labelKey={option => `${option.name} ${option.code.trim()}`}
                         options={this.state.retentionScheduleResponse}
-                        placeholder="Choose a state..."/>
+                        placeholder="Type in and select a retention schedule..."/>
         }
         if (this.state.classificationParentHistory.length > 1) {
             for(let i = 1; this.state.classificationParentHistory.length > i; i++) {
