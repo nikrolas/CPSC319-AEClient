@@ -420,7 +420,7 @@ class CreateRecord extends Component {
         let retentionForm = null;
         let listLocationJson = null;
         let classificationPath = "";
-        if (this.state.recordTypeResponse !== null) {
+        if (this.state.recordTypeResponse !== null && !this.state.recordTypeResponse.error) {
             listRecordTypeJson = this.state.recordTypeResponse.map((item, i) => <option data-order={i} value={item.typeId}>{item.typeName}</option>);
         }
         if (this.state.classificationResponse !== null) {
@@ -546,7 +546,11 @@ class CreateRecord extends Component {
                         validationState={this.state.recordNumberValidationState}
                     >
                         <ControlLabel>Record Number {requiredLabel}
-                            <br/> {this.state.recordNumberPattern} </ControlLabel>
+                            <br/>
+                                <div id="suggestedRecordNum">
+                                    {this.state.recordNumberPattern}
+                                </div>
+                        </ControlLabel>
                         <OverlayTrigger
                             trigger="click"
                             placement="right"
@@ -570,6 +574,7 @@ class CreateRecord extends Component {
                         </FormGroup>
                     <FormGroup
                         validationState={this.state.titleValidationState}
+                        controlId="formTitle"
                     >
                         <ControlLabel>Title {requiredLabel}</ControlLabel>
                         <FormControl
@@ -646,6 +651,7 @@ class CreateRecord extends Component {
                     </FormGroup>
 
                     <FormGroup
+                        controlId="formConsignmentCode"
                         validationState={this.state.consignmentCodeValidationState}
                     >
                         <ControlLabel>Consignment Code</ControlLabel>
@@ -662,6 +668,7 @@ class CreateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId="formNotes"
                         validationState={this.state.notesValidationState}
                     >
                         <ControlLabel>Notes</ControlLabel>

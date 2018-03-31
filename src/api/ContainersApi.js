@@ -9,7 +9,8 @@ export function getContainerById(containerId, userId) {
 }
 
 export function getContainersByIds(containerIds, userId) {
-    return fetch(serviceRoot + containersPath + "?ids=" + containerIds + "?userId=" + userId);
+    let stringContainerIds = containerIds.join(",");
+    return fetch(serviceRoot + containersPath + "?ids=" + stringContainerIds + "&userId=" + userId);
 }
 
 export function createContainer(data, userId) {

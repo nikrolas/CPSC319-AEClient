@@ -1,5 +1,5 @@
 describe('search', function () {
-    let serviceRoot = "http://localhost:3000";
+    let serviceRoot = "/";
 
     beforeEach(function () {
         cy.visit(serviceRoot);

@@ -1,6 +1,6 @@
 describe('permissions', function () {
     beforeEach(function () {
-        cy.visit('http://localhost:3000');
+        cy.visit('/');
     });
 
     it('should be able to switch users', function() {

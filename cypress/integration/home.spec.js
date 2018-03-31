@@ -1,6 +1,6 @@
 describe('home', function () {
     beforeEach(function () {
-        cy.visit('http://localhost:3000');
+        cy.visit('/');
     });
 
     it('should have search input', function () {
