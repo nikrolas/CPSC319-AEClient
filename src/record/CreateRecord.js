@@ -134,6 +134,11 @@ class CreateRecord extends Component {
                 //Validation handling here
                 if(e.target.name === "recordType") {
                     this.numberPatternRules(this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]);
+                    if(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]!== null) {
+                        console.log(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]);
+                        this._typeahead._updateText(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]);
+
+                    }
                     this.setState({recordTypeSelectionIndex:e.target.selectedIndex-1});
                     const length = this.state.recordType.length;
                     if (length >= 1) {
@@ -399,7 +404,8 @@ class CreateRecord extends Component {
                 }
             })
             .catch(error => {
-
+                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                window.scrollTo(0, 0)
             })
     }
 
@@ -436,12 +442,13 @@ class CreateRecord extends Component {
                 <option key={i} value={item.locationId}>{item.locationName}</option>);
         }
         if (this.state.retentionScheduleResponse !== null) {
-            retentionForm =
-                <Typeahead
-                    onChange={this.handleChange}
-                    labelKey={option => `${option.name} ${option.code.trim()}`}
-                options={this.state.retentionScheduleResponse}
-                placeholder="Choose a state..."/>
+                retentionForm =
+                    <Typeahead
+                        ref={component => this._typeahead = component ? component.getInstance() : this._typeahead}
+                        onChange={this.handleChange}
+                        labelKey={option => `${option.name} ${option.code.trim()}`}
+                        options={this.state.retentionScheduleResponse}
+                        placeholder="Choose a state..."/>
         }
         if (this.state.classificationParentHistory.length > 1) {
             for(let i = 1; this.state.classificationParentHistory.length > i; i++) {

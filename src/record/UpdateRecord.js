@@ -139,8 +139,9 @@ class UpdateRecord extends Component {
                 }
             })
             .catch(err => {
-            console.error("Error loading record: " + err.message);
-        });
+                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                window.scrollTo(0, 0)
+            });
         getRetentionSchedule()
             .then(response => response.json())
             .then(data => {
@@ -394,7 +395,8 @@ class UpdateRecord extends Component {
                 }
             })
             .catch(error => {
-
+                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                window.scrollTo(0, 0)
             })
     }
 

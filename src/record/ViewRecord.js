@@ -18,26 +18,26 @@ class ViewRecord extends Component {
                 alertMsg: "",
                 success: true,
                 recordJson: {
-                    title: "",
-                    number: "",
-                    scheduleId: "",
-                    typeId: "",
-                    consignmentCode: "",
-                    containerId: "",
-                    locationId: "",
-                    classifications: "",
-                    notes: "",
-                    id: "",
-                    stateId: "",
-                    createdAt: "",
-                    updatedAt: "",
-                    closedAt: "",
-                    location: "",
-                    schedule: "",
-                    type: "",
-                    state: "",
-                    containerNumber: "",
-                    scheduleYear: ""
+                    title: "n/a",
+                    number: "n/a",
+                    scheduleId: "n/a",
+                    typeId: "n/a",
+                    consignmentCode: "n/a",
+                    containerId: "n/a",
+                    locationId: "n/a",
+                    classifications: "n/a",
+                    notes: "n/a",
+                    id: "n/a",
+                    stateId: "n/a",
+                    createdAt: "n/a",
+                    updatedAt: "n/a",
+                    closedAt: "n/a",
+                    location: "n/a",
+                    schedule: "n/a",
+                    type: "n/a",
+                    state: "n/a",
+                    containerNumber: "n/a",
+                    scheduleYear: "n/a"
                 },
                 onItemSelectCallback: props.onItemSelect,
                 onDataUpdateCallback: props.onDataUpdate
@@ -116,7 +116,10 @@ class ViewRecord extends Component {
 
                 }
             })
-            .catch(error => console.log('error============:', error));
+            .catch(error => {
+                this.setState({alertMsg: "The application was unable to connect to the network. Please try again later."});
+                window.scrollTo(0, 0);
+            });
     }
 
     handleRemoveFromContainer = () => {
@@ -145,7 +148,8 @@ class ViewRecord extends Component {
                 }
             })
             .catch(err => {
-                console.error("Error updating record: " + err.message);
+                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                window.scrollTo(0, 0)
             });
     };
 
@@ -277,6 +281,7 @@ class ViewRecord extends Component {
                         </Col>
                     </Row>
                 </Grid>
+                <br/>
             </div>
         )
     }
