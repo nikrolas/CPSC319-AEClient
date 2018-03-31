@@ -39,7 +39,7 @@ class SelectTable extends Component {
     }
 
     componentWillMount() {
-        let stored = sessionStorage.getItem("tray" + this.state.user.id);
+        let stored = localStorage.getItem("tray" + this.state.user.id);
         if (stored) {
             let tray = JSON.parse(stored);
             this.setState({tray});
@@ -159,7 +159,7 @@ class SelectTable extends Component {
         if (updated) {
             this.setState({tray, addbtntext: 'Success'});
             console.log(this.state.user.id);
-            sessionStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
+            localStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
             setTimeout(() => {
                 this.setState({addbtntext: 'Add to Tray'});
             }, 700);
@@ -242,7 +242,7 @@ class SelectTable extends Component {
                 <div style={styles.btncontainer}>
                     <button className='btn btn-s'
                             style={this.addStyle()}
-                            disabled={!selection.length}
+                            disabled={!selection.length || !this.state.user || this.state.user.role === "General"}
                             onClick={updateTray}>{addbtntext}</button>
                     <ContextualActions {...this.props}
                                        selectedItemIndexes={selection}

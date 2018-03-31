@@ -110,7 +110,16 @@ class ViewRecord extends Component {
                     window.scrollTo(0, 0)
                 }
                 else {
-                    this.props.history.push("/results/");
+                    for(let i = 0; i < data.responseList.length; i++) {
+                        if(!data.responseList[i].status) {
+                            this.setState({alertMsg: data.responseList[i].msg, success: false});
+                            window.scrollTo(0, 0)
+                        }
+                        else {
+                            this.props.history.push("/results/");
+                        }
+                    }
+
                 }
             })
             .catch(error => console.log('error============:', error));
