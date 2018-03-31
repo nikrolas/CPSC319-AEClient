@@ -57,10 +57,6 @@ class CreateRecord extends Component {
                 retentionValidationState:null,
                 retentionSchedule:null,
 
-                containerValidationMsg:"",
-                containerValidationState:"success",
-                container: null,
-
                 consignmentCodeValidationMsg:"",
                 consignmentCodeValidationState:"success",
                 consignmentCode: null,
@@ -259,27 +255,6 @@ class CreateRecord extends Component {
                     }
                     else {
                         this.setState({retentionValidationState:null});
-                    }
-                }
-                if(e.target.name === "container") {
-                    const regexNumbers = /^[0-9\b]{1,11}$/;
-                    const regexNumbersExceed = /^[0-9\b]{12,}$/;
-                    const regexNotNumbers = /[^0-9]+/;
-
-                    if (regexNumbers.test(this.state.container)) {
-                        this.setState({containerValidationState:'success'});
-                    }
-                    else if (regexNumbersExceed.test(this.state.container)) {
-                        this.setState({containerValidationState:'error'});
-                        this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
-                    }
-                    else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
-                        this.setState({containerValidationState:'error'});
-                        this.setState({containerValidationMsg:'Please enter numbers only'});
-                    }
-                    else {
-                        this.setState({container: null});
-                        this.setState({containerValidationState:'success'});
                     }
                 }
 
@@ -638,23 +613,6 @@ class CreateRecord extends Component {
                             :<br/>
                         }
                     </FormGroup>
-                    <FormGroup
-                        validationState={this.state.containerValidationState}
-                    >
-                        <ControlLabel>Container Number</ControlLabel>
-                        <FormControl
-                            name="container"
-                            type="text"
-                            value={this.state.container}
-                            placeholder="Enter digits"
-                            onChange={this.handleChange}
-                        />
-                        { this.state.containerValidationState === "error"
-                            ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :<br/>
-                        }
-                    </FormGroup>
-
                     <FormGroup
                         validationState={this.state.consignmentCodeValidationState}
                     >
