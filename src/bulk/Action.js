@@ -77,10 +77,12 @@ function deleteSelectedContainers(containerIds, userId) {
                 }
             })
             .then(result => {
-                if (result.containerNumber) {
-                    reject(result.error + ": " + result.containerNumber);
-                } else if (result.exception) {
-                   reject(result.message);
+                if (!success) {
+                    if (result.containerNumber) {
+                        reject(result.error + ": " + result.containerNumber);
+                    } else if (result.exception) {
+                        reject(result.message);
+                    }
                 }
             })
             .catch(error => {

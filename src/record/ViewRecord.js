@@ -103,7 +103,7 @@ class ViewRecord extends Component {
     handleSubmit() {
         deleteRecordByIds([this.props.match.params.recordId], this.state.user.id)
             .then(response => {
-                    return response.json();
+                return response.json();
             })
             .then(data => {
                 if (data.status && (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500)) {
@@ -111,12 +111,16 @@ class ViewRecord extends Component {
                     window.scrollTo(0, 0)
                 }
                 else {
-                    for(let i = 0; i < data.responseList.length; i++) {
-                        if(!data.responseList[i].status) {
+                    for (let i = 0; i < data.responseList.length; i++) {
+                        if (!data.responseList[i].status) {
                             this.setState({alertMsg: data.responseList[i].msg, success: false});
                             window.scrollTo(0, 0)
                         } else {
-                            this.setState({alertMsg: "This record has been successfully deleted.", success: true, readOnly: true});
+                            this.setState({
+                                alertMsg: "This record has been successfully deleted.",
+                                success: true,
+                                readOnly: true
+                            });
                             window.scrollTo(0, 0)
                         }
                     }
@@ -154,7 +158,7 @@ class ViewRecord extends Component {
                 }
             })
             .catch(err => {
-                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                this.setState({alertMsg: "The application was unable to connect to the network. Please try again later."});
                 window.scrollTo(0, 0)
             });
     };
@@ -193,7 +197,8 @@ class ViewRecord extends Component {
                 <Grid>
                     <Row>
                         <Col md={10} mdOffset={2}>
-                            <h1 id={this.state.recordJson["number"] && this.state.recordJson["number"] !== "n/a" ? "recordNumberHeading": null} style={title}>{this.state.recordJson["number"]}</h1>
+                            <h1 id={this.state.recordJson["number"] && this.state.recordJson["number"] !== "n/a" ? "recordNumberHeading" : null}
+                                style={title}>{this.state.recordJson["number"]}</h1>
                         </Col>
                     </Row>
                     <Row>
@@ -206,7 +211,9 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>State</b>
                                 <br/>
-                                {this.state.recordJson["state"]}
+                                <div id="recordState">
+                                    {this.state.recordJson["state"]}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Location</b>
@@ -270,7 +277,8 @@ class ViewRecord extends Component {
                                     body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
                                     confirmText="Remove"
                                     title="Removing from container">
-                                    <Button bsStyle="warning" disabled={!this.isInContainer() || this.state.readOnly}>Remove From
+                                    <Button bsStyle="warning" disabled={!this.isInContainer() || this.state.readOnly}>Remove
+                                        From
                                         Container</Button>
                                 </Confirm>
                                 <Button bsStyle="warning"
@@ -286,7 +294,8 @@ class ViewRecord extends Component {
                                     <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
                                 <Link to={'/createVolume'}>
-                                    <Button bsStyle="primary" style={{marginLeft: '5px'}} disabled={this.state.readOnly}> Create Volume </Button>
+                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}
+                                            disabled={this.state.readOnly}> Create Volume </Button>
                                 </Link>
                             </ButtonToolbar>
                         </Col>

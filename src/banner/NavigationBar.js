@@ -18,8 +18,8 @@ class NavigationBar extends Component {
         let workTray = null;
         let newRecord = null;
         let locations = "";
-        if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "") {
-            for (let i = 0; i < this.state.user.locations.length; i ++ ){
+        if (this.state.user !== undefined && this.state.user !== null && this.state.user !== "" && this.state.user.locations) {
+            for (let i = 0; i < this.state.user.locations.length; i++) {
                 if (i === 0) {
                     locations += this.state.user.locations[i].locationName
                 }

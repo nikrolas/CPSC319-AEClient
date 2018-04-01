@@ -32,6 +32,14 @@ Cypress.Commands.add("switchUser", (userId) => {
     });
 });
 
+Cypress.Commands.add("viewRecordById", (id) => {
+    cy.visit("/viewRecord/" + id);
+});
+
+Cypress.Commands.add("viewContainerById", (id) => {
+    cy.visit("/viewContainer/" + id);
+});
+
 Cypress.Commands.add("createRecord", (recordType, location, recordNumber, title, classifications, schedule, consignmentCode, notes, userId) => {
     cy.visit("/createRecord?userId=" + userId);
     cy.get("select#formRecordType").select(recordType);
@@ -132,12 +140,11 @@ Cypress.Commands.add("actionOnAllWorktrayItems", (actionButtonText) => {
 Cypress.Commands.add("goToRecord", (recordNumber) => {
     cy.visit("/");
     cy.get('input').type(recordNumber + '{enter}');
-    cy.get(".rt-table>>>>>>a").first().click();
+    cy.get(":nth-child(3) > div > a").click();
 });
 
 Cypress.Commands.add("goToContainer", (containerNumber) => {
     cy.visit("/");
     cy.get('input').type(containerNumber + '{enter}');
-    cy.get("select#filterSelect").select("Containers");
-    cy.get(".rt-table>>>>>a").first().click();
+    cy.get(":nth-child(8) > a").click();
 });

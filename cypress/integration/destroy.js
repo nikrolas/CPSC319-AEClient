@@ -1,9 +1,12 @@
+import {getIdFromLocation} from "../support/functions";
+
 describe('destroy', function () {
     beforeEach(function () {
         cy.visit('/');
     });
 
     it('should be able to destroy containers and closed records and delete containers', function () {
+        let recordId = 0;
         cy.createContainer("CYPRESS - destroy", "Edmonton", "Cypress - destroy", "Cypress-recordForDestruction", 500);
 
         //View first record in contained records table
@@ -22,19 +25,27 @@ describe('destroy', function () {
                 cy.contains("Remove From Container").click();
                 cy.get(".modal-footer > .btn-danger").click();
 
-                cy.get("#recordNumberHeading")
-                    .then(recordNum => {
-                        cy.addRecordsToWorkTray([recordNum.text()]);
-                        cy.actionOnAllWorktrayItems("Destroy");
-                        cy.url().should('include', '/confirmAction');
-                        cy.contains("Confirm").click();
-                        cy.contains("Successfully destroyed the records.");
-                        cy.url().should('include', '/confirmAction');
-                        cy.contains("Confirm").click();
-                        cy.contains("Successfully deleted empty containers.");
-                        cy.contains("Confirm").should('be.disabled');
-                        cy.contains("Done").click();
-                    });
+                cy.location().then(loc => {
+                    recordId = getIdFromLocation(loc);
+                    cy.get("#recordState").contains("Archived - Local");
+
+                    cy.get("#recordNumberHeading")
+                        .then(recordNum => {
+                            cy.addRecordsToWorkTray([recordNum.text()]);
+                            cy.actionOnAllWorktrayItems("Destroy");
+                            cy.url().should('include', '/confirmAction');
+                            cy.contains("Confirm").click();
+                            cy.contains("Successfully destroyed the records.");
+                            cy.url().should('include', '/confirmAction');
+                            cy.contains("Confirm").click();
+                            cy.contains("Successfully deleted empty containers.");
+                            cy.contains("Confirm").should('be.disabled');
+                            cy.contains("Done").click();
+
+                            cy.viewRecordById(recordId);
+                            cy.get("#recordState").contains("Destroyed");
+                        });
+                });
             });
     });
 
@@ -98,7 +109,7 @@ describe('destroy', function () {
                 cy.addContainersToWorkTray(containerNumbers);
                 cy.actionOnAllWorktrayItems("Destroy");
                 cy.contains("Confirm").click();
-                cy.contains("You do not have permission to destroy record EDM-2018/708 from your location Edmonton.");
+                cy.contains("You do not have permission to destroy record");
             })
     });
 });
