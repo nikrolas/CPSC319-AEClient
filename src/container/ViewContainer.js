@@ -149,7 +149,7 @@ class ViewContainer extends Component {
             })
             .then(result => {
                 if (result.status !== 200) {
-                        this.setState({alertMsg: result.error + ": " + result.numbers});
+                        this.setState({alertMsg: result.error + ": " + result.containerNumber});
                         window.scrollTo(0, 0);
                 }
                 else {
@@ -185,7 +185,7 @@ class ViewContainer extends Component {
                 <Grid>
                     <Row>
                         <Col md={10} mdOffset={2}>
-                            <h1 style={title}>{containerNumber}</h1>
+                            <h1 id={containerNumber ? "containerNumberHeading" : null}  style={title}>{containerNumber}</h1>
                         </Col>
                     </Row>
                     <Row>

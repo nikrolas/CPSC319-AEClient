@@ -593,7 +593,7 @@ class UpdateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
-                        controlId="formControlsSelect "
+                        controlId="formState"
                         onChange={this.handleChange}
                         validationState={this.state.stateValidationState}
 

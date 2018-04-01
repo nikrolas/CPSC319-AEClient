@@ -67,7 +67,67 @@ Cypress.Commands.add("createRecord", (recordType, location, recordNumber, title,
     })
 });
 
-Cypress.Commands.add("createContainer", (title, location, notes, userId) => {
-    cy.createRecord("Subject", "Burnaby", null, "Cypress-Create Record For Container", ["CORPORATE AFFAIRS","CONTRACTING"], "PUBLICATION - INVENTORY P5.I2.01", "CYRPESS-TEST", "CYPRESS TESTING", 500);
-    cy.visit("/search?userId=" + userId);
-})
+Cypress.Commands.add("createContainer", (title, location, notes, recordTitlePrefix, userId) => {
+    cy.switchUser(userId);
+    cy.clearWorkTray();
+
+    let recordNumbers = [];
+    cy.createRecord("Subject", location, null, recordTitlePrefix + "1", ["CORPORATE AFFAIRS", "CONTRACTING"],
+        "PUBLICATION - INVENTORY P5.I2.01", "CYRPESS-TEST", "CYPRESS TESTING", 500);
+    cy.get("#recordNumberHeading")
+        .then(recordNum => {
+            recordNumbers.push(recordNum.text());
+            cy.createRecord("Subject", location, null, recordTitlePrefix + "2", ["CORPORATE AFFAIRS", "CONTRACTING"],
+                "PUBLICATION - INVENTORY P5.I2.01", "CYRPESS-TEST", "CYPRESS TESTING", 500);
+
+            cy.get("#recordNumberHeading")
+                .then(recordNum => {
+                    recordNumbers.push(recordNum.text());
+
+                    cy.addRecordsToWorkTray(recordNumbers);
+
+                    cy.actionOnAllWorktrayItems("Contain");
+
+                    cy.get("#formTitle").type(title);
+                    cy.get("select#formLocation").select(location);
+                    if (notes != null) {
+                        cy.get("#formNotes").type(notes);
+                    }
+                    cy.contains("Submit").click();
+                })
+        })
+});
+
+
+Cypress.Commands.add("clearWorkTray", () => {
+    cy.contains("Work Tray").click();
+    cy.contains("All").click();
+});
+
+Cypress.Commands.add("addRecordsToWorkTray", (recordNumbers) => {
+    recordNumbers.forEach(num => {
+        cy.visit("/");
+        cy.get('input').type(num + '{enter}');
+        cy.get(":nth-child(1) > .rt-tr > > input").click();
+        cy.contains("Add to Tray").click();
+    });
+});
+
+Cypress.Commands.add("actionOnAllWorktrayItems", (actionButtonText) => {
+    cy.contains("Work Tray").click();
+    cy.get(".rt-th > div > input").click();
+    cy.contains(actionButtonText).click();
+});
+
+Cypress.Commands.add("goToRecord", (recordNumber) => {
+        cy.visit("/");
+        cy.get('input').type(recordNumber + '{enter}');
+        cy.get(":nth-child(1) > .rt-tr > :nth-child(3) > div > a").click();
+});
+
+Cypress.Commands.add("goToContainer", (containerNumber) => {
+    cy.visit("/");
+    cy.get('input').type(containerNumber + '{enter}');
+    cy.get("select#filterSelect").select("Containers");
+    cy.get(":nth-child(1) > .rt-tr > :nth-child(3) > div > a").click();
+});

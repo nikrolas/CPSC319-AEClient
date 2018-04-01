@@ -17,7 +17,7 @@ class CreateContainer extends Component {
                 success: false,
                 alertMsg: "",
                 title: "",
-                location: {},
+                locationId: null,
                 locations: [],
                 destructionDate: this.getDestructionDate(),
                 notes: "",
@@ -41,9 +41,9 @@ class CreateContainer extends Component {
 
     componentDidMount() {
         let locations = this.props.userData.locations;
-        let location;
+        let locationId;
         if (locations && locations.length > 0) {
-            location = locations[0];
+            locationId = locations[0].locationId;
         }
 
         let invalidStateErrors = [];
@@ -52,7 +52,7 @@ class CreateContainer extends Component {
             invalidStateErrors.push("At least one record must be selected.");
         }
 
-        this.setState({location, locations, invalidStateErrors});
+        this.setState({locationId, locations, invalidStateErrors});
     }
 
 
@@ -97,9 +97,9 @@ class CreateContainer extends Component {
                 }
             }
 
-            if (e.target.name === "location") {
-                const length = this.state.location.length;
-                if (length >= 1) {
+            if (e.target.name === "locationId") {
+                const locationId = e.target.value;
+                if (locationId != null) {
                     this.setState({locationValidationState: 'success'});
                 }
                 else {
@@ -145,22 +145,15 @@ class CreateContainer extends Component {
             let formData =
                 {
                     title: state.title,
-                    location: state.location,
+                    locationId: state.locationId,
                     notes: state.notes
                 };
-            //TODO: workaround - remove!
-            let code = "TOR";
-            if (this.state.locations[0] && this.state.locations[0].locationCode) {
-                code = this.state.locations[0].locationCode.toUpperCase();
-            }
-            formData.containerNumber = "2019/123-" + code;
 
             let selectedRecordIds = [];
             state.selectedRecords.forEach(record => {
                 selectedRecordIds.push(record.id);
             });
             formData.records = selectedRecordIds;
-            formData.locationId = this.state.location.locationId;
 
             let success = false;
             createContainer(formData, this.state.user.id)
@@ -231,6 +224,7 @@ class CreateContainer extends Component {
                 <div>{destructionDate}</div>
                 <form onSubmit={this.handleSubmit} style={styles.formStyle}>
                     <FormGroup
+                        controlId="formTitle"
                         validationState={this.state.titleValidationState}
                     >
                         <ControlLabel>Title {requiredLabel}</ControlLabel>
@@ -254,9 +248,9 @@ class CreateContainer extends Component {
                     >
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
                         <FormControl
-                            name="location"
+                            name="locationId"
                             componentClass="select"
-                            value={this.state.location}
+                            value={this.state.locationId}
                         >
                             {listLocationJson}
                         </FormControl>
@@ -267,6 +261,7 @@ class CreateContainer extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId="formNotes"
                         validationState={this.state.notesValidationState}
                     >
                         <ControlLabel>Notes</ControlLabel>

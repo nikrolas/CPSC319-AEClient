@@ -247,7 +247,9 @@ class SelectTable extends Component {
                                        columns={columns}/>
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>
-                        <select style={styles.sel}
+                        <select
+                        id="filterSelect"
+                            style={styles.sel}
                                 className="form-control"
                                 onChange={this.handleSelectChange}
                                 value={selectvalue}>

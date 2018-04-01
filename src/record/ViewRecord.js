@@ -189,7 +189,7 @@ class ViewRecord extends Component {
                 <Grid>
                     <Row>
                         <Col md={10} mdOffset={2}>
-                            <h1 style={title}>{this.state.recordJson["number"]}</h1>
+                            <h1 id={this.state.recordJson["number"] ? "recordNumberHeading": null} style={title}>{this.state.recordJson["number"]}</h1>
                         </Col>
                     </Row>
                     <Row>
