@@ -113,6 +113,16 @@ Cypress.Commands.add("addRecordsToWorkTray", (recordNumbers) => {
     });
 });
 
+Cypress.Commands.add("addContainersToWorkTray", (containerNumbers) => {
+    containerNumbers.forEach(num => {
+        cy.visit("/");
+        cy.get('input').type(num + '{enter}');
+        cy.get("select#filterSelect").select("Containers");
+        cy.get(":nth-child(1) > .rt-tr > > input").click();
+        cy.contains("Add to Tray").click();
+    });
+});
+
 Cypress.Commands.add("actionOnAllWorktrayItems", (actionButtonText) => {
     cy.contains("Work Tray").click();
     cy.get(".rt-th > div > input").click();
