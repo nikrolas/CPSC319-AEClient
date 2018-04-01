@@ -53,11 +53,6 @@ class UpdateRecord extends Component {
                 stateValidationState:"success",
                 stateId:null,
 
-                containerValidationMsg:"",
-                containerValidationState:"success",
-                container: null,
-
-
                 consignmentCodeValidationMsg:"",
                 consignmentCodeValidationState:"success",
                 consignmentCode: null,
@@ -113,7 +108,6 @@ class UpdateRecord extends Component {
                 this.setState({retentionSchedule: data.scheduleId});
                 this.setState({retentionScheduleName:data.schedule});
                 this.setState({stateId: data.stateId});
-                this.setState({container:data.container});
                 this.setState({consignmentCode:data.consignmentCode});
                 this.setState({notes:data.notes});
                 data.classIds.forEach( id => {
@@ -139,8 +133,9 @@ class UpdateRecord extends Component {
                 }
             })
             .catch(err => {
-            console.error("Error loading record: " + err.message);
-        });
+                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                window.scrollTo(0, 0)
+            });
         getRetentionSchedule()
             .then(response => response.json())
             .then(data => {
@@ -278,27 +273,6 @@ class UpdateRecord extends Component {
                             this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
                         });
                 }
-                if(e.target.name === "container") {
-                    const regexNumbers = /^[0-9\b]{1,11}$/;
-                    const regexNumbersExceed = /^[0-9\b]{12,}$/;
-                    const regexNotNumbers = /[^0-9]+/;
-
-                    if (regexNumbers.test(this.state.container)) {
-                        this.setState({containerValidationState:'success'});
-                    }
-                    else if (regexNumbersExceed.test(this.state.container)) {
-                        this.setState({containerValidationState:'error'});
-                        this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
-                    }
-                    else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
-                        this.setState({containerValidationState:'error'});
-                        this.setState({containerValidationMsg:'Please enter numbers only'});
-                    }
-                    else {
-                        this.setState({container: null});
-                        this.setState({containerValidationState:'success'});
-                    }
-                }
 
                 if(e.target.name === "consignmentCode") {
                     const length = this.state.consignmentCode.length;
@@ -394,7 +368,8 @@ class UpdateRecord extends Component {
                 }
             })
             .catch(error => {
-
+                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                window.scrollTo(0, 0)
             })
     }
 
@@ -435,7 +410,7 @@ class UpdateRecord extends Component {
                         defaultInputValue = {this.state.retentionScheduleName}
                         labelKey={option => `${option.name} ${option.code.trim()}`}
                         options={this.state.retentionScheduleResponse}
-                        placeholder="Choose a state..."/>
+                        placeholder="Type in and select a retention schedule..."/>
             }
         }
         if (this.state.classificationParentHistory.length > 1) {
@@ -606,24 +581,8 @@ class UpdateRecord extends Component {
                         >
                             {listRecordStatesJson}
                         </FormControl>
-                        { this.state.containerValidationState === "error"
-                            ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :<br/>
-                        }
-                    </FormGroup>
-                    <FormGroup
-                        validationState={this.state.containerValidationState}
-                    >
-                        <ControlLabel>Container Number</ControlLabel>
-                        <FormControl
-                            name="container"
-                            type="text"
-                            value={this.state.container}
-                            placeholder="Enter digits"
-                            onChange={this.handleChange}
-                        />
-                        { this.state.containerValidationState === "error"
-                            ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
+                        { this.state.stateValidationState === "error"
+                            ?<HelpBlock>{this.state.stateValidationMessage}</HelpBlock>
                             :<br/>
                         }
                     </FormGroup>

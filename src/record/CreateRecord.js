@@ -27,6 +27,7 @@ class CreateRecord extends Component {
                 recordTypeValidationMsg:"",
                 recordTypeValidationState:null,
                 recordType: null,
+                recordTypeSelectionIndex:0,
 
                 locationValidationMsg:"",
                 locationValidationState:"success",
@@ -55,10 +56,6 @@ class CreateRecord extends Component {
                 retentionValidationMsg:"",
                 retentionValidationState:null,
                 retentionSchedule:null,
-
-                containerValidationMsg:"",
-                containerValidationState:"success",
-                container: null,
 
                 consignmentCodeValidationMsg:"",
                 consignmentCodeValidationState:"success",
@@ -133,6 +130,12 @@ class CreateRecord extends Component {
                 //Validation handling here
                 if(e.target.name === "recordType") {
                     this.numberPatternRules(this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]);
+                    if(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]!== null) {
+                        console.log(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]);
+                        this._typeahead._updateText(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]);
+
+                    }
+                    this.setState({recordTypeSelectionIndex:e.target.selectedIndex-1});
                     const length = this.state.recordType.length;
                     if (length >= 1) {
                         this.setState({recordTypeValidationState: 'success'});
@@ -142,7 +145,9 @@ class CreateRecord extends Component {
                     }
                 }
                 if(e.target.name === "location") {
-                    this.setState({locationSelectedIndex: e.target.selectedIndex});
+                    this.setState({locationSelectedIndex: e.target.selectedIndex}, ()=> {
+                        this.numberPatternRules(this.state.recordTypeResponse[this.state.recordTypeSelectionIndex]["numberPattern"]);
+                    });
                     const length = this.state.location.length;
                     if (length >= 1) {
                         this.setState({locationValidationState: 'success'});
@@ -250,27 +255,6 @@ class CreateRecord extends Component {
                     }
                     else {
                         this.setState({retentionValidationState:null});
-                    }
-                }
-                if(e.target.name === "container") {
-                    const regexNumbers = /^[0-9\b]{1,11}$/;
-                    const regexNumbersExceed = /^[0-9\b]{12,}$/;
-                    const regexNotNumbers = /[^0-9]+/;
-
-                    if (regexNumbers.test(this.state.container)) {
-                        this.setState({containerValidationState:'success'});
-                    }
-                    else if (regexNumbersExceed.test(this.state.container)) {
-                        this.setState({containerValidationState:'error'});
-                        this.setState({containerValidationMsg:'Please enter less than 12 numbers'});
-                    }
-                    else if (regexNotNumbers.test(this.state.container && this.state.container.length !== 0)){
-                        this.setState({containerValidationState:'error'});
-                        this.setState({containerValidationMsg:'Please enter numbers only'});
-                    }
-                    else {
-                        this.setState({container: null});
-                        this.setState({containerValidationState:'success'});
                     }
                 }
 
@@ -395,7 +379,8 @@ class CreateRecord extends Component {
                 }
             })
             .catch(error => {
-
+                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                window.scrollTo(0, 0)
             })
     }
 
@@ -432,12 +417,13 @@ class CreateRecord extends Component {
                 <option key={i} value={item.locationId}>{item.locationName}</option>);
         }
         if (this.state.retentionScheduleResponse !== null) {
-            retentionForm =
-                <Typeahead
-                    onChange={this.handleChange}
-                    labelKey={option => `${option.name} ${option.code.trim()}`}
-                options={this.state.retentionScheduleResponse}
-                placeholder="Choose a state..."/>
+                retentionForm =
+                    <Typeahead
+                        ref={component => this._typeahead = component ? component.getInstance() : this._typeahead}
+                        onChange={this.handleChange}
+                        labelKey={option => `${option.name} ${option.code.trim()}`}
+                        options={this.state.retentionScheduleResponse}
+                        placeholder="Type in and select a retention schedule..."/>
         }
         if (this.state.classificationParentHistory.length > 1) {
             for(let i = 1; this.state.classificationParentHistory.length > i; i++) {
@@ -458,11 +444,10 @@ class CreateRecord extends Component {
                 id="popover-positioned-scrolling-right"
                 title="Key Codes"
             >
-                <strong>KKK:</strong> Location Code <br/>
-                <strong>YYYY: </strong> Year <br/>
+                <strong>KKK:</strong> Location Code (generated)<br/>
+                <strong>YYYY: </strong> Year (generated) <br/>
                 <strong>X/Z:</strong> Alphanumeric <br/>
-                <strong>G:</strong> Autogenerated <br/>
-                <strong>L:</strong> Client
+                <strong>N:</strong> Numeric digits <br/>
             </Popover>
         );
         const popoverRightClassification = (
@@ -634,28 +619,11 @@ class CreateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
-                        validationState={this.state.containerValidationState}
-                    >
-                        <ControlLabel>Container Number</ControlLabel>
-                        <FormControl
-                            name="container"
-                            type="text"
-                            value={this.state.container}
-                            placeholder="Enter digits"
-                            onChange={this.handleChange}
-                        />
-                        { this.state.containerValidationState === "error"
-                            ?<HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
-                            :<br/>
-                        }
-                    </FormGroup>
-
-                    <FormGroup
-                        controlId="formConsignmentCode"
                         validationState={this.state.consignmentCodeValidationState}
                     >
                         <ControlLabel>Consignment Code</ControlLabel>
                         <FormControl
+                            controlId="formConsignmentCode"
                             name="consignmentCode"
                             type="text"
                             value={this.state.consignmentCode}

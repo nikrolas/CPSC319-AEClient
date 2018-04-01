@@ -61,7 +61,6 @@ export function createRecord(state) {
             scheduleId: state.retentionSchedule[0].id,
             typeId: state.recordType,
             consignmentCode: state.consignmentCode,
-            containerId: state.container,
             locationId: state.location,
             classIds: state.classificationBack,
             notes: state.notes,
@@ -84,7 +83,6 @@ export function updateRecord(recordId, state) {
             consignmentCode: state.consignmentCode,
             notes: state.notes,
             stateId: state.stateId,
-            containerId: state.container
         })
     });
 }

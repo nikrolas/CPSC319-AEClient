@@ -28,14 +28,20 @@ const renderMergedProps = (component, ...rest) => {
     );
 };
 
-const PrivateRoute = ({component, redirectTo, authenticated, ...rest}) => {
+const PrivateRoute = ({component, redirectTo, authenticated, general, ...rest}) => {
     return (
         <Route {...rest} render={routeProps => {
-            return authenticated ? (
-                renderMergedProps(component, routeProps, rest)
-            ) : (
-                renderMergedProps(NotAuthenticated)
-            );
+            if(authenticated) {
+                if (general) {
+                    return renderMergedProps(NotAuthenticated)
+                }
+                else {
+                    return renderMergedProps(component, routeProps, rest)
+                }
+            }
+            else {
+                return renderMergedProps(NotAuthenticated)
+            }
         }}/>
     );
 };
@@ -51,7 +57,8 @@ class App extends Component {
             selectedItemIndexes: [],
             confirmActionProps: {},
             userData: null,
-            userAuthenticated: false
+            isLogin: false,
+            isGeneral:false
         };
     }
 
@@ -83,12 +90,18 @@ class App extends Component {
         this.setState({userData: userJson});
         if (userJson.role === "Administrator" || userJson.role === "RMC" || userJson.role === "General") {
             this.setState({
-                userAuthenticated: true,
+                isLogin: true,
             });
+            if( userJson.role === "General") {
+                this.setState({
+                   isGeneral:true,
+                });
+            }
         }
         else {
             this.setState({
-                userAuthenticated: false,
+                isLogin: false,
+                isGeneral:false,
             });
         }
     }
@@ -113,12 +126,18 @@ class App extends Component {
                         });
                         if (data.role === "Administrator" || data.role === "RMC"|| data.role ==="General") {
                             this.setState({
-                                userAuthenticated: true,
+                                isLogin: true,
                             });
+                            if( data.role === "General") {
+                                this.setState({
+                                    isGeneral:true,
+                                });
+                            }
                         }
                         else {
                             this.setState({
-                                userAuthenticated: false,
+                                isLogin: false,
+                                isGeneral:false,
                             });
                         }
                         setTimeout(() => {
@@ -177,17 +196,19 @@ class App extends Component {
                     <NavigationBar selectedItemIndexes={this.state.selectedItemIndexes}
                                    resultsData={this.state.resultsData}
                                    userData={this.state.userData}
-                                   authenticated={this.state.userAuthenticated}/>
+                                   authenticated={this.state.isLogin}/>
                     <Switch>
                         <PrivateRoute exact path='/'
                                       component={Home}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
                         />
                         <PrivateRoute path='/createRecord/'
                                       component={CreateRecord}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/viewRecord/:recordId?'
                                       component={ViewRecord}
@@ -195,12 +216,15 @@ class App extends Component {
                                       onDataUpdate={this.setResultsStates}
                                       onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+
                         />
                         <PrivateRoute path='/updateRecord/:recordId?'
                                       component={UpdateRecord}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/viewContainer/:containerId?'
                                       component={ViewContainer}
@@ -208,17 +232,22 @@ class App extends Component {
                                       onDataUpdate={this.setResultsStates}
                                       onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/updateContainer/:containerId?'
                                       component={UpdateContainer}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/notAuthorized/'
                                       component={NotAuthenticated}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+
                         />
                         <PrivateRoute path="/results/:searchString?"
                                       component={SelectTable}
@@ -226,7 +255,8 @@ class App extends Component {
                                       onDataUpdate={this.setResultsStates}
                                       onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+
                         />
                         <PrivateRoute path="/worktray/"
                                       component={WorkTray}
@@ -234,7 +264,9 @@ class App extends Component {
                                       onDataUpdate={this.setResultsStates}
                                       onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/createContainer/'
                                       component={CreateContainer}
@@ -242,7 +274,9 @@ class App extends Component {
                                       resultsData={this.state.resultsData}
                                       resultsColumns={this.state.resultsColumns}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/addToContainer/'
                                       component={AddToContainer}
@@ -250,7 +284,9 @@ class App extends Component {
                                       resultsData={this.state.resultsData}
                                       resultsColumns={this.state.resultsColumns}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/createVolume/'
                                       component={CreateVolume}
@@ -258,7 +294,9 @@ class App extends Component {
                                       resultsData={this.state.resultsData}
                                       resultsColumns={this.state.resultsColumns}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+
                         />
                         <PrivateRoute path='/confirmAction'
                                       selectedItemIndexes={this.state.selectedItemIndexes}
@@ -267,7 +305,9 @@ class App extends Component {
                                       component={ConfirmAction}
                                       actionProps={this.state.confirmActionProps}
                                       userData={this.state.userData}
-                                      authenticated={this.state.userAuthenticated}/>
+                                      authenticated={this.state.isLogin}
+                                      general = {this.state.isGeneral}
+                        />
                         <Route path='/notFound' component={NotFound}/>
                         <Route component={NotFound}/>
                     </Switch>
