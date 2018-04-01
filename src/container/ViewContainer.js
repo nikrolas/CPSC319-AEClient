@@ -22,6 +22,8 @@ class ViewContainer extends Component {
             {
                 user: props.userData,
                 alertMsg: "",
+                success: false,
+                readOnly: false,
                 closedAt: null,
                 data: [],
                 columns: columns,
@@ -92,7 +94,6 @@ class ViewContainer extends Component {
     };
 
 
-
     setRecordsState = (records) => {
         let latestClosedAtRecord = records[0];
 
@@ -145,18 +146,31 @@ class ViewContainer extends Component {
     handleDelete() {
         deleteContainers([this.props.match.params.containerId], this.state.user.id)
             .then(response => {
-                return response.json();
+                if (response.ok) {
+                    this.setState({
+                        alertMsg: "This container has been successfully deleted.", success: true, readOnly: true});
+                    window.scrollTo(0, 0);
+                } else {
+                    return response.json();
+                }
             })
             .then(result => {
-                if (result.status !== 200) {
-                        this.setState({alertMsg: result.error + ": " + result.containerNumber});
-                        window.scrollTo(0, 0);
-                }
-                else {
-                    this.props.history.goBack();
+                if (result && result.status !== 200) {
+                    let alertMsg = "";
+                    if (result.containerNumber) {
+                        alertMsg = result.error + ": " + result.containerNumber;
+                    } else if (result.exception) {
+                        alertMsg = result.message;
+                    }
+                    this.setState({alertMsg: alertMsg, success: false});
+                    window.scrollTo(0, 0);
                 }
             })
-            .catch(error => console.log('error============:', error));
+            .catch(error => {
+                console.error(error)
+                this.setState({alertMsg: "An unexpected error occurred when trying to delete this container. See the developers console for more details."});
+                window.scrollTo(0, 0);
+            });
     }
 
     render() {
@@ -179,13 +193,14 @@ class ViewContainer extends Component {
         return (
             <div>
                 {this.state.alertMsg && this.state.alertMsg.length !== 0
-                    ? <Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    ? <Alert bsStyle={this.state.success ? "success" : "danger"}><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
                 <Grid>
                     <Row>
                         <Col md={10} mdOffset={2}>
-                            <h1 id={containerNumber ? "containerNumberHeading" : null}  style={title}>{containerNumber}</h1>
+                            <h1 id={containerNumber ? "containerNumberHeading" : null}
+                                style={title}>{containerNumber}</h1>
                         </Col>
                     </Row>
                     <Row>
@@ -262,18 +277,19 @@ class ViewContainer extends Component {
                         <Col md={9} mdOffset={2}>
                             <ButtonToolbar style={btnStyle}>
                                 <Link to={updateContainerLink}>
-                                    <Button bsStyle="primary"> Edit Container </Button>
+                                    <Button bsStyle="primary" disabled={this.state.readOnly}> Edit Container </Button>
                                 </Link>
                                 <Button bsStyle="warning"
+                                        disabled={this.state.readOnly}
                                         onClick={() => this.bulkAction(destroyAction)}>
                                     Destroy
                                 </Button>
                                 <Confirm
                                     onConfirm={this.handleDelete}
                                     body={"Are you sure you want to delete " + containerNumber + "?"}
-                                    confirmText="Confirm Delete"
+                                    confirmText="Delete"
                                     title="Deleting Container">
-                                    <Button bsStyle="danger">Delete</Button>
+                                    <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
                             </ButtonToolbar>
                         </Col>

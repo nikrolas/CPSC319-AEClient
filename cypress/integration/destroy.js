@@ -98,7 +98,7 @@ describe('destroy', function () {
                 cy.addContainersToWorkTray(containerNumbers);
                 cy.actionOnAllWorktrayItems("Destroy");
                 cy.contains("Confirm").click();
-                cy.contains("You do not have permission");
+                cy.contains("You do not have permission to destroy record EDM-2018/708 from your location Edmonton.");
             })
     });
 });

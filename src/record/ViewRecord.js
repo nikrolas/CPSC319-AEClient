@@ -19,6 +19,7 @@ class ViewRecord extends Component {
                 user: props.userData,
                 alertMsg: "",
                 success: true,
+                readOnly: false,
                 recordJson: {
                     title: "n/a",
                     number: "n/a",
@@ -102,10 +103,10 @@ class ViewRecord extends Component {
     handleSubmit() {
         deleteRecordByIds([this.props.match.params.recordId], this.state.user.id)
             .then(response => {
-                return response.json();
+                    return response.json();
             })
             .then(data => {
-                if (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500) {
+                if (data.status && (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500)) {
                     this.setState({alertMsg: data.message, success: false});
                     window.scrollTo(0, 0)
                 }
@@ -114,12 +115,11 @@ class ViewRecord extends Component {
                         if(!data.responseList[i].status) {
                             this.setState({alertMsg: data.responseList[i].msg, success: false});
                             window.scrollTo(0, 0)
-                        }
-                        else {
-                            this.props.history.push("/results/");
+                        } else {
+                            this.setState({alertMsg: "This record has been successfully deleted.", success: true, readOnly: true});
+                            window.scrollTo(0, 0)
                         }
                     }
-
                 }
             })
             .catch(error => {
@@ -263,29 +263,30 @@ class ViewRecord extends Component {
                         <Col md={10} mdOffset={2}>
                             <ButtonToolbar style={btnStyle}>
                                 <Link to={updateRecordLink}>
-                                    <Button bsStyle="primary"> Edit Record </Button>
+                                    <Button bsStyle="primary" disabled={this.state.readOnly}> Edit Record </Button>
                                 </Link>
                                 <Confirm
                                     onConfirm={this.handleRemoveFromContainer}
                                     body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
                                     confirmText="Remove"
                                     title="Removing from container">
-                                    <Button bsStyle="warning" disabled={!this.isInContainer()}>Remove From
+                                    <Button bsStyle="warning" disabled={!this.isInContainer() || this.state.readOnly}>Remove From
                                         Container</Button>
                                 </Confirm>
                                 <Button bsStyle="warning"
-                                        onClick={() => this.bulkAction(destroyAction)}>
+                                        onClick={() => this.bulkAction(destroyAction)}
+                                        disabled={this.state.readOnly}>
                                     Destroy
                                 </Button>
                                 <Confirm
                                     onConfirm={this.handleSubmit}
                                     body="Are you sure you want to delete this?"
-                                    confirmText="Confirm Delete"
+                                    confirmText="Delete"
                                     title="Deleting Record">
-                                    <Button bsStyle="danger">Delete Record</Button>
+                                    <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
                                 <Link to={'/createVolume'}>
-                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}> Create Volume </Button>
+                                    <Button bsStyle="primary" style={{marginLeft: '5px'}} disabled={this.state.readOnly}> Create Volume </Button>
                                 </Link>
                             </ButtonToolbar>
                         </Col>
