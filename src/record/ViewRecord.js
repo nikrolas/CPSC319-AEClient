@@ -250,6 +250,11 @@ class ViewRecord extends Component {
                                 <br/>
                                 {this.state.recordJson["schedule"]} ({this.state.recordJson["scheduleYear"]})
                             </p>
+                            <p style={title}>
+                                <b>Container Number:</b>
+                                <br/>
+                                {this.state.recordJson["containerNumber"]}
+                            </p>
                         </Col>
                         <Col md={9} mdOffset={2}>
                             <p style={title}>
