@@ -193,7 +193,7 @@ class ViewRecord extends Component {
                 <Grid>
                     <Row>
                         <Col md={10} mdOffset={2}>
-                            <h1 id={this.state.recordJson["number"] ? "recordNumberHeading": null} style={title}>{this.state.recordJson["number"]}</h1>
+                            <h1 id={this.state.recordJson["number"] && this.state.recordJson["number"] !== "n/a" ? "recordNumberHeading": null} style={title}>{this.state.recordJson["number"]}</h1>
                         </Col>
                     </Row>
                     <Row>

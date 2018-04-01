@@ -619,11 +619,11 @@ class CreateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId="formConsignmentCode"
                         validationState={this.state.consignmentCodeValidationState}
                     >
                         <ControlLabel>Consignment Code</ControlLabel>
                         <FormControl
-                            controlId="formConsignmentCode"
                             name="consignmentCode"
                             type="text"
                             value={this.state.consignmentCode}
