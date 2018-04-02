@@ -113,7 +113,7 @@ class ViewContainer extends Component {
     scheduleText = () => {
         if (this.state.containerJson && this.state.containerJson.scheduleName) {
             let yearStr = "";
-            if (this.state.containerJson.scheduleYear) {
+            if (this.state.containerJson.scheduleYear !== null) {
                 yearStr = " (" + this.state.containerJson.scheduleYear + ")";
             }
             return this.state.containerJson.scheduleName + yearStr;

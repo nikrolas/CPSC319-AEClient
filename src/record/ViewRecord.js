@@ -1,6 +1,15 @@
 import React, {Component} from 'react';
 import {getRecordById, deleteRecordByIds, updateRecord} from "../api/RecordsApi";
-import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
+import {
+    Row,
+    Col,
+    Grid,
+    Button,
+    ButtonToolbar,
+    Alert,
+    FormGroup,
+    FormControl
+} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
 import {getDateTimeString} from "../utilities/DateTime";
@@ -8,6 +17,8 @@ import {recordsResultsAccessors} from "../search/Results";
 import {getColumns} from "../utilities/ReactTable";
 import {destroyAction} from "../bulk/Action";
 import {goTo} from "../context/ContextualActions";
+import {addRecordsToContainer} from "../api/ContainersApi";
+import {searchByNumber} from "../api/SearchApi";
 
 
 class ViewRecord extends Component {
@@ -20,6 +31,8 @@ class ViewRecord extends Component {
                 alertMsg: "",
                 success: true,
                 readOnly: false,
+                newContainerNumber: "",
+                newContainerId: 0,
                 recordJson: {
                     title: "n/a",
                     number: "n/a",
@@ -102,7 +115,71 @@ class ViewRecord extends Component {
     };
 
     handleChange(e) {
+        e.persist();
+        this.setState({[e.target.name]: e.target.value});
+    }
 
+    addToContainer = (e) => {
+        if (this.state.newContainerNumber && this.state.newContainerNumber.length > 0) {
+            let options = {
+                record: false,
+                container: true
+            }
+            let encodedSearchString = encodeURIComponent(this.state.newContainerNumber.trim());
+            searchByNumber(encodedSearchString, options, 1, 5, this.state.user.id)
+                .then(response => {
+                    return response.json()
+                })
+                .then((res) => {
+                    if (res.error || (res.status && res.status !== 200)) {
+                        let status = res.status ? res.status : "";
+                        let err = res.error ? " " + res.error : "";
+                        let msg = res.message ? ": " + res.message : "";
+                        let alertMsg = status + err + msg;
+                        this.setState({alertMsg});
+                        window.scrollTo(0, 0)
+                    }
+                    else {
+                        if (res.results && res.results.length === 1) {
+                            addRecordsToContainer(res.results[0].containerId, [this.state.recordJson], this.state.user.id)
+                                .then(responses => {
+                                    return responses[0].json();
+                                })
+                                .then(result => {
+                                    this.setData(this, result);
+                                    this.setState({
+                                        alertMsg: "Successfully added to the container: " + result.containerNumber,
+                                        success: true
+                                    });
+                                    window.scrollTo(0, 0);
+                                })
+                                .catch(err => {
+                                    this.setState({success: false});
+                                    this.setState({alertMsg: err});
+                                    window.scrollTo(0, 0);
+                                });
+                        } else if (res.results && res.results.length > 1) {
+                            this.setState({success: false});
+                            this.setState({alertMsg: "The container number needs to be unique. More than one container was found with the given container number."});
+                            window.scrollTo(0, 0);
+                        } else if (res.results && res.results.length === 0) {
+                            this.setState({success: false});
+                            this.setState({alertMsg: "The container number does not exist."});
+                            window.scrollTo(0, 0);
+                        } else {
+                            console.log(res);
+                            this.setState({success: false});
+                            this.setState({alertMsg: "Unexpected result from looking up the container number. See console for more details."});
+                            window.scrollTo(0, 0);
+                        }
+                    }
+                })
+                .catch(error => {
+                    this.setState({alertMsg: error, loading: false});
+                    window.scrollTo(0, 0)
+                });
+        }
+        e.preventDefault();
     }
 
     handleSubmit() {
@@ -141,6 +218,7 @@ class ViewRecord extends Component {
         let recordState = JSON.parse(JSON.stringify(this.state.recordJson));
         recordState.classificationBack = recordState.classIds;
         recordState.containerNumber = "";
+        recordState.containerId = null;
         recordState.retentionSchedule = recordState.scheduleId;
         recordState.user = JSON.parse(JSON.stringify(this.state.user));
 
@@ -220,11 +298,11 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>State</b>
                                 <br/>
-                                <div id="recordState">
-                                {this.state.recordJson["state"] !== ""
-                                    ? this.state.recordJson["state"]
-                                    : "n/a"}
-                                </div>
+                                <span id="recordState">
+                                    {this.state.recordJson["state"] !== ""
+                                        ? this.state.recordJson["state"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Location</b>
@@ -356,6 +434,38 @@ class ViewRecord extends Component {
                                 </Confirm>
                             </ButtonToolbar>
                         </Col>
+                    </Row>
+                    <Row style={{marginTop: "10px"}}> <ButtonToolbar style={btnStyle}>
+                        <Col md={3} mdOffset={2}>
+
+                            <form onSubmit={e => {
+                                e.preventDefault();
+                            }}>
+                                <FormGroup
+                                    controlId="addToContainerInput"
+                                >
+                                    <FormControl
+                                        type="text"
+                                        name="newContainerNumber"
+                                        value={this.state.newContainerNumber}
+                                        placeholder="Enter Container Number"
+                                        onChange={this.handleChange}
+                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
+                                    />
+                                </FormGroup>
+                            </form>
+                        </Col>
+                        <Col>
+                            <ButtonToolbar style={btnStyle}>
+                                <Button bsStyle="primary"
+                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
+                                        onClick={this.addToContainer}
+                                >
+                                    Add to Container
+                                </Button>
+                            </ButtonToolbar>
+                        </Col>
+                    </ButtonToolbar>
                     </Row>
                 </Grid>
                 <br/>

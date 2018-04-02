@@ -59,15 +59,18 @@ class AddToContainer extends Component {
             this.state.selectedRecords.forEach(record => {
                 if (record && record.containerNumber && record.containerNumber !== selectedContainer.containerNumber) {
                     alertMsg = "Record " + record.number + " is already in a container: " + record.containerNumber;
+                    this.setState({success: false});
                     return;
                 }
 
                 if (selectedContainer && selectedContainer.locationId && record.locationId !== selectedContainer.locationId) {
                     alertMsg = "Records are in a different location. Expected: " + selectedContainer.locationName;
+                    this.setState({success: false});
                     return;
                 }
                 if (selectedContainer && selectedContainer.scheduleId && record.scheduleId !== selectedContainer.scheduleId) {
                     alertMsg = "Records have a different schedule. Expected: " + selectedContainer.scheduleName;
+                    this.setState({success: false});
                     return;
                 }
             });
@@ -160,24 +163,24 @@ class AddToContainer extends Component {
                                 <p style={title}>
                                     <b>Location</b>
                                     <br/>
-                                    {container.locationName}
+                                    {container.locationName ? container.locationName : "N/A"}
                                 </p>
                                 <p style={title}>
                                     <b>State</b>
                                     <br/>
-                                    {container.state}
+                                    {container.state ? container.state : "N/A"}
                                 </p>
                             </Col>
                             <Col md={5}>
                                 <p style={title}>
                                     <b>Consignment Code</b>
                                     <br/>
-                                    {container.consignmentCode}
+                                    {container.consignmentCode ? container.consignmentCode: "N/A"}
                                 </p>
                                 <p style={title}>
-                                    <b>Schedule:</b>
+                                    <b>Schedule</b>
                                     <br/>
-                                    {container.scheduleName}
+                                    {container.scheduleName ? container.scheduleName : "N/A"}
                                 </p>
                             </Col>
                         </Row>

@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Popover,OverlayTrigger} from 'react-bootstrap'
-//import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
+import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Popover, OverlayTrigger} from 'react-bootstrap';
 import {
     getClassifications,
     getRecordById,
