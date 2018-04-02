@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import {Confirm} from 'react-confirm-bootstrap'
-import {deleteContainers, getContainerById} from "../api/ContainersApi";
+import {deleteContainers, getContainerById, getMostRecentClosedAt} from "../api/ContainersApi";
 import {getRecordsByIds} from "../api/RecordsApi";
 import ReactTable from "react-table";
 import {getColumns, setData} from "../utilities/ReactTable";
@@ -37,9 +37,9 @@ class ViewContainer extends Component {
                     locationName: "",
                     title: "",
                     type: "",
-                    location: null,
                     state: null,
                     scheduleName: null,
+                    scheduleYear: null,
                     consignmentCode: "",
                     destructionDate: "",
                     createdAt: "",
@@ -78,13 +78,30 @@ class ViewContainer extends Component {
                     let recordIds = data.childRecordIds;
                     if (recordIds && recordIds.length > 0) {
                         this.setRecords(recordIds)
+
+                        getMostRecentClosedAt(this.props.match.params.containerId, this.state.user.id)
+                            .then(response => {
+                                return response.json();
+                            })
+                            .then(result => {
+                                if (result.exception) {
+                                    this.setState({alertMsg: "Cannot determine the Closed At date. " + result.message});
+                                } else {
+                                    let closedAtObj = {closedAt: result};
+                                    transformDates(closedAtObj, getDateTimeString);
+                                    this.setState({closedAt: closedAtObj.closedAt});
+                                }
+                            })
+                            .catch(error => {
+                                this.setState({alertMsg: "An unexpected error occurred while retreiving the closedAt date: " + error});
+                            });
                     }
                 } else {
                     throw new Error(data.message);
                 }
             })
-            .catch(err => {
-                console.error("Error loading container: " + err.message);
+            .catch(error => {
+                this.setState({alertMsg: "An unexpected error occurred while loading the container: " + error});
             });
     };
 
@@ -93,20 +110,21 @@ class ViewContainer extends Component {
         goTo(this.props, "/confirmAction");
     };
 
+    scheduleText = () => {
+        if (this.state.containerJson && this.state.containerJson.scheduleName) {
+            let yearStr = "";
+            if (this.state.containerJson.scheduleYear) {
+                yearStr = " (" + this.state.containerJson.scheduleYear + ")";
+            }
+            return this.state.containerJson.scheduleName + yearStr;
+        } else {
+            return "N/A";
+        }
+    }
 
     setRecordsState = (records) => {
-        let latestClosedAtRecord = records[0];
-
-        records.forEach(r => {
-            if (latestClosedAtRecord < r.closedAt) {
-                latestClosedAtRecord = r;
-            }
-        });
-
         let newState = {
-            records: records,
-            closedAt: getDateTimeString(new Date(latestClosedAtRecord.closedAt)),
-            scheduleYear: latestClosedAtRecord.scheduleYear
+            records: records
         };
 
         newState.records.forEach(record => {
@@ -150,7 +168,8 @@ class ViewContainer extends Component {
             .then(response => {
                 if (response.ok) {
                     this.setState({
-                        alertMsg: "This container has been successfully deleted.", success: true, readOnly: true});
+                        alertMsg: "This container has been successfully deleted.", success: true, readOnly: true
+                    });
                     window.scrollTo(0, 0);
                 } else {
                     return response.json();
@@ -215,7 +234,7 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Location</b>
                                 <br/>
-                                {this.state.containerJson.location ? this.state.containerJson.location : "N/A"}
+                                {this.state.containerJson.locationName ? this.state.containerJson.locationName : "N/A"}
                             </p>
                             <p style={title}>
                                 <b>State</b>
@@ -247,7 +266,7 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Retention Schedule:</b>
                                 <br/>
-                                {this.state.containerJson.scheduleName ? this.state.containerJson.scheduleName + " (" + this.state.scheduleYear + ")" : "N/A"}
+                                {this.scheduleText()}
                             </p>
                         </Col>
                         <Col md={10} mdOffset={2}>

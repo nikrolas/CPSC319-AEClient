@@ -58,6 +58,11 @@ export function deleteContainers(ids, userId) {
     });
 }
 
+export function getMostRecentClosedAt(containerId, userId) {
+    return fetch(serviceRoot + containerPath + "/" + containerId + '/closedAt?userId=' + userId);
+}
+
+
 export function addRecordToContainer(containerId, record, userId) {
     let state = record;
     state.containerId = containerId;
