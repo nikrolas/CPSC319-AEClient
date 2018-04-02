@@ -185,7 +185,7 @@ describe('delete', function () {
             });
     });
 
-    it('should not be able to delete a items outside of authorized locations', function () {
+    it.only('should not be able to delete a items outside of authorized locations', function () {
         let containerNumbers = [];
         let recordNumbers = [];
 
@@ -212,6 +212,7 @@ describe('delete', function () {
                                 cy.switchUser(101);
 
                                 recordNumbers.forEach(recordNum => {
+                                    cy.goToRecord(recordNum);
                                     cy.contains("Delete").click();
                                     cy.get(".modal-footer > .btn-danger").click();
                                     cy.contains("You do not have permission to delete records in Edmonton.");
