@@ -8,14 +8,12 @@ import {
     ButtonToolbar,
     Alert,
     FormGroup,
-    ControlLabel,
-    FormControl,
-    HelpBlock
+    FormControl
 } from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
 import {getDateTimeString} from "../utilities/DateTime";
-import {containersResultsAccessors, recordsResultsAccessors} from "../search/Results";
+import {recordsResultsAccessors} from "../search/Results";
 import {getColumns} from "../utilities/ReactTable";
 import {destroyAction} from "../bulk/Action";
 import {goTo} from "../context/ContextualActions";
