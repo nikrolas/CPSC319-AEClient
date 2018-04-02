@@ -110,6 +110,7 @@ class UpdateRecord extends Component {
                 this.setState({stateId: data.stateId});
                 this.setState({consignmentCode:data.consignmentCode});
                 this.setState({notes:data.notes});
+                this.setState({containerId: data.containerId});
                 data.classIds.forEach( id => {
                    this.state.classificationBack.push(id.toString());
                 });

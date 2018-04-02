@@ -24,6 +24,32 @@ export function parseResponseList(response) {
     return errorMsg;
 }
 
+export function parseResponses(responses, data, dataKey) {
+    let errorMsg = "";
+    let msgNumMap = {};
+    responses.forEach((error, index) => {
+        if (msgNumMap[error.message]) {
+            msgNumMap[error.message].push(data[index][dataKey]);
+        } else {
+            msgNumMap[error.message] = [data[index][dataKey]];
+        }
+    });
+
+    let uniqueMsgs = Object.keys(msgNumMap);
+    if (uniqueMsgs.length > 0) {
+        uniqueMsgs.forEach(msg => {
+            let appendItems = "";
+            if (msgNumMap[msg] && msgNumMap[msg].length > 0) {
+                appendItems = " Items: " + msgNumMap[msg].join(", ");
+            }
+            errorMsg = errorMsg + msg + appendItems + "\n";
+        });
+    } else {
+        errorMsg = "No errors found.";
+    }
+    return errorMsg;
+}
+
 export function isOk(response) {
     let errors = 0;
 

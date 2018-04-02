@@ -1,5 +1,6 @@
 import {serviceRoot} from "./ServiceRoot";
 import {updateRecord} from "./RecordsApi";
+import {parseResponses} from "../utilities/Responses";
 
 let containersPath = "/containers";
 let containerPath = "/container";
@@ -63,9 +64,52 @@ export function getMostRecentClosedAt(containerId, userId) {
 }
 
 
-export function addRecordToContainer(containerId, record, userId) {
-    let state = record;
-    state.containerId = containerId;
-    state.user = {id: userId};
-    return updateRecord(record.id, state);
+export function addRecordsToContainer(containerId, records, userId) {
+
+    return new Promise((resolve, reject) => {
+        let promises = [];
+
+        records.forEach(record => {
+            let state = record;
+            state.containerId = containerId;
+            state.user = {id: userId};
+            state.retentionSchedule = record.scheduleId;
+            state.classificationBack = record.classIds;
+            promises.push(updateRecord(record.id, state));
+        });
+
+        Promise.all(promises)
+            .then(responses => {
+                let errResponses = [];
+                let errRecords = [];
+                responses.forEach((response, index) => {
+                    if (!response.ok) {
+                        errResponses.push(response);
+                        errRecords.push(records[index]);
+                    }
+                });
+
+                if (errResponses.length > 0) {
+                    let responsePromises = [];
+                    errResponses.forEach(errResponse => {
+                        responsePromises.push(errResponse.json());
+                    });
+
+                    Promise.all(responsePromises)
+                        .then(responses => {
+                            reject(parseResponses(responses, errRecords, "number"));
+                        })
+                        .catch(err => {
+                            reject("An unexpected error occured while parsing the error responses. " + err);
+                        });
+                } else {
+                    resolve();
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                reject("An unexpected error occured while adding records to the container: " + error);
+            })
+
+    });
 }

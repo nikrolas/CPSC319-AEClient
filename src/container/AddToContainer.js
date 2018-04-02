@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Alert, Grid, Row, Col, ButtonToolbar, Button} from 'react-bootstrap'
-import {addRecordToContainer} from "../api/ContainersApi";
+import {addRecordsToContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
 import {isARecordItem} from "../utilities/Items";
 import AlertDismissable from "../AlertDismissable";
@@ -14,7 +14,7 @@ class AddToContainer extends Component {
         this.state =
             {
                 user: props.userData,
-                success: false,
+                success: null,
                 alertMsg: "",
                 title: "",
                 location: "",
@@ -24,8 +24,6 @@ class AddToContainer extends Component {
 
                 invalidStateErrors: []
             };
-
-        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -54,24 +52,26 @@ class AddToContainer extends Component {
             invalidStateErrors.push("One container must be selected.");
         }
 
-        let selectedContainer = this.state.selectedContainers[0];
         let alertMsg = "";
+        if (invalidStateErrors.length === 0) {
+            let selectedContainer = this.state.selectedContainers[0];
 
-        this.state.selectedRecords.forEach(record => {
-            if (record.containerNumber && record.containerNumber !== selectedContainer.containerNumber) {
-                alertMsg = "Record " + record.number + " is already in a container: " + record.containerNumber;
-                return;
-            }
+            this.state.selectedRecords.forEach(record => {
+                if (record && record.containerNumber && record.containerNumber !== selectedContainer.containerNumber) {
+                    alertMsg = "Record " + record.number + " is already in a container: " + record.containerNumber;
+                    return;
+                }
 
-            if (selectedContainer.locationId && record.locationId !== selectedContainer.locationId) {
-                alertMsg = "Records are in a different location. Expected: " + selectedContainer.locationName;
-                return;
-            }
-            if (selectedContainer.scheduleId && record.scheduleId !== selectedContainer.scheduleId) {
-                alertMsg = "Records have a different schedule. Expected: " + selectedContainer.scheduleName;
-                return;
-            }
-        });
+                if (selectedContainer && selectedContainer.locationId && record.locationId !== selectedContainer.locationId) {
+                    alertMsg = "Records are in a different location. Expected: " + selectedContainer.locationName;
+                    return;
+                }
+                if (selectedContainer && selectedContainer.scheduleId && record.scheduleId !== selectedContainer.scheduleId) {
+                    alertMsg = "Records have a different schedule. Expected: " + selectedContainer.scheduleName;
+                    return;
+                }
+            });
+        }
 
         this.setState({alertMsg, invalidStateErrors});
     }
@@ -92,60 +92,20 @@ class AddToContainer extends Component {
         return {selectedRecords, selectedContainers};
     };
 
-    handleChange(e) {
-        e.persist();
-        this.setState({[e.target.name]: e.target.value}, () => {
-            if (e.target.name === "title") {
-                const length = this.state.title.length;
-                if (length >= 1 && length < 256) {
-                    this.setState({titleValidationState: 'success'});
-                }
-                else if (length >= 256) {
-                    this.setState({titleValidationMsg: "Please enter less than 256 characters"});
-                    this.setState({titleValidationState: 'error'});
-                }
-                else {
-                    this.setState({titleValidationState: null});
-                }
-            }
-
-            if (e.target.name === "location") {
-                const length = this.state.location.length;
-                if (length >= 1) {
-                    this.setState({locationValidationState: 'success'});
-                }
-                else {
-                    this.setState({locationValidationState: null});
-                }
-            }
-
-            if (e.target.name === "notes") {
-                const length = this.state.notes.length;
-                this.setState({notesValidationState: 'success'});
-                if (length === 0) {
-                    this.setState({notes: null});
-                }
-            }
-        });
-    };
-
     handleSubmit = (event) => {
-        addRecordToContainer(this.state.selectedContainers[0].id, this.state.selectedRecords[0], this.state.user.id)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                if (data.status !== 201) {
-                    throw new Error(data.message);
-                }
-                this.setState({success: true});
-                this.props.history.push("/viewContainer/" + data.containerId);
-            })
-            .catch(err => {
-                this.setState({success: false});
-                this.setState({alertMsg: "Unable to add to container: " + err.message});
-                window.scrollTo(0, 0);
-            });
+        if (this.state.success) {
+            this.props.history.push("/viewContainer/" + this.state.selectedContainers[0].containerId);
+        } else {
+            addRecordsToContainer(this.state.selectedContainers[0].containerId, this.state.selectedRecords, this.state.user.id)
+                .then(result => {
+                    this.setState({alertMsg: "Successfully added the records to the container.", success: true});
+                })
+                .catch(err => {
+                    this.setState({success: false});
+                    this.setState({alertMsg: err});
+                    window.scrollTo(0, 0);
+                });
+        }
         event.preventDefault();
     };
 
@@ -238,9 +198,14 @@ class AddToContainer extends Component {
                         </Row>
                         <Row>
                             <ButtonToolbar style={btnStyle}>
-                                <Button onClick={handleCancel}> Cancel </Button>
-                                <Button bsStyle="primary" onClick={this.handleSubmit}
-                                        disabled={this.state.alertMsg !== ""}>Proceed</Button>
+                                <Button onClick={handleCancel}>
+                                    {this.state.success ? "Done" : "Cancel"}
+                                </Button>
+                                <Button bsStyle="primary"
+                                        onClick={this.handleSubmit}
+                                        disabled={this.state.success === false}>
+                                    {this.state.success ? "View Container" : "Proceed"}
+                                </Button>
                             </ButtonToolbar>
                         </Row>
                     </Grid>
