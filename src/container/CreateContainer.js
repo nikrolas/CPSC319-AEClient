@@ -78,13 +78,13 @@ class CreateContainer extends Component {
                     success: false
                 });
             } else {
-                setData(this, this.state.selectedRecords, this.state.columns, () => {
-                    this.setState({success: true});
-                });
+                this.setState({success: true});
             }
         }
+        setData(this, this.state.selectedRecords, this.state.columns, () => {
+            this.setState({locationId, locations, invalidStateErrors});
+        });
 
-        this.setState({locationId, locations, invalidStateErrors});
     }
 
 

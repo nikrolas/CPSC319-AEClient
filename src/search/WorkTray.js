@@ -138,7 +138,10 @@ class WorkTray extends Component {
         let iconColumn = columns.find(col => {
             return col.accessor === "icon";
         })
-        let iconCell = iconColumn.Cell;
+        let iconCell = () => {};
+        if (iconColumn) {
+         iconCell = iconColumn.Cell;
+        }
 
         let columnsCopy = JSON.parse(JSON.stringify(columns));
         let index = columnsCopy.findIndex(column => {
@@ -146,11 +149,13 @@ class WorkTray extends Component {
         });
         columnsCopy.splice(index, 1);
 
-        //Add Cell function back to icon column
-        let shallowIconColumn = columnsCopy.find(col => {
-            return col.accessor === "icon";
-        })
-        shallowIconColumn.Cell = iconCell;
+        if (iconColumn) {
+            //Add Cell function back to icon column
+            let shallowIconColumn = columnsCopy.find(col => {
+                return col.accessor === "icon";
+            })
+            shallowIconColumn.Cell = iconCell;
+        }
 
         return columnsCopy;
     };
