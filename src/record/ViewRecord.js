@@ -120,61 +120,65 @@ class ViewRecord extends Component {
     }
 
     addToContainer = (e) => {
-        let options = {
-            record: false,
-            container: true
-        }
+        if (this.state.newContainerNumber && this.state.newContainerNumber.length > 0) {
+            let options = {
+                record: false,
+                container: true
+            }
 
-        searchByNumber(this.state.newContainerNumber, options, 1, 5, this.state.user.id)
-            .then(response => {
-                return response.json()
-            })
-            .then((res) => {
-                if (res.error || (res.status && res.status !== 200)) {
-                    let status = res.status ? res.status : "";
-                    let err = res.error ? " " + res.error : "";
-                    let msg = res.message ? ": " + res.message : "";
-                    let alertMsg = status + err + msg;
-                    this.setState({alertMsg});
-                    window.scrollTo(0, 0)
-                }
-                else {
-                    if (res.results && res.results.length === 1) {
-                        addRecordsToContainer(res.results[0].containerId, [this.state.recordJson], this.state.user.id)
-                            .then(responses => {
-                                return responses[0].json();
-                            })
-                            .then(result => {
-                                this.setData(this, result);
-                                this.setState({alertMsg: "Successfully added to the container: " + result.containerNumber, success: true});
-                                window.scrollTo(0, 0);
-                            })
-                            .catch(err => {
-                                this.setState({success: false});
-                                this.setState({alertMsg: err});
-                                window.scrollTo(0, 0);
-                            });
-                    } else if (res.results && res.results.length > 1) {
-                        this.setState({success: false});
-                        this.setState({alertMsg: "The container number is not unique."});
-                        window.scrollTo(0, 0);
-                    } else if (res.results && res.results.length === 0) {
-                        this.setState({success: false});
-                        this.setState({alertMsg: "The container number does not exist."});
-                        window.scrollTo(0, 0);
-                    } else {
-                        console.log(res);
-                        this.setState({success: false});
-                        this.setState({alertMsg: "Unexpected result from looking up the container number. See console for more details."});
-                        window.scrollTo(0, 0);
+            searchByNumber(this.state.newContainerNumber, options, 1, 5, this.state.user.id)
+                .then(response => {
+                    return response.json()
+                })
+                .then((res) => {
+                    if (res.error || (res.status && res.status !== 200)) {
+                        let status = res.status ? res.status : "";
+                        let err = res.error ? " " + res.error : "";
+                        let msg = res.message ? ": " + res.message : "";
+                        let alertMsg = status + err + msg;
+                        this.setState({alertMsg});
+                        window.scrollTo(0, 0)
                     }
-                }
-            })
-            .catch(error => {
-                this.setState({alertMsg: error, loading: false});
-                window.scrollTo(0, 0)
-            });
-
+                    else {
+                        if (res.results && res.results.length === 1) {
+                            addRecordsToContainer(res.results[0].containerId, [this.state.recordJson], this.state.user.id)
+                                .then(responses => {
+                                    return responses[0].json();
+                                })
+                                .then(result => {
+                                    this.setData(this, result);
+                                    this.setState({
+                                        alertMsg: "Successfully added to the container: " + result.containerNumber,
+                                        success: true
+                                    });
+                                    window.scrollTo(0, 0);
+                                })
+                                .catch(err => {
+                                    this.setState({success: false});
+                                    this.setState({alertMsg: err});
+                                    window.scrollTo(0, 0);
+                                });
+                        } else if (res.results && res.results.length > 1) {
+                            this.setState({success: false});
+                            this.setState({alertMsg: "The container number is not unique."});
+                            window.scrollTo(0, 0);
+                        } else if (res.results && res.results.length === 0) {
+                            this.setState({success: false});
+                            this.setState({alertMsg: "The container number does not exist."});
+                            window.scrollTo(0, 0);
+                        } else {
+                            console.log(res);
+                            this.setState({success: false});
+                            this.setState({alertMsg: "Unexpected result from looking up the container number. See console for more details."});
+                            window.scrollTo(0, 0);
+                        }
+                    }
+                })
+                .catch(error => {
+                    this.setState({alertMsg: error, loading: false});
+                    window.scrollTo(0, 0)
+                });
+        }
         e.preventDefault();
     }
 
@@ -369,7 +373,7 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Note</b>
                                 <br/>
-                                {this.state.recordJson["notes"] !== ""
+                                {this.state.recordJson["notes"] !== null
                                     ? this.state.recordJson["notes"]
                                     : "n/a"}
                             </p>

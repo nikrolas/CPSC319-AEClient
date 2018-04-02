@@ -148,7 +148,15 @@ class UpdateRecord extends Component {
         getRecordStates()
             .then(response => response.json())
             .then(data => {
-                this.setState({recordStateResponse: data});
+                let splice_data = data;
+                if(this.state.retentionScheduleName !== null) {
+                    splice_data.splice(3,1);
+                }
+                else {
+                    splice_data.splice(1,1);
+                    splice_data.splice(4,1);
+                }
+                this.setState({recordStateResponse: splice_data});
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
