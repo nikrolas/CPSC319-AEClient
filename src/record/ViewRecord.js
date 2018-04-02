@@ -141,6 +141,7 @@ class ViewRecord extends Component {
         let recordState = JSON.parse(JSON.stringify(this.state.recordJson));
         recordState.classificationBack = recordState.classIds;
         recordState.containerNumber = "";
+        recordState.containerId = null;
         recordState.retentionSchedule = recordState.scheduleId;
         recordState.user = JSON.parse(JSON.stringify(this.state.user));
 
