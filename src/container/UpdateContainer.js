@@ -33,7 +33,7 @@ class UpdateContainer extends Component {
 
                 consignmentCodeValidationMsg: "",
                 consignmentCodeValidationState: "success",
-                consignmentCode: null,
+                consignmentCode: "",
 
                 notesValidationMsg: "",
                 notesValidationState: "success",
@@ -109,56 +109,56 @@ class UpdateContainer extends Component {
     };
 
     handleChange(e) {
-            e.persist();
-            this.setState({[e.target.name]: e.target.value}, () => {
-                if (e.target.name === "title") {
-                    const length = this.state.responseJson["title"].length;
-                    if (length >= 1 && length < 256) {
-                        this.setState({titleValidationState: 'success'});
-                    }
-                    else if (length >= 250) {
-                        this.setState({titleValidationMsg: "Please enter less than 256 characters"});
-                        this.setState({titleValidationState: 'error'});
-                    }
-                    else {
-                        this.setState({titleValidationState: null});
-                    }
+        e.persist();
+        this.setState({[e.target.name]: e.target.value}, () => {
+            if (e.target.name === "title") {
+                const length = this.state.responseJson["title"].length;
+                if (length >= 1 && length < 256) {
+                    this.setState({titleValidationState: 'success'});
                 }
-
-                if (e.target.name === "location") {
-                    const length = this.state.location.length;
-                    if (length >= 1) {
-                        this.setState({locationValidationState: 'success'});
-                    }
-                    else {
-                        this.setState({locationValidationState: 'error'});
-                        this.setState({locationValidationMsg: 'Location should be pre-selected. Please notify the developers.'});
-                    }
+                else if (length >= 250) {
+                    this.setState({titleValidationMsg: "Please enter less than 256 characters"});
+                    this.setState({titleValidationState: 'error'});
                 }
-
-                if (e.target.name === "consignmentCode") {
-                    const length = this.state.consignmentCode.length;
-                    if (length >= 1 && length <= 50) {
-                        this.setState({consignmentCodeValidationState: 'success'});
-                    }
-                    else if (length > 50) {
-                        this.setState({consignmentCodeValidationState: 'error'});
-                        this.setState({consignmentCodeValidationMsg: 'Please enter less than 51 characters only'});
-                    }
-                    else {
-                        this.setState({consignmentCode: null});
-                        this.setState({consignmentCodeValidationState: 'success'});
-                    }
+                else {
+                    this.setState({titleValidationState: null});
                 }
+            }
 
-                if (e.target.name === "notes") {
-                    const length = this.state.notes.length;
-                    if (length >= 0) {
-                        this.setState({notesValidationState: 'success'});
-                    }
+            if (e.target.name === "location") {
+                const length = this.state.location.length;
+                if (length >= 1) {
+                    this.setState({locationValidationState: 'success'});
                 }
+                else {
+                    this.setState({locationValidationState: 'error'});
+                    this.setState({locationValidationMsg: 'Location should be pre-selected. Please notify the developers.'});
+                }
+            }
 
-            });
+            if (e.target.name === "consignmentCode") {
+                const length = this.state.consignmentCode.length;
+                if (length >= 1 && length <= 50) {
+                    this.setState({consignmentCodeValidationState: 'success'});
+                }
+                else if (length > 50) {
+                    this.setState({consignmentCodeValidationState: 'error'});
+                    this.setState({consignmentCodeValidationMsg: 'Please enter less than 51 characters only'});
+                }
+                else {
+                    this.setState({consignmentCode: ""});
+                    this.setState({consignmentCodeValidationState: 'success'});
+                }
+            }
+
+            if (e.target.name === "notes") {
+                const length = this.state.notes.length;
+                if (length >= 0) {
+                    this.setState({notesValidationState: 'success'});
+                }
+            }
+
+        });
     }
 
     handleSubmit(event) {
@@ -184,24 +184,31 @@ class UpdateContainer extends Component {
             }
         }
         if (!failValidation) {
-            updateContainer(this.props.match.params.containerId, this.state, this.state.user.id)
-                .then(response => {
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 401 ||data.status === 400||data.status === 404||data.status === 500) {
-                        this.setState({alertMsg: data.message});
+            this.setState({
+                title: this.state.title.trim(),
+                consignmentCode: this.state.consignmentCode.trim(),
+                notes: this.state.notes.trim()
+            }, () => {
+                updateContainer(this.props.match.params.containerId, this.state, this.state.user.id)
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500) {
+                            this.setState({alertMsg: data.message});
+                            window.scrollTo(0, 0)
+                        }
+                        else {
+                            this.props.history.push("/viewContainer/" + data.containerId);
+                        }
+                    })
+                    .catch(error => {
+                        this.setState({alertMsg: "The application was unable to connect to the network. Please try again later."});
                         window.scrollTo(0, 0)
-                    }
-                    else {
-                        this.props.history.push("/viewContainer/" + data.containerId);
-                    }
-                })
-                .catch(error => {
-                    this.setState({alertMsg: "The application was unable to connect to the network. Please try again later."});
-                    window.scrollTo(0, 0)
-                });
+                    });
+            });
         }
+
         event.preventDefault();
     }
 

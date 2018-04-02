@@ -4,6 +4,7 @@ import {createContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
 import AlertDismissable from "../AlertDismissable";
 import {isARecordItem} from "../utilities/Items";
+import {setData} from "../utilities/ReactTable";
 
 class CreateContainer extends Component {
 
@@ -77,7 +78,9 @@ class CreateContainer extends Component {
                     success: false
                 });
             } else {
-                this.setState({success: true});
+                setData(this, this.state.selectedRecords, this.state.columns, () => {
+                    this.setState({success: true});
+                });
             }
         }
 
@@ -173,9 +176,9 @@ class CreateContainer extends Component {
 
             let formData =
                 {
-                    title: state.title,
+                    title: state.title.trim(),
                     locationId: state.locationId,
-                    notes: state.notes
+                    notes: state.notes.trim()
                 };
 
             let selectedRecordIds = [];
@@ -224,7 +227,7 @@ class CreateContainer extends Component {
         let listLocationJson = null;
         const destructionDate = <div>{this.state.destructionDate}</div>;
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
-        const {selectedRecords, columns} = this.state;
+        const {columns, data} = this.state;
 
         let handleAction = () => {
             this.props.history.push("/");
@@ -314,7 +317,7 @@ class CreateContainer extends Component {
                     <strong>Records to contain:</strong>
                     <div style={styles.recordsTable}>
                         <ReactTable
-                            data={selectedRecords}
+                            data={data}
                             columns={columns}
                             className="-striped -highlight"
                             showPagination={true}

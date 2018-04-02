@@ -244,7 +244,7 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Consignment Code</b>
                                 <br/>
-                                {this.state.containerJson["consignmentCode"] ? this.state.containerJson["consignmentCode"] : "(none)"}
+                                {this.state.containerJson["consignmentCode"] && this.state.containerJson["consignmentCode"].length > 0 ? this.state.containerJson["consignmentCode"] : "(none)"}
                             </p>
                         </Col>
                         <Col md={4}>
