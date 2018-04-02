@@ -163,24 +163,24 @@ class AddToContainer extends Component {
                                 <p style={title}>
                                     <b>Location</b>
                                     <br/>
-                                    {container.locationName}
+                                    {container.locationName ? container.locationName : "N/A"}
                                 </p>
                                 <p style={title}>
                                     <b>State</b>
                                     <br/>
-                                    {container.state}
+                                    {container.state ? container.state : "N/A"}
                                 </p>
                             </Col>
                             <Col md={5}>
                                 <p style={title}>
                                     <b>Consignment Code</b>
                                     <br/>
-                                    {container.consignmentCode}
+                                    {container.consignmentCode ? container.consignmentCode: "N/A"}
                                 </p>
                                 <p style={title}>
-                                    <b>Schedule:</b>
+                                    <b>Schedule</b>
                                     <br/>
-                                    {container.scheduleName}
+                                    {container.scheduleName ? container.scheduleName : "N/A"}
                                 </p>
                             </Col>
                         </Row>

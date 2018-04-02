@@ -70,7 +70,7 @@ export function addRecordsToContainer(containerId, records, userId) {
         let promises = [];
 
         records.forEach(record => {
-            let state = record;
+            let state = JSON.parse(JSON.stringify(record));
             state.containerId = containerId;
             state.user = {id: userId};
             state.retentionSchedule = record.scheduleId;
