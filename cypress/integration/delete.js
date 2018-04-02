@@ -130,9 +130,14 @@ describe('delete', function () {
                                 cy.actionOnAllWorktrayItems("Delete");
                                 cy.contains("Confirm").click();
                                 cy.contains("You do not have permission to delete container " + containerNumbers[0] + " from your location.");
+
+                                cy.clearWorkTray();
+                                cy.addRecordsToWorkTray(recordNumbers);
+                                cy.actionOnAllWorktrayItems("Delete");
+                                cy.contains("Confirm").click();
+                                cy.contains("You do not have permission to delete records in Edmonton.");
                             });
                     });
             });
     });
-})
-;
+});

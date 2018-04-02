@@ -3,6 +3,7 @@ import {deleteContainers, getContainersByIds, updateContainer} from "../api/Cont
 import {deleteRecordByIds, destroyRecords, getRecordStates} from "../api/RecordsApi";
 import {getColumns} from "../utilities/ReactTable";
 import {containersResultsAccessors} from "../search/Results";
+import {parseResponseList} from "../utilities/Responses";
 
 
 function getSelectedRecordsAndContainerIds(items) {
@@ -293,21 +294,17 @@ export let deleteAction = {
 
         return new Promise((resolve, reject) => {
             if (recordIds.length > 0) {
-                let deleteRecordsSuccess = false;
                 deleteRecordByIds(recordIds, userId)
                     .then(response => {
-                        if (response.ok) {
-                            deleteRecordsSuccess = true;
-                        } else {
-                            response.json();
-                        }
+                        return response.text();
                     })
                     .then(result => {
-                        if (!deleteRecordsSuccess) {
-                            reject("Failed to delete records. " + result.error + " Items: " + result.numbers);
+                        if (result && result.length > 0) {
+                            let responseList = JSON.parse(result);
+                            reject(parseResponseList(responseList));
                         } else if (containerIds.length > 0) {
                             deleteSelectedContainers(containerIds, userId)
-                                .then(result => {
+                                .then(() => {
                                     resolve("Successfully deleted the records and containers.");
                                 })
                                 .catch(error => {

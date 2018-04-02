@@ -42,7 +42,7 @@ class ConfirmAction extends Component {
                 this.state.onActionComplete(this);
             })
             .catch(error => {
-                this.setState({alertMsg: "Failed to complete action: " + error, success: false, actionsComplete: true});
+                this.setState({alertMsg: error, success: false, actionsComplete: true});
             });
     };
 
