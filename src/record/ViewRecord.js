@@ -125,8 +125,8 @@ class ViewRecord extends Component {
                 record: false,
                 container: true
             }
-
-            searchByNumber(this.state.newContainerNumber, options, 1, 5, this.state.user.id)
+            let encodedSearchString = encodeURIComponent(this.state.newContainerNumber.trim());
+            searchByNumber(encodedSearchString, options, 1, 5, this.state.user.id)
                 .then(response => {
                     return response.json()
                 })
@@ -160,7 +160,7 @@ class ViewRecord extends Component {
                                 });
                         } else if (res.results && res.results.length > 1) {
                             this.setState({success: false});
-                            this.setState({alertMsg: "The container number is not unique."});
+                            this.setState({alertMsg: "The container number needs to be unique. More than one container was found with the given container number."});
                             window.scrollTo(0, 0);
                         } else if (res.results && res.results.length === 0) {
                             this.setState({success: false});
@@ -413,9 +413,12 @@ class ViewRecord extends Component {
                             </ButtonToolbar>
                         </Col>
                     </Row>
-                    <Row style={{marginTop: "10px"}}>
+                    <Row style={{marginTop: "10px"}}> <ButtonToolbar style={btnStyle}>
                         <Col md={3} mdOffset={2}>
-                            <form onSubmit={e => { e.preventDefault(); }}>
+
+                            <form onSubmit={e => {
+                                e.preventDefault();
+                            }}>
                                 <FormGroup
                                     controlId="addToContainerInput"
                                 >
@@ -425,6 +428,7 @@ class ViewRecord extends Component {
                                         value={this.state.newContainerNumber}
                                         placeholder="Enter Container Number"
                                         onChange={this.handleChange}
+                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
                                     />
                                 </FormGroup>
                             </form>
@@ -432,13 +436,14 @@ class ViewRecord extends Component {
                         <Col>
                             <ButtonToolbar style={btnStyle}>
                                 <Button bsStyle="primary"
-                                        disabled={this.state.recordJson.containerId !== 0}
+                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
                                         onClick={this.addToContainer}
                                 >
                                     Add to Container
                                 </Button>
                             </ButtonToolbar>
                         </Col>
+                    </ButtonToolbar>
                     </Row>
                 </Grid>
                 <br/>
