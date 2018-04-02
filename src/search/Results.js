@@ -12,7 +12,7 @@ import {Alert} from 'react-bootstrap';
 const CheckboxTable = checkboxHOC(ReactTable);
 
 export const recordsResultsAccessors = ["number", "title", "type", "state", "location", "containerNumber", "consignmentCode"];
-export const containersResultsAccessors = ["containerNumber", "title", "state", "location", "consignmentCode"];
+export const containersResultsAccessors = ["containerNumber", "title", "state", "locationName", "consignmentCode"];
 
 class SelectTable extends Component {
     constructor(props) {

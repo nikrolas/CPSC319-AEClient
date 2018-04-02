@@ -1,4 +1,5 @@
 import React from 'react';
+import {isAContainerItem, isARecordItem} from "../utilities/Items";
 
 export const accessorHeaderMapping = {
     number: "Number",
@@ -8,6 +9,7 @@ export const accessorHeaderMapping = {
     containerNumber: "Container",
     classifications: "Classifications",
     location: "Location",
+    locationName: "Location",
     createdAt: "Created",
     updatedAt: "Updated",
     closedAt: "Closed",
@@ -116,12 +118,20 @@ export function setData(context, data, columns, callback) {
     if (data) {
         rowdata = data.map((item, index) => {
             const _id = index;
-            const icon = item.hasOwnProperty("number") ? "record" : "container";
-            return {
+            const icon = isARecordItem(item) ? "record" : "container";
+            let transformedData = {
                 _id,
                 icon,
                 ...item,
+            };
+
+            // Allows container location to show up on results/worktray table
+            // Records objects use "location" instead of "locationName"
+            if (isAContainerItem(item)) {
+                transformedData.location = item.locationName;
             }
+
+            return transformedData;
         });
     }
     setTableState(context, rowdata, columns, callback);
