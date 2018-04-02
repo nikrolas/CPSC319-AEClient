@@ -3,7 +3,7 @@ describe('updateRecord', function () {
         cy.visit('/');
     });
 
-    it('should create a new record', function () {
+    it('should update a new record', function () {
         cy.createRecord("Subject", "Burnaby", null, "Cypress-Create Record", ["CORPORATE AFFAIRS","CONTRACTING"], "PUBLICATION - INVENTORY P5.I2.01", "CYPRESS-TEST", "CYPRESS TESTING", 500);
         cy.get("#edit").click();
         cy.get("#formTitleText").clear().type("Updated Cypress Record");
