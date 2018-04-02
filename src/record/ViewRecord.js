@@ -254,6 +254,15 @@ class ViewRecord extends Component {
         return this.state.success ? 'success' : 'danger';
     };
 
+    getContainerNumber = () => {
+        if (this.state.recordJson["containerNumber"] !== null) {
+            return this.state.recordJson["containerNumber"]
+        } else {
+            return "n/a";
+        }
+    };
+
+
     render() {
 
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
@@ -264,11 +273,31 @@ class ViewRecord extends Component {
         let btnStyle = {
             display: "none",
         };
+
+        let disabledLink = {
+            textDecoration: "inherit",
+            color: "inherit",
+            pointerEvents: "none",
+            cursor: "default"
+        };
+
+        let linkStyle = () => {
+            if (this.state.recordJson.containerId) {
+                return {};
+            } else {
+                return disabledLink;
+            }
+        }
+
         if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
             btnStyle = {
                 display: "flex",
                 justifyContent: "left"
             }
+        }
+        let containerPath = "/";
+        if (this.state.recordJson.containerId) {
+            containerPath = "/viewContainer/" + this.state.recordJson.containerId;
         }
 
         return (
@@ -382,11 +411,9 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Container Number:</b>
                                 <br/>
-                                <div id="containerNumber">
-                                {this.state.recordJson["containerNumber"] !== null
-                                    ? this.state.recordJson["containerNumber"]
-                                    : "n/a"}
-                                </div>
+                                <Link id="containerNumber" style={linkStyle()} to={containerPath}>
+                                    {this.getContainerNumber()}
+                                </Link>
                             </p>
                         </Col>
                         <Col md={9} mdOffset={2}>
@@ -416,7 +443,8 @@ class ViewRecord extends Component {
                                     body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
                                     confirmText="Remove"
                                     title="Removing from container">
-                                    <Button bsStyle="warning" disabled={!this.isInContainer() || this.state.readOnly}>Remove
+                                    <Button bsStyle="warning"
+                                            disabled={!this.isInContainer() || this.state.readOnly}>Remove
                                         From
                                         Container</Button>
                                 </Confirm>
