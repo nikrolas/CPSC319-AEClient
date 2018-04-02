@@ -211,6 +211,30 @@ class SelectTable extends Component {
         });
     };
 
+    sortThisColumn = (id, desc) => {
+        let data = [...this.state.data];
+        data.sort((a, b) => this.defaultSortMethod(a[id], b[id]));
+        if (desc) data.reverse();
+        this.setState({data});
+    };
+    defaultSortMethod = (a, b, desc) => {
+        // force null and undefined to the bottom
+        a = (a === null || a === undefined) ? -Infinity : a
+        b = (b === null || b === undefined) ? -Infinity : b
+        // force any string values to lowercase
+        a = typeof a === 'string' ? a.toLowerCase() : a
+        b = typeof b === 'string' ? b.toLowerCase() : b
+        // Return either 1 or -1 to indicate a sort priority
+        if (a > b) {
+            return 1
+        }
+        if (a < b) {
+            return -1
+        }
+        // returning 0 or undefined will use any subsequent column sorting methods or the row index as a tiebreaker
+        return 0
+    };
+
     render() {
         const {toggleSelection, toggleAll, isSelected, updateTray} = this;
         const {data, columns, selectAll, selection, selectvalue, addbtntext, loading, page, pages, pageSize, alertMsg} = this.state;
@@ -272,6 +296,7 @@ class SelectTable extends Component {
                         defaultPageSize={pageSize}
                         onPageChange={(page) => this.setState({page}, () => this.search(page, pageSize))}
                         onPageSizeChange={(pageSize) => this.setState({pageSize}, () => this.search(page, pageSize))}
+                        onSortedChange={(newSorted) => this.sortThisColumn(newSorted[0].id, newSorted[0].desc)}
                         {...checkboxProps}
                     />
                 </div>
