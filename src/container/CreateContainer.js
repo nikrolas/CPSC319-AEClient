@@ -201,10 +201,13 @@ class CreateContainer extends Component {
                         window.scrollTo(0, 0);
 
                         if (data.exception) {
-                            this.setState({alertMsg: data.message});
+                            this.setState({alertMsg: data.message, success: false});
+                        }
+                        else if (data.number) {
+                            this.setState({alertMsg: data.error + ": " + data.number.join(", "), success: false});
                         }
                         else {
-                            this.setState({alertMsg: data.error + ": " + data.number});
+                            this.setState({alertMsg: "An unexpected error occured while creating the container: " + data});
                         }
                     }
                 })
