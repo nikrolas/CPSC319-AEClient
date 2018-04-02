@@ -59,15 +59,18 @@ class AddToContainer extends Component {
             this.state.selectedRecords.forEach(record => {
                 if (record && record.containerNumber && record.containerNumber !== selectedContainer.containerNumber) {
                     alertMsg = "Record " + record.number + " is already in a container: " + record.containerNumber;
+                    this.setState({success: false});
                     return;
                 }
 
                 if (selectedContainer && selectedContainer.locationId && record.locationId !== selectedContainer.locationId) {
                     alertMsg = "Records are in a different location. Expected: " + selectedContainer.locationName;
+                    this.setState({success: false});
                     return;
                 }
                 if (selectedContainer && selectedContainer.scheduleId && record.scheduleId !== selectedContainer.scheduleId) {
                     alertMsg = "Records have a different schedule. Expected: " + selectedContainer.scheduleName;
+                    this.setState({success: false});
                     return;
                 }
             });
