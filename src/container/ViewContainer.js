@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import {Confirm} from 'react-confirm-bootstrap'
 import {deleteContainers, getContainerById} from "../api/ContainersApi";
-import {getRecordById} from "../api/RecordsApi";
+import {getRecordsByIds} from "../api/RecordsApi";
 import ReactTable from "react-table";
 import {getColumns, setData} from "../utilities/ReactTable";
 import {getDateString, getDateTimeString, transformDates} from "../utilities/DateTime";
@@ -117,20 +117,22 @@ class ViewContainer extends Component {
 
     setRecords = (recordIds) => {
         let that = this;
-        let promises = [];
-        recordIds.forEach((record) => {
-            promises.push(getRecordById(record, this.state.user.id)
-                .then((result) => {
-                    return result.json();
-                })
-            );
-        });
-
-        Promise.all(promises)
-            .then((results) => {
-                if (results.length > 0) {
-                    this.setRecordsState(results);
-                    setData(that, results, this.state.columns);
+        let r = (recordIds && recordIds.length > 0) ? JSON.stringify(recordIds) : "";
+        let recordsIds = r ? r.substring(1, r.length - 1) : "";
+        getRecordsByIds(recordsIds, this.state.user.id)
+            .then((response) => {
+                return response.json();
+            })
+            .then((res) => {
+                if (res.error || (res.status && res.status !== 200)) {
+                    let status = res.status ? res.status : "";
+                    let err = res.error ? " " + res.error : "";
+                    let msg = res.message ? ": " + res.message : "";
+                    throw new Error(status + err + msg);
+                }
+                else if (res.length > 0) {
+                    this.setRecordsState(res);
+                    setData(that, res, this.state.columns);
                 }
             })
             .catch((err) => {

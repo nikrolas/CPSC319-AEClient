@@ -307,6 +307,10 @@ class ViewRecord extends Component {
                                 <Link to={updateRecordLink}>
                                     <Button bsStyle="primary" disabled={this.state.readOnly}> Edit Record </Button>
                                 </Link>
+                                <Link to={'/createVolume'}>
+                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}
+                                            disabled={this.state.readOnly}> Create Volume </Button>
+                                </Link>
                                 <Confirm
                                     onConfirm={this.handleRemoveFromContainer}
                                     body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
@@ -328,10 +332,6 @@ class ViewRecord extends Component {
                                     title="Deleting Record">
                                     <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
-                                <Link to={'/createVolume'}>
-                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}
-                                            disabled={this.state.readOnly}> Create Volume </Button>
-                                </Link>
                             </ButtonToolbar>
                         </Col>
                     </Row>
