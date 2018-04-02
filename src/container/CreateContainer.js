@@ -52,6 +52,16 @@ class CreateContainer extends Component {
             invalidStateErrors.push("At least one record must be selected.");
         }
 
+        let recordsAlreadyContained = this.state.selectedRecords.filter(record => {
+            return record.containerNumber != null || record.containerId != 0;
+        });
+
+        if (recordsAlreadyContained.length > 0) {
+            let recordNumbers = recordsAlreadyContained.map(r => r.containerNumber);
+            this.setState({alertMsg: "One or more records are already in a container: " + recordNumbers.join(", "), success: false});
+        }
+
+
         this.setState({locationId, locations, invalidStateErrors});
     }
 
@@ -276,7 +286,7 @@ class CreateContainer extends Component {
                     <Button bsStyle="danger" style={{marginRight: '10px'}} onClick={() => {
                         this.props.history.goBack()
                     }}>Cancel</Button>
-                    <Button bsStyle="primary" type="submit">Submit</Button>
+                    <Button bsStyle="primary" type="submit" disabled={!this.state.success}>Submit</Button>
                 </form>
                 <div style={styles.container}>
                     <strong>Records to contain:</strong>
