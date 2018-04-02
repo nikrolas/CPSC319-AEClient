@@ -50,17 +50,36 @@ class CreateContainer extends Component {
 
         if (!this.state.selectedRecords || !this.state.selectedRecords.length > 0) {
             invalidStateErrors.push("At least one record must be selected.");
+        } else {
+
+            let recordsAlreadyContained = this.state.selectedRecords.filter(record => {
+                return record.containerNumber !== null || record.containerId !== 0;
+            });
+
+            let firstRecordSchedule = this.state.selectedRecords[0].scheduleId;
+            let differentSchedules = false;
+
+            this.state.selectedRecords.forEach(record => {
+                if (record.scheduleId !== firstRecordSchedule) {
+                    differentSchedules = true;
+                }
+            })
+
+            if (recordsAlreadyContained.length > 0) {
+                let recordNumbers = recordsAlreadyContained.map(r => r.containerNumber);
+                this.setState({
+                    alertMsg: "One or more records are already in a container: " + recordNumbers.join(", "),
+                    success: false
+                });
+            } else if (differentSchedules) {
+                this.setState({
+                    alertMsg: "You cannot contain records with different retention schedules.",
+                    success: false
+                });
+            } else {
+                this.setState({success: true});
+            }
         }
-
-        let recordsAlreadyContained = this.state.selectedRecords.filter(record => {
-            return record.containerNumber != null || record.containerId != 0;
-        });
-
-        if (recordsAlreadyContained.length > 0) {
-            let recordNumbers = recordsAlreadyContained.map(r => r.containerNumber);
-            this.setState({alertMsg: "One or more records are already in a container: " + recordNumbers.join(", "), success: false});
-        }
-
 
         this.setState({locationId, locations, invalidStateErrors});
     }
