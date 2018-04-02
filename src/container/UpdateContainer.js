@@ -185,9 +185,9 @@ class UpdateContainer extends Component {
         }
         if (!failValidation) {
             this.setState({
-                title: this.state.title.trim(),
-                consignmentCode: this.state.consignmentCode.trim(),
-                notes: this.state.notes.trim()
+                title: this.state.title ? this.state.title.trim() : this.state.title,
+                consignmentCode: this.state.consignmentCode ? this.state.consignmentCode.trim() : this.state.consignmentCode,
+                notes: this.state.notes ? this.state.notes.trim() : this.state.notes
             }, () => {
                 updateContainer(this.props.match.params.containerId, this.state, this.state.user.id)
                     .then(response => {

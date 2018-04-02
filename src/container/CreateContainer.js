@@ -176,9 +176,9 @@ class CreateContainer extends Component {
 
             let formData =
                 {
-                    title: state.title.trim(),
+                    title: state.title ? state.title.trim() : state.title,
                     locationId: state.locationId,
-                    notes: state.notes.trim()
+                    notes: state.notes ? state.notes.trim() : state.notes
                 };
 
             let selectedRecordIds = [];
