@@ -50,7 +50,11 @@ function destroySelectedRecords(uniqueRecordIds, userId) {
             .then(result => {
                 if (!success) {
                     if (result.number) {
-                        reject(result.error + " Items: " + result.number);
+                        let itemsStr = "";
+                        if (result.number.length > 0) {
+                            itemsStr = " Items: " + result.number.join(", ");
+                        }
+                        reject(result.error + itemsStr);
                     } else if (result.exception) {
                         reject(result.message);
                     } else {
@@ -80,7 +84,11 @@ function deleteSelectedContainers(containerIds, userId) {
             .then(result => {
                 if (!success) {
                     if (result.containerNumber) {
-                        reject(result.error + ": " + result.containerNumber);
+                        let containerNumStr = "";
+                        if (result.containerNumber.length > 0) {
+                            containerNumStr = ": " + result.containerNumber.join(", ");
+                        }
+                        reject(result.error + containerNumStr);
                     } else if (result.exception) {
                         reject(result.message);
                     }
@@ -201,7 +209,11 @@ export let deleteEmptyContainersAction = {
                         response.json()
                             .then(result => {
                                 if (result.containerNumber) {
-                                    reject(result.error + ": " + result.containerNumber);
+                                    let containerNumStr = "";
+                                    if (result.containerNumber.length > 0) {
+                                        containerNumStr = ": " + result.containerNumber.join(", ");
+                                    }
+                                    reject(result.error + containerNumStr);
                                 } else if (result.exception) {
                                     reject(result.message)
                                 } else {
