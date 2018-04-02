@@ -1,6 +1,6 @@
 import {isAContainerItem, isARecordItem} from "../utilities/Items";
-import {deleteContainers, getContainersByIds, updateContainer} from "../api/ContainersApi";
-import {deleteRecordByIds, destroyRecords, getRecordStates} from "../api/RecordsApi";
+import {deleteContainers, getContainersByIds} from "../api/ContainersApi";
+import {deleteRecordByIds, destroyRecords} from "../api/RecordsApi";
 import {getColumns} from "../utilities/ReactTable";
 import {containersResultsAccessors} from "../search/Results";
 import {isOk, parseResponseList} from "../utilities/Responses";
@@ -129,62 +129,6 @@ function getEmptyContainers(containerIds, userId) {
     });
 }
 
-function updateContainersState(containers, userId) {
-    return new Promise((resolve, reject) => {
-        let destroyedId = 6;
-        getRecordStates()
-            .then(response => {
-                return response.json();
-            })
-            .then(result => {
-                result.forEach(state => {
-                    if (state.name === "Destroyed") {
-                        destroyedId = state.id;
-                    }
-                });
-
-                let promises = [];
-                containers.forEach(container => {
-                    let updatedState = {
-                        containerNumber: container.containerNumber,
-                        title: container.title,
-                        locationId: container.locationId,
-                        stateId: destroyedId,
-                        consignmentCode: container.consignmentCode,
-                        notes: container.notes,
-                        childRecordIds: container.childRecordIds
-                    };
-                    promises.push(updateContainer(container.containerId, updatedState, userId));
-                });
-
-                Promise.all(promises)
-                    .then(response => {
-                        if (response.filter(r => !r.ok).length > 0) {
-                            let errorPromises = [];
-                            response.forEach(res => {
-                                errorPromises.push(res.json());
-                            });
-                            Promise.all(errorPromises)
-                                .then(errors => {
-                                    reject("Error updating container states. " + errors[0].error);
-                                })
-                                .catch(error => {
-                                    reject("Error updating container states. " + error.error);
-                                })
-                        } else {
-                            resolve();
-                        }
-                    })
-                    .catch(error => {
-                        reject("Unexpected error while updating container states: " + error.error);
-                    })
-            })
-            .catch(error => {
-                reject(error);
-            })
-    });
-}
-
 export let destroyAction = {
     header: "Destroy Records",
     prompt: "The following items will be destroyed.",
@@ -192,7 +136,6 @@ export let destroyAction = {
     action: (items, userId) => {
         let {containerIds, uniqueRecordIds} = getRecordsContainerRecordsAndContainerIds(items);
         let records = items.filter(item => isARecordItem(item));
-        let containers = items.filter(item => isAContainerItem(item));
         let containerIdsOfSelectedRecords = [];
 
         records.forEach(record => {
@@ -205,31 +148,10 @@ export let destroyAction = {
             if (uniqueRecordIds && uniqueRecordIds.length > 0) {
                 destroySelectedRecords(uniqueRecordIds, userId)
                     .then((destroyMsg) => {
-                        updateContainersState(containers, userId)
-                            .then(() => {
-                                getEmptyContainers(containerIds.concat(containerIdsOfSelectedRecords), userId)
-                                    .then(result => {
-                                        this.emptyContainers = result;
-                                        resolve(destroyMsg);
-                                    })
-                                    .catch(error => {
-                                        reject(error);
-                                    });
-                            })
-                            .catch(error => {
-                                reject(error);
-                            })
-                    })
-                    .catch(error => {
-                        reject(error);
-                    });
-            } else if (containerIds.length > 0) {
-                updateContainersState(containers, userId)
-                    .then(() => {
                         getEmptyContainers(containerIds.concat(containerIdsOfSelectedRecords), userId)
                             .then(result => {
                                 this.emptyContainers = result;
-                                resolve("The selected containers are empty and can be deleted.");
+                                resolve(destroyMsg);
                             })
                             .catch(error => {
                                 reject(error);
@@ -237,7 +159,16 @@ export let destroyAction = {
                     })
                     .catch(error => {
                         reject(error);
+                    });
+            } else if (containerIds.length > 0) {
+                getEmptyContainers(containerIds.concat(containerIdsOfSelectedRecords), userId)
+                    .then(result => {
+                        this.emptyContainers = result;
+                        resolve("The selected containers are empty and can be deleted.");
                     })
+                    .catch(error => {
+                        reject(error);
+                    });
             } else if (containerIds.length === 0 && uniqueRecordIds.length === 0) {
                 reject("No items were selected.");
             } else {

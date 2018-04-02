@@ -185,7 +185,7 @@ describe('delete', function () {
             });
     });
 
-    it.only('should not be able to delete a items outside of authorized locations', function () {
+    it('should not be able to delete a items outside of authorized locations', function () {
         let containerNumbers = [];
         let recordNumbers = [];
 
