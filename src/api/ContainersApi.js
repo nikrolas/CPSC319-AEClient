@@ -103,7 +103,7 @@ export function addRecordsToContainer(containerId, records, userId) {
                             reject("An unexpected error occured while parsing the error responses. " + err);
                         });
                 } else {
-                    resolve();
+                    resolve(responses);
                 }
             })
             .catch(error => {
