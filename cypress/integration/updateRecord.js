@@ -18,5 +18,9 @@ describe('updateRecord', function () {
         cy.get("#formConsignmentCode").clear().type("Updated Cypress Test");
         cy.get("#formNotes").clear().type("Updated Cypress Test");
         cy.contains("Submit").click();
+        cy.contains("Updated Cypress Record");
+        cy.contains("CORPORATE AFFAIRS - INCORPORATION(1)");
+        cy.contains("ADVISORY SERVICES/ADVICE/Background");
+        cy.contains("Inactive");
     });
 });

@@ -211,9 +211,11 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Title</b>
                                 <br/>
+                                <div id="title">
                                 {this.state.recordJson["title"] !== ""
                                     ? this.state.recordJson["title"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>State</b>
@@ -227,77 +229,97 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Location</b>
                                 <br/>
+                                <div id="location">
                                 {this.state.recordJson["location"] !== ""
                                     ? this.state.recordJson["location"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Record Type</b>
                                 <br/>
+                                <div id="recordType">
                                 {this.state.recordJson["type"] !== ""
                                     ? this.state.recordJson["type"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Classification</b>
                                 <br/>
+                                <div id="classification">
                                 {this.state.recordJson["classifications"] !== ""
                                     ? this.state.recordJson["classifications"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Consignment Code</b>
                                 <br/>
+                                <div id="consignmentCode">
                                 {this.state.recordJson["consignmentCode"] !== ""
                                     ? this.state.recordJson["consignmentCode"]
                                     : "n/a"}
+                                </div>
                             </p>
                         </Col>
                         <Col md={5}>
                             <p style={title}>
                                 <b>Created At:</b>
                                 <br/>
+                                <div id="createdAt">
                                 {this.state.recordJson["createdAt"] !== ""
                                     ? this.state.recordJson["createdAt"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Updated At:</b>
                                 <br/>
+                                <div id="updatedAt">
                                 {this.state.recordJson["updatedAt"] !== ""
                                     ? this.state.recordJson["updatedAt"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Closed At:</b>
                                 <br/>
+                                <div id="closedAt">
                                 {this.state.recordJson["closedAt"] !== ""
                                     ? this.state.recordJson["closedAt"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Retention Schedule:</b>
                                 <br/>
+                                <div id="retentionSchedule">
                                 {this.state.recordJson["schedule"] !== ""
                                     ? this.state.recordJson["schedule"]
                                     : "n/a"}
                                 ({this.state.recordJson["scheduleYear"]})
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Container Number:</b>
                                 <br/>
+                                <div id="containerNumber">
                                 {this.state.recordJson["containerNumber"] !== null
                                     ? this.state.recordJson["containerNumber"]
                                     : "n/a"}
+                                </div>
                             </p>
                         </Col>
                         <Col md={9} mdOffset={2}>
                             <p style={title}>
                                 <b>Note</b>
                                 <br/>
+                                <div id="note">
                                 {this.state.recordJson["notes"] !== null
                                     ? this.state.recordJson["notes"]
                                     : "n/a"}
+                                </div>
                             </p>
                         </Col>
                     </Row>
