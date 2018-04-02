@@ -305,7 +305,7 @@ class ViewRecord extends Component {
                         <Col md={10} mdOffset={2}>
                             <ButtonToolbar style={btnStyle}>
                                 <Link to={updateRecordLink}>
-                                    <Button bsStyle="primary" disabled={this.state.readOnly}> Edit Record </Button>
+                                    <Button id = "edit" bsStyle="primary" disabled={this.state.readOnly}> Edit Record </Button>
                                 </Link>
                                 <Link to={'/createVolume'}>
                                     <Button bsStyle="primary" style={{marginLeft: '5px'}}

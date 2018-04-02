@@ -498,6 +498,7 @@ class UpdateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId="formTitleText"
                         validationState={this.state.titleValidationState}
                     >
                         <ControlLabel>Title {requiredLabel}</ControlLabel>
@@ -596,6 +597,7 @@ class UpdateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId = "formConsignmentCode"
                         validationState={this.state.consignmentCodeValidationState}
                     >
                         <ControlLabel>Consignment Code</ControlLabel>
@@ -612,6 +614,7 @@ class UpdateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId="formNotes"
                         validationState={this.state.notesValidationState}
                     >
                         <ControlLabel>Notes</ControlLabel>
