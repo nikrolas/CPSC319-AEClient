@@ -24,7 +24,6 @@ class UpdateContainer extends Component {
 
                 locationValidationMsg: "",
                 locationValidationState: "success",
-                location: null,
                 locationId: null,
 
                 //TODO State
@@ -83,7 +82,6 @@ class UpdateContainer extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({userLocations: data.locations});
-                this.setState({location: data.locations[0].locationId})
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
@@ -128,7 +126,7 @@ class UpdateContainer extends Component {
                 }
 
                 if (e.target.name === "location") {
-                    const length = this.state.responseJson["location"].length;
+                    const length = this.state.location.length;
                     if (length >= 1) {
                         this.setState({locationValidationState: 'success'});
                     }
@@ -248,25 +246,24 @@ class UpdateContainer extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         {this.state.titleValidationState === "error"
                             ? <HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
                             : null
                         }
                     </FormGroup>
                     <FormGroup
-                        controlId="formControlsSelect"
+                        controlId="formLocation"
                         onChange={this.handleChange}
                         validationState={this.state.locationValidationState}
                     >
                         <ControlLabel>Location {requiredLabel}</ControlLabel>
                         <FormControl
-                            name="location"
+                            name="locationId"
                             componentClass="select"
                         >
                             {listLocationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
+
                         {this.state.locationValidationState === "error"
                             ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
                             : null
@@ -286,7 +283,6 @@ class UpdateContainer extends Component {
                         >
                             {listRecordStatesJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         {this.state.containerValidationState === "error"
                             ? <HelpBlock>{this.state.containerValidationMsg}</HelpBlock>
                             : null
@@ -303,7 +299,6 @@ class UpdateContainer extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         {this.state.consignmentCodeValidationState === "error"
                             ? <HelpBlock>{this.state.consignmentCodeValidationMsg}</HelpBlock>
                             : null
@@ -320,7 +315,6 @@ class UpdateContainer extends Component {
                             placeholder="Enter text"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         {this.state.notesValidationState === "error"
                             ? <HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
                             : null

@@ -235,7 +235,6 @@ class CreateContainer extends Component {
                             placeholder="Enter container title"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         {this.state.titleValidationState === "error"
                             ? <HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
                             : null
@@ -254,7 +253,6 @@ class CreateContainer extends Component {
                         >
                             {listLocationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         {this.state.locationValidationState === "error"
                             ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
                             : null
@@ -270,7 +268,6 @@ class CreateContainer extends Component {
                                      placeholder="Enter text"
                                      value={this.state.notes}
                                      onChange={this.handleChange}/>
-                        <FormControl.Feedback/>
                         {this.state.notesValidationState === "error"
                             ? <HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
                             : null

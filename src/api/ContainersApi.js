@@ -39,7 +39,7 @@ export function updateContainer(containerId, data, userId) {
             stateId: data.stateId,
             consignmentCode: data.consignmentCode,
             notes: data.notes,
-            records: data.childRecordIds
+            records: data.records
         })
     });
 }
