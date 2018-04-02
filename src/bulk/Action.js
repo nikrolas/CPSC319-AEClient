@@ -3,7 +3,7 @@ import {deleteContainers, getContainersByIds, updateContainer} from "../api/Cont
 import {deleteRecordByIds, destroyRecords, getRecordStates} from "../api/RecordsApi";
 import {getColumns} from "../utilities/ReactTable";
 import {containersResultsAccessors} from "../search/Results";
-import {parseResponseList} from "../utilities/Responses";
+import {isOk, parseResponseList} from "../utilities/Responses";
 
 
 function getSelectedRecordsAndContainerIds(items) {
@@ -291,7 +291,7 @@ export let deleteAction = {
     prompt: "The following items will be deleted.",
     action: (items, userId) => {
         let {containerIds, recordIds} = getSelectedRecordsAndContainerIds(items);
-
+        let deleteSuccess = true;
         return new Promise((resolve, reject) => {
             if (recordIds.length > 0) {
                 deleteRecordByIds(recordIds, userId)
@@ -300,18 +300,24 @@ export let deleteAction = {
                     })
                     .then(result => {
                         if (result && result.length > 0) {
-                            let responseList = JSON.parse(result);
-                            reject(parseResponseList(responseList));
-                        } else if (containerIds.length > 0) {
-                            deleteSelectedContainers(containerIds, userId)
-                                .then(() => {
-                                    resolve("Successfully deleted the records and containers.");
-                                })
-                                .catch(error => {
-                                    reject("Only records were deleted. " + error);
-                                });
-                        } else {
-                            resolve("Successfully deleted the records.")
+                            let response = JSON.parse(result);
+                            if (!isOk(response)) {
+                                deleteSuccess = false;
+                                reject(parseResponseList(response));
+                            }
+                        }
+                        if (deleteSuccess) {
+                            if (containerIds.length > 0) {
+                                deleteSelectedContainers(containerIds, userId)
+                                    .then(() => {
+                                        resolve("Successfully deleted the records and containers.");
+                                    })
+                                    .catch(error => {
+                                        reject("Only records were deleted. " + error);
+                                    });
+                            } else {
+                                resolve("Successfully deleted the records.")
+                            }
                         }
                     })
                     .catch(error => {

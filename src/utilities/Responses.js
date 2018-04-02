@@ -12,10 +12,25 @@ export function parseResponseList(response) {
     let uniqueMsgs = Object.keys(msgNumMap);
     if (uniqueMsgs.length > 0) {
         uniqueMsgs.forEach(msg => {
-            errorMsg = errorMsg + msg + " Items: " + msgNumMap[msg].join(", ") + "\n";
+            let appendItems = "";
+            if (msgNumMap[msg] && msgNumMap[msg].length > 0) {
+                appendItems = " Items: " + msgNumMap[msg].join(", ");
+            }
+            errorMsg = errorMsg + msg + appendItems + "\n";
         });
     } else {
         errorMsg = "No errors found.";
     }
     return errorMsg;
+}
+
+export function isOk(response) {
+    let errors = 0;
+
+    response.responseList.forEach(response => {
+        if (!response.status) {
+            errors++;
+        }
+    });
+    return errors === 0;
 }
