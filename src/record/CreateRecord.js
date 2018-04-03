@@ -131,7 +131,6 @@ class CreateRecord extends Component {
                 if(e.target.name === "recordType") {
                     this.numberPatternRules(this.state.recordTypeResponse[e.target.selectedIndex-1]["numberPattern"]);
                     if(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]!== null) {
-                        console.log(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]);
                         this._typeahead._updateText(this.state.recordTypeResponse[e.target.selectedIndex-1]["defaultSchedule"]);
 
                     }

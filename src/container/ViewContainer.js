@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import {Confirm} from 'react-confirm-bootstrap'
-import {deleteContainers, getContainerById} from "../api/ContainersApi";
-import {getRecordById} from "../api/RecordsApi";
+import {deleteContainers, getContainerById, getMostRecentClosedAt} from "../api/ContainersApi";
+import {getRecordsByIds} from "../api/RecordsApi";
 import ReactTable from "react-table";
 import {getColumns, setData} from "../utilities/ReactTable";
 import {getDateString, getDateTimeString, transformDates} from "../utilities/DateTime";
@@ -22,6 +22,8 @@ class ViewContainer extends Component {
             {
                 user: props.userData,
                 alertMsg: "",
+                success: false,
+                readOnly: false,
                 closedAt: null,
                 data: [],
                 columns: columns,
@@ -35,9 +37,9 @@ class ViewContainer extends Component {
                     locationName: "",
                     title: "",
                     type: "",
-                    location: null,
                     state: null,
                     scheduleName: null,
+                    scheduleYear: null,
                     consignmentCode: "",
                     destructionDate: "",
                     createdAt: "",
@@ -76,13 +78,30 @@ class ViewContainer extends Component {
                     let recordIds = data.childRecordIds;
                     if (recordIds && recordIds.length > 0) {
                         this.setRecords(recordIds)
+
+                        getMostRecentClosedAt(this.props.match.params.containerId, this.state.user.id)
+                            .then(response => {
+                                return response.json();
+                            })
+                            .then(result => {
+                                if (result.exception) {
+                                    this.setState({alertMsg: "Cannot determine the Closed At date. " + result.message});
+                                } else {
+                                    let closedAtObj = {closedAt: result};
+                                    transformDates(closedAtObj, getDateTimeString);
+                                    this.setState({closedAt: closedAtObj.closedAt});
+                                }
+                            })
+                            .catch(error => {
+                                this.setState({alertMsg: "An unexpected error occurred while retreiving the closedAt date: " + error});
+                            });
                     }
                 } else {
                     throw new Error(data.message);
                 }
             })
-            .catch(err => {
-                console.error("Error loading container: " + err.message);
+            .catch(error => {
+                this.setState({alertMsg: "An unexpected error occurred while loading the container: " + error});
             });
     };
 
@@ -91,21 +110,21 @@ class ViewContainer extends Component {
         goTo(this.props, "/confirmAction");
     };
 
-
+    scheduleText = () => {
+        if (this.state.containerJson && this.state.containerJson.scheduleName) {
+            let yearStr = "";
+            if (this.state.containerJson.scheduleYear !== null) {
+                yearStr = " (" + this.state.containerJson.scheduleYear + ")";
+            }
+            return this.state.containerJson.scheduleName + yearStr;
+        } else {
+            return "N/A";
+        }
+    }
 
     setRecordsState = (records) => {
-        let latestClosedAtRecord = records[0];
-
-        records.forEach(r => {
-            if (latestClosedAtRecord < r.closedAt) {
-                latestClosedAtRecord = r;
-            }
-        });
-
         let newState = {
-            records: records,
-            closedAt: getDateTimeString(new Date(latestClosedAtRecord.closedAt)),
-            scheduleYear: latestClosedAtRecord.scheduleYear
+            records: records
         };
 
         newState.records.forEach(record => {
@@ -116,20 +135,22 @@ class ViewContainer extends Component {
 
     setRecords = (recordIds) => {
         let that = this;
-        let promises = [];
-        recordIds.forEach((record) => {
-            promises.push(getRecordById(record, this.state.user.id)
-                .then((result) => {
-                    return result.json();
-                })
-            );
-        });
-
-        Promise.all(promises)
-            .then((results) => {
-                if (results.length > 0) {
-                    this.setRecordsState(results);
-                    setData(that, results, this.state.columns);
+        let r = (recordIds && recordIds.length > 0) ? JSON.stringify(recordIds) : "";
+        let recordsIds = r ? r.substring(1, r.length - 1) : "";
+        getRecordsByIds(recordsIds, this.state.user.id)
+            .then((response) => {
+                return response.json();
+            })
+            .then((res) => {
+                if (res.error || (res.status && res.status !== 200)) {
+                    let status = res.status ? res.status : "";
+                    let err = res.error ? " " + res.error : "";
+                    let msg = res.message ? ": " + res.message : "";
+                    throw new Error(status + err + msg);
+                }
+                else if (res.length > 0) {
+                    this.setRecordsState(res);
+                    setData(that, res, this.state.columns);
                 }
             })
             .catch((err) => {
@@ -145,18 +166,32 @@ class ViewContainer extends Component {
     handleDelete() {
         deleteContainers([this.props.match.params.containerId], this.state.user.id)
             .then(response => {
-                return response.json();
+                if (response.ok) {
+                    this.setState({
+                        alertMsg: "This container has been successfully deleted.", success: true, readOnly: true
+                    });
+                    window.scrollTo(0, 0);
+                } else {
+                    return response.json();
+                }
             })
             .then(result => {
-                if (result.status !== 200) {
-                        this.setState({alertMsg: result.error + ": " + result.containerNumber});
-                        window.scrollTo(0, 0);
-                }
-                else {
-                    this.props.history.goBack();
+                if (result && result.status !== 200) {
+                    let alertMsg = "";
+                    if (result.containerNumber) {
+                        alertMsg = result.error + ": " + result.containerNumber;
+                    } else if (result.exception) {
+                        alertMsg = result.message;
+                    }
+                    this.setState({alertMsg: alertMsg, success: false});
+                    window.scrollTo(0, 0);
                 }
             })
-            .catch(error => console.log('error============:', error));
+            .catch(error => {
+                console.error(error)
+                this.setState({alertMsg: "An unexpected error occurred when trying to delete this container. See the developers console for more details."});
+                window.scrollTo(0, 0);
+            });
     }
 
     render() {
@@ -166,26 +201,32 @@ class ViewContainer extends Component {
             textAlign: "left",
         };
         let btnStyle = {
-            display: "flex",
-            justifyContent: "left",
-            marginTop: "20px"
+            display: "none",
         };
+
         let table = {
             marginTop: "20px"
         };
 
         let containerNumber = this.state.containerJson["containerNumber"];
-
+        if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+            btnStyle = {
+                display: "flex",
+                justifyContent: "left",
+                marginTop: "20px"
+        }
+        }
         return (
             <div>
                 {this.state.alertMsg && this.state.alertMsg.length !== 0
-                    ? <Alert bsStyle="danger"><h4>{this.state.alertMsg}</h4></Alert>
+                    ? <Alert bsStyle={this.state.success ? "success" : "danger"}><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
                 <Grid>
                     <Row>
                         <Col md={10} mdOffset={2}>
-                            <h1 id={containerNumber ? "containerNumberHeading" : null}  style={title}>{containerNumber}</h1>
+                            <h1 id={containerNumber ? "containerNumberHeading" : null}
+                                style={title}>{containerNumber}</h1>
                         </Col>
                     </Row>
                     <Row>
@@ -198,7 +239,7 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Location</b>
                                 <br/>
-                                {this.state.containerJson.location ? this.state.containerJson.location : "N/A"}
+                                {this.state.containerJson.locationName ? this.state.containerJson.locationName : "N/A"}
                             </p>
                             <p style={title}>
                                 <b>State</b>
@@ -208,7 +249,12 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Consignment Code</b>
                                 <br/>
-                                {this.state.containerJson["consignmentCode"] ? this.state.containerJson["consignmentCode"] : "(none)"}
+                                {this.state.containerJson["consignmentCode"] && this.state.containerJson["consignmentCode"].length > 0 ? this.state.containerJson["consignmentCode"] : "(none)"}
+                            </p>
+                            <p style={title}>
+                                <b>Retention Schedule:</b>
+                                <br/>
+                                {this.scheduleText()}
                             </p>
                         </Col>
                         <Col md={4}>
@@ -227,17 +273,12 @@ class ViewContainer extends Component {
                                 <br/>
                                 {this.state.closedAt ? this.state.closedAt : "N/A"}
                             </p>
-                            <p style={title}>
-                                <b>Retention Schedule:</b>
-                                <br/>
-                                {this.state.containerJson.scheduleName ? this.state.containerJson.scheduleName + " (" + this.state.scheduleYear + ")" : "N/A"}
-                            </p>
                         </Col>
                         <Col md={10} mdOffset={2}>
                             <p style={title}>
                                 <b>Notes</b>
                                 <br/>
-                                {this.state.containerJson["notes"]}
+                                {this.state.containerJson["notes"] ? this.state.containerJson["notes"]:"N/A"}
                             </p>
                         </Col>
                     </Row>
@@ -262,20 +303,22 @@ class ViewContainer extends Component {
                         <Col md={9} mdOffset={2}>
                             <ButtonToolbar style={btnStyle}>
                                 <Link to={updateContainerLink}>
-                                    <Button bsStyle="primary"> Edit Container </Button>
+                                    <Button bsStyle="primary" disabled={this.state.readOnly}> Edit Container </Button>
                                 </Link>
                                 <Button bsStyle="warning"
+                                        disabled={this.state.readOnly}
                                         onClick={() => this.bulkAction(destroyAction)}>
                                     Destroy
                                 </Button>
                                 <Confirm
                                     onConfirm={this.handleDelete}
                                     body={"Are you sure you want to delete " + containerNumber + "?"}
-                                    confirmText="Confirm Delete"
+                                    confirmText="Delete"
                                     title="Deleting Container">
-                                    <Button bsStyle="danger">Delete</Button>
+                                    <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
                             </ButtonToolbar>
+                            <br/>
                         </Col>
                     </Row>
                 </Grid>

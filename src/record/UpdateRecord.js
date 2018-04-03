@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Popover,OverlayTrigger} from 'react-bootstrap'
-//import {getClassifications, getRecordById, getRetentionSchedule,getRecordStates, getUser, updateRecord} from "../APIs/RecordsApi";
+import {Button, ButtonGroup, FormGroup, ControlLabel, FormControl, HelpBlock, Alert, Popover, OverlayTrigger} from 'react-bootstrap';
 import {
     getClassifications,
     getRecordById,
@@ -110,6 +109,7 @@ class UpdateRecord extends Component {
                 this.setState({stateId: data.stateId});
                 this.setState({consignmentCode:data.consignmentCode});
                 this.setState({notes:data.notes});
+                this.setState({containerId: data.containerId});
                 data.classIds.forEach( id => {
                    this.state.classificationBack.push(id.toString());
                 });
@@ -148,7 +148,15 @@ class UpdateRecord extends Component {
         getRecordStates()
             .then(response => response.json())
             .then(data => {
-                this.setState({recordStateResponse: data});
+                let splice_data = data;
+                if(this.state.retentionScheduleName !== null) {
+                    splice_data.splice(3,1);
+                }
+                else {
+                    splice_data.splice(1,1);
+                    splice_data.splice(4,1);
+                }
+                this.setState({recordStateResponse: splice_data});
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
@@ -489,6 +497,7 @@ class UpdateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId="formTitleText"
                         validationState={this.state.titleValidationState}
                     >
                         <ControlLabel>Title {requiredLabel}</ControlLabel>
@@ -587,6 +596,7 @@ class UpdateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId = "formConsignmentCode"
                         validationState={this.state.consignmentCodeValidationState}
                     >
                         <ControlLabel>Consignment Code</ControlLabel>
@@ -603,6 +613,7 @@ class UpdateRecord extends Component {
                         }
                     </FormGroup>
                     <FormGroup
+                        controlId="formNotes"
                         validationState={this.state.notesValidationState}
                     >
                         <ControlLabel>Notes</ControlLabel>

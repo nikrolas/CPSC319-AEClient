@@ -4,6 +4,7 @@ import {createContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
 import AlertDismissable from "../AlertDismissable";
 import {isARecordItem} from "../utilities/Items";
+import {setData} from "../utilities/ReactTable";
 
 class CreateContainer extends Component {
 
@@ -50,9 +51,40 @@ class CreateContainer extends Component {
 
         if (!this.state.selectedRecords || !this.state.selectedRecords.length > 0) {
             invalidStateErrors.push("At least one record must be selected.");
-        }
+        } else {
 
-        this.setState({locationId, locations, invalidStateErrors});
+            let recordsAlreadyContained = this.state.selectedRecords.filter(record => {
+                return record.containerNumber !== null || record.containerId !== 0;
+            });
+
+            let firstRecordSchedule = this.state.selectedRecords[0].scheduleId;
+            let differentSchedules = false;
+
+            this.state.selectedRecords.forEach(record => {
+                if (record.scheduleId !== firstRecordSchedule) {
+                    differentSchedules = true;
+                }
+            })
+
+            if (recordsAlreadyContained.length > 0) {
+                let recordNumbers = recordsAlreadyContained.map(r => r.containerNumber);
+                this.setState({
+                    alertMsg: "One or more records are already in a container: " + recordNumbers.join(", "),
+                    success: false
+                });
+            } else if (differentSchedules) {
+                this.setState({
+                    alertMsg: "You cannot contain records with different retention schedules.",
+                    success: false
+                });
+            } else {
+                this.setState({success: true});
+            }
+        }
+        setData(this, this.state.selectedRecords, this.state.columns, () => {
+            this.setState({locationId, locations, invalidStateErrors});
+        });
+
     }
 
 
@@ -144,9 +176,9 @@ class CreateContainer extends Component {
 
             let formData =
                 {
-                    title: state.title,
+                    title: state.title ? state.title.trim() : state.title,
                     locationId: state.locationId,
-                    notes: state.notes
+                    notes: state.notes ? state.notes.trim() : state.notes
                 };
 
             let selectedRecordIds = [];
@@ -172,10 +204,13 @@ class CreateContainer extends Component {
                         window.scrollTo(0, 0);
 
                         if (data.exception) {
-                            this.setState({alertMsg: data.message});
+                            this.setState({alertMsg: data.message, success: false});
+                        }
+                        else if (data.number) {
+                            this.setState({alertMsg: data.error + ": " + data.number.join(", "), success: false});
                         }
                         else {
-                            this.setState({alertMsg: data.error + ": " + data.number});
+                            this.setState({alertMsg: "An unexpected error occured while creating the container: " + data});
                         }
                     }
                 })
@@ -192,7 +227,7 @@ class CreateContainer extends Component {
         let listLocationJson = null;
         const destructionDate = <div>{this.state.destructionDate}</div>;
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
-        const {selectedRecords, columns} = this.state;
+        const {columns, data} = this.state;
 
         let handleAction = () => {
             this.props.history.push("/");
@@ -235,7 +270,6 @@ class CreateContainer extends Component {
                             placeholder="Enter container title"
                             onChange={this.handleChange}
                         />
-                        <FormControl.Feedback/>
                         {this.state.titleValidationState === "error"
                             ? <HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
                             : null
@@ -254,7 +288,6 @@ class CreateContainer extends Component {
                         >
                             {listLocationJson}
                         </FormControl>
-                        <FormControl.Feedback/>
                         {this.state.locationValidationState === "error"
                             ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
                             : null
@@ -270,7 +303,6 @@ class CreateContainer extends Component {
                                      placeholder="Enter text"
                                      value={this.state.notes}
                                      onChange={this.handleChange}/>
-                        <FormControl.Feedback/>
                         {this.state.notesValidationState === "error"
                             ? <HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
                             : null
@@ -279,13 +311,13 @@ class CreateContainer extends Component {
                     <Button bsStyle="danger" style={{marginRight: '10px'}} onClick={() => {
                         this.props.history.goBack()
                     }}>Cancel</Button>
-                    <Button bsStyle="primary" type="submit">Submit</Button>
+                    <Button bsStyle="primary" type="submit" disabled={!this.state.success}>Submit</Button>
                 </form>
                 <div style={styles.container}>
                     <strong>Records to contain:</strong>
                     <div style={styles.recordsTable}>
                         <ReactTable
-                            data={selectedRecords}
+                            data={data}
                             columns={columns}
                             className="-striped -highlight"
                             showPagination={true}

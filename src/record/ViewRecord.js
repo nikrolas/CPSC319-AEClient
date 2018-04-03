@@ -1,6 +1,15 @@
 import React, {Component} from 'react';
 import {getRecordById, deleteRecordByIds, updateRecord} from "../api/RecordsApi";
-import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
+import {
+    Row,
+    Col,
+    Grid,
+    Button,
+    ButtonToolbar,
+    Alert,
+    FormGroup,
+    FormControl
+} from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
 import {getDateTimeString} from "../utilities/DateTime";
@@ -8,6 +17,8 @@ import {recordsResultsAccessors} from "../search/Results";
 import {getColumns} from "../utilities/ReactTable";
 import {destroyAction} from "../bulk/Action";
 import {goTo} from "../context/ContextualActions";
+import {addRecordsToContainer} from "../api/ContainersApi";
+import {searchByNumber} from "../api/SearchApi";
 
 
 class ViewRecord extends Component {
@@ -19,6 +30,9 @@ class ViewRecord extends Component {
                 user: props.userData,
                 alertMsg: "",
                 success: true,
+                readOnly: false,
+                newContainerNumber: "",
+                newContainerId: 0,
                 recordJson: {
                     title: "n/a",
                     number: "n/a",
@@ -101,7 +115,71 @@ class ViewRecord extends Component {
     };
 
     handleChange(e) {
+        e.persist();
+        this.setState({[e.target.name]: e.target.value});
+    }
 
+    addToContainer = (e) => {
+        if (this.state.newContainerNumber && this.state.newContainerNumber.length > 0) {
+            let options = {
+                record: false,
+                container: true
+            }
+            let encodedSearchString = encodeURIComponent(this.state.newContainerNumber.trim());
+            searchByNumber(encodedSearchString, options, 1, 5, this.state.user.id)
+                .then(response => {
+                    return response.json()
+                })
+                .then((res) => {
+                    if (res.error || (res.status && res.status !== 200)) {
+                        let status = res.status ? res.status : "";
+                        let err = res.error ? " " + res.error : "";
+                        let msg = res.message ? ": " + res.message : "";
+                        let alertMsg = status + err + msg;
+                        this.setState({alertMsg});
+                        window.scrollTo(0, 0)
+                    }
+                    else {
+                        if (res.results && res.results.length === 1) {
+                            addRecordsToContainer(res.results[0].containerId, [this.state.recordJson], this.state.user.id)
+                                .then(responses => {
+                                    return responses[0].json();
+                                })
+                                .then(result => {
+                                    this.setData(this, result);
+                                    this.setState({
+                                        alertMsg: "Successfully added to the container: " + result.containerNumber,
+                                        success: true
+                                    });
+                                    window.scrollTo(0, 0);
+                                })
+                                .catch(err => {
+                                    this.setState({success: false});
+                                    this.setState({alertMsg: err});
+                                    window.scrollTo(0, 0);
+                                });
+                        } else if (res.results && res.results.length > 1) {
+                            this.setState({success: false});
+                            this.setState({alertMsg: "The container number needs to be unique. More than one container was found with the given container number."});
+                            window.scrollTo(0, 0);
+                        } else if (res.results && res.results.length === 0) {
+                            this.setState({success: false});
+                            this.setState({alertMsg: "The container number does not exist."});
+                            window.scrollTo(0, 0);
+                        } else {
+                            console.log(res);
+                            this.setState({success: false});
+                            this.setState({alertMsg: "Unexpected result from looking up the container number. See console for more details."});
+                            window.scrollTo(0, 0);
+                        }
+                    }
+                })
+                .catch(error => {
+                    this.setState({alertMsg: error, loading: false});
+                    window.scrollTo(0, 0)
+                });
+        }
+        e.preventDefault();
     }
 
     handleSubmit() {
@@ -110,21 +188,24 @@ class ViewRecord extends Component {
                 return response.json();
             })
             .then(data => {
-                if (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500) {
+                if (data.status && (data.status === 401 || data.status === 400 || data.status === 404 || data.status === 500)) {
                     this.setState({alertMsg: data.message, success: false});
                     window.scrollTo(0, 0)
                 }
                 else {
-                    for(let i = 0; i < data.responseList.length; i++) {
-                        if(!data.responseList[i].status) {
+                    for (let i = 0; i < data.responseList.length; i++) {
+                        if (!data.responseList[i].status) {
                             this.setState({alertMsg: data.responseList[i].msg, success: false});
                             window.scrollTo(0, 0)
-                        }
-                        else {
-                            this.props.history.push("/results/");
+                        } else {
+                            this.setState({
+                                alertMsg: "This record has been successfully deleted.",
+                                success: true,
+                                readOnly: true
+                            });
+                            window.scrollTo(0, 0)
                         }
                     }
-
                 }
             })
             .catch(error => {
@@ -137,6 +218,7 @@ class ViewRecord extends Component {
         let recordState = JSON.parse(JSON.stringify(this.state.recordJson));
         recordState.classificationBack = recordState.classIds;
         recordState.containerNumber = "";
+        recordState.containerId = null;
         recordState.retentionSchedule = recordState.scheduleId;
         recordState.user = JSON.parse(JSON.stringify(this.state.user));
 
@@ -159,7 +241,7 @@ class ViewRecord extends Component {
                 }
             })
             .catch(err => {
-                this.setState({alertMsg:"The application was unable to connect to the network. Please try again later."})
+                this.setState({alertMsg: "The application was unable to connect to the network. Please try again later."});
                 window.scrollTo(0, 0)
             });
     };
@@ -172,6 +254,15 @@ class ViewRecord extends Component {
         return this.state.success ? 'success' : 'danger';
     };
 
+    getContainerNumber = () => {
+        if (this.state.recordJson["containerNumber"] !== null) {
+            return this.state.recordJson["containerNumber"]
+        } else {
+            return "n/a";
+        }
+    };
+
+
     render() {
 
         const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
@@ -182,11 +273,31 @@ class ViewRecord extends Component {
         let btnStyle = {
             display: "none",
         };
+
+        let disabledLink = {
+            textDecoration: "inherit",
+            color: "inherit",
+            pointerEvents: "none",
+            cursor: "default"
+        };
+
+        let linkStyle = () => {
+            if (this.state.recordJson.containerId) {
+                return {};
+            } else {
+                return disabledLink;
+            }
+        }
+
         if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
             btnStyle = {
                 display: "flex",
                 justifyContent: "left"
             }
+        }
+        let containerPath = "/";
+        if (this.state.recordJson.containerId) {
+            containerPath = "/viewContainer/" + this.state.recordJson.containerId;
         }
 
         return (
@@ -207,91 +318,113 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Title</b>
                                 <br/>
+                                <div id="title">
                                 {this.state.recordJson["title"] !== ""
                                     ? this.state.recordJson["title"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>State</b>
                                 <br/>
-                                {this.state.recordJson["state"] !== ""
-                                    ? this.state.recordJson["state"]
-                                    : "n/a"}
+                                <span id="recordState">
+                                    {this.state.recordJson["state"] !== ""
+                                        ? this.state.recordJson["state"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Location</b>
                                 <br/>
+                                <div id="location">
                                 {this.state.recordJson["location"] !== ""
                                     ? this.state.recordJson["location"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Record Type</b>
                                 <br/>
+                                <div id="recordType">
                                 {this.state.recordJson["type"] !== ""
                                     ? this.state.recordJson["type"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Classification</b>
                                 <br/>
+                                <div id="classification">
                                 {this.state.recordJson["classifications"] !== ""
                                     ? this.state.recordJson["classifications"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Consignment Code</b>
                                 <br/>
+                                <div id="consignmentCode">
                                 {this.state.recordJson["consignmentCode"] !== ""
                                     ? this.state.recordJson["consignmentCode"]
                                     : "n/a"}
+                                </div>
                             </p>
                         </Col>
                         <Col md={5}>
                             <p style={title}>
                                 <b>Created At:</b>
                                 <br/>
+                                <div id="createdAt">
                                 {this.state.recordJson["createdAt"] !== ""
                                     ? this.state.recordJson["createdAt"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Updated At:</b>
                                 <br/>
+                                <div id="updatedAt">
                                 {this.state.recordJson["updatedAt"] !== ""
                                     ? this.state.recordJson["updatedAt"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Closed At:</b>
                                 <br/>
+                                <div id="closedAt">
                                 {this.state.recordJson["closedAt"] !== ""
                                     ? this.state.recordJson["closedAt"]
                                     : "n/a"}
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Retention Schedule:</b>
                                 <br/>
+                                <div id="retentionSchedule">
                                 {this.state.recordJson["schedule"] !== ""
                                     ? this.state.recordJson["schedule"]
                                     : "n/a"}
                                 ({this.state.recordJson["scheduleYear"]})
+                                </div>
                             </p>
                             <p style={title}>
                                 <b>Container Number:</b>
                                 <br/>
-                                {this.state.recordJson["containerNumber"] !== null
-                                    ? this.state.recordJson["containerNumber"]
-                                    : "n/a"}
+                                <Link id="containerNumber" style={linkStyle()} to={containerPath}>
+                                    {this.getContainerNumber()}
+                                </Link>
                             </p>
                         </Col>
                         <Col md={9} mdOffset={2}>
                             <p style={title}>
                                 <b>Note</b>
                                 <br/>
+                                <div id="note">
                                 {this.state.recordJson["notes"] !== null
                                     ? this.state.recordJson["notes"]
                                     : "n/a"}
+                                </div>
                             </p>
                         </Col>
                     </Row>
@@ -299,32 +432,68 @@ class ViewRecord extends Component {
                         <Col md={10} mdOffset={2}>
                             <ButtonToolbar style={btnStyle}>
                                 <Link to={updateRecordLink}>
-                                    <Button bsStyle="primary"> Edit Record </Button>
+                                    <Button id = "edit" bsStyle="primary" disabled={this.state.readOnly}> Edit Record </Button>
+                                </Link>
+                                <Link to={'/createVolume'}>
+                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}
+                                            disabled={this.state.readOnly}> Create Volume </Button>
                                 </Link>
                                 <Confirm
                                     onConfirm={this.handleRemoveFromContainer}
                                     body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
                                     confirmText="Remove"
                                     title="Removing from container">
-                                    <Button bsStyle="warning" disabled={!this.isInContainer()}>Remove From
+                                    <Button bsStyle="warning"
+                                            disabled={!this.isInContainer() || this.state.readOnly}>Remove
+                                        From
                                         Container</Button>
                                 </Confirm>
                                 <Button bsStyle="warning"
-                                        onClick={() => this.bulkAction(destroyAction)}>
+                                        onClick={() => this.bulkAction(destroyAction)}
+                                        disabled={this.state.readOnly}>
                                     Destroy
                                 </Button>
                                 <Confirm
                                     onConfirm={this.handleSubmit}
                                     body="Are you sure you want to delete this?"
-                                    confirmText="Confirm Delete"
+                                    confirmText="Delete"
                                     title="Deleting Record">
-                                    <Button bsStyle="danger">Delete Record</Button>
+                                    <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
-                                <Link to={'/createVolume'}>
-                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}> Create Volume </Button>
-                                </Link>
                             </ButtonToolbar>
                         </Col>
+                    </Row>
+                    <Row style={{marginTop: "10px"}}> <ButtonToolbar style={btnStyle}>
+                        <Col md={3} mdOffset={2}>
+
+                            <form onSubmit={e => {
+                                e.preventDefault();
+                            }}>
+                                <FormGroup
+                                    controlId="addToContainerInput"
+                                >
+                                    <FormControl
+                                        type="text"
+                                        name="newContainerNumber"
+                                        value={this.state.newContainerNumber}
+                                        placeholder="Enter Container Number"
+                                        onChange={this.handleChange}
+                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
+                                    />
+                                </FormGroup>
+                            </form>
+                        </Col>
+                        <Col>
+                            <ButtonToolbar style={btnStyle}>
+                                <Button bsStyle="primary"
+                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
+                                        onClick={this.addToContainer}
+                                >
+                                    Add to Container
+                                </Button>
+                            </ButtonToolbar>
+                        </Col>
+                    </ButtonToolbar>
                     </Row>
                 </Grid>
                 <br/>

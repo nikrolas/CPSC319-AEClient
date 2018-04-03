@@ -68,6 +68,8 @@ export function createRecord(state) {
     });
 }
 
+// addRecordsToContainer API assumes this body structure
+// Take caution when changing the body
 export function updateRecord(recordId, state) {
     return fetch(serviceRoot + '/records/' + recordId + '?userId=' + state.user.id, {
         method: 'PUT',
@@ -83,6 +85,7 @@ export function updateRecord(recordId, state) {
             consignmentCode: state.consignmentCode,
             notes: state.notes,
             stateId: state.stateId,
+            containerId: state.containerId
         })
     });
 }

@@ -134,11 +134,29 @@ class WorkTray extends Component {
     };
 
     removeDeleteColumn = (columns) => {
+        //JSON.stringify drops functions so we will keep the reference here
+        let iconColumn = columns.find(col => {
+            return col.accessor === "icon";
+        })
+        let iconCell = () => {};
+        if (iconColumn) {
+         iconCell = iconColumn.Cell;
+        }
+
         let columnsCopy = JSON.parse(JSON.stringify(columns));
         let index = columnsCopy.findIndex(column => {
             return column.id === 'xbutton';
         });
         columnsCopy.splice(index, 1);
+
+        if (iconColumn) {
+            //Add Cell function back to icon column
+            let shallowIconColumn = columnsCopy.find(col => {
+                return col.accessor === "icon";
+            })
+            shallowIconColumn.Cell = iconCell;
+        }
+
         return columnsCopy;
     };
 

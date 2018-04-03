@@ -30,6 +30,8 @@ class AlertDismissable extends Component {
                     </p>
                 </Alert>
             );
+        } else {
+            return (<div></div>);
         }
     }
 }

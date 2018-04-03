@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {Row, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import ReactTable from "react-table";
 import {getSelectedItems} from "../utilities/Items";
+import {setData} from "../utilities/ReactTable";
+import AlertDismissable from "../AlertDismissable";
 
 
 class ConfirmAction extends Component {
@@ -18,17 +20,28 @@ class ConfirmAction extends Component {
                 header: "",
                 prompt: "",
                 valid: true,
-                actionsComplete: false
+                actionsComplete: false,
+                invalidStateErrors: []
             };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentWillMount() {
-        let data = getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
-        let {header, prompt, action, onActionComplete} = this.props.actionProps;
-        let columns = this.props.resultsColumns;
 
-        this.setState({data, columns, header, prompt, action, onActionComplete});
+        let invalidStateErrors = [];
+        if (!this.props.resultsData || !this.props.resultsData.length > 0) {
+            invalidStateErrors.push("At least one item must be selected.");
+        }
+        else {
+            let data = getSelectedItems(this.props.resultsData, this.props.selectedItemIndexes);
+            let {header, prompt, action, onActionComplete} = this.props.actionProps;
+            let columns = this.props.resultsColumns;
+            setData(this, data, columns, () => {
+            });
+            this.setState({header, prompt, action, onActionComplete});
+        }
+
+        this.setState({invalidStateErrors});
     };
 
     enableAction = () => {
@@ -42,7 +55,7 @@ class ConfirmAction extends Component {
                 this.state.onActionComplete(this);
             })
             .catch(error => {
-                this.setState({alertMsg: "Failed to complete action: " + error, success: false, actionsComplete: true});
+                this.setState({alertMsg: error, success: false, actionsComplete: true});
             });
     };
 
@@ -65,10 +78,20 @@ class ConfirmAction extends Component {
             }
         };
 
+        let handleAction = () => {
+            this.props.history.push("/");
+        };
+
+        let alertMessage = this.state.invalidStateErrors.join("\n");
+
+        if (this.state.invalidStateErrors.length > 0) {
+            return <AlertDismissable handleAction={handleAction} alertMessage={alertMessage}/>
+        }
+
         return (
             <div>
                 {this.state.alertMsg && this.state.alertMsg.length !== 0
-                    ? <Alert bsStyle={this.state.success ? "success":"danger"}><h4>{this.state.alertMsg}</h4></Alert>
+                    ? <Alert bsStyle={this.state.success ? "success" : "danger"}><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
                 <h1>{this.state.header}</h1>

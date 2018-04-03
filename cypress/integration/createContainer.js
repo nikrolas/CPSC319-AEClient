@@ -4,7 +4,14 @@ describe('createContainer', function () {
     });
 
     it('should create a new container', function () {
-        cy.createRecord("Subject", "Burnaby", null, "Cypress-Create Record For Container", ["CORPORATE AFFAIRS","CONTRACTING"], "PUBLICATION - INVENTORY P5.I2.01", "CYRPESS-TEST", "CYPRESS TESTING", 500);
+        cy.createContainer("CYPRESS - createContainer1", "Edmonton", "Cypress - destroy", "Cypress-recordForDestruction", 500);
+
+    });
+
+    it('should create multiple containers', function () {
+        cy.createContainer("CYPRESS - createContainer1", "Edmonton", "Cypress - destroy", "Cypress-recordForDestruction", 500);
+        cy.createContainer("CYPRESS - createContainer2", "Edmonton", "Cypress - destroy", "Cypress-recordForDestruction", 500);
+        cy.createContainer("CYPRESS - createContainer3", "Edmonton", "Cypress - destroy", "Cypress-recordForDestruction", 500);
 
     });
 });
