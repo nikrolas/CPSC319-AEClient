@@ -233,7 +233,6 @@ class App extends Component {
                                       onSelectAction={this.setConfirmAction}
                                       userData={this.state.userData}
                                       authenticated={this.state.isLogin}
-                                      general = {this.state.isGeneral}
 
                         />
                         <PrivateRoute path='/updateContainer/:containerId?'

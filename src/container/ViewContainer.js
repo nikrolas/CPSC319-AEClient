@@ -201,16 +201,21 @@ class ViewContainer extends Component {
             textAlign: "left",
         };
         let btnStyle = {
-            display: "flex",
-            justifyContent: "left",
-            marginTop: "20px"
+            display: "none",
         };
+
         let table = {
             marginTop: "20px"
         };
 
         let containerNumber = this.state.containerJson["containerNumber"];
-
+        if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
+            btnStyle = {
+                display: "flex",
+                justifyContent: "left",
+                marginTop: "20px"
+        }
+        }
         return (
             <div>
                 {this.state.alertMsg && this.state.alertMsg.length !== 0
@@ -246,6 +251,11 @@ class ViewContainer extends Component {
                                 <br/>
                                 {this.state.containerJson["consignmentCode"] && this.state.containerJson["consignmentCode"].length > 0 ? this.state.containerJson["consignmentCode"] : "(none)"}
                             </p>
+                            <p style={title}>
+                                <b>Retention Schedule:</b>
+                                <br/>
+                                {this.scheduleText()}
+                            </p>
                         </Col>
                         <Col md={4}>
                             <p style={title}>
@@ -263,17 +273,12 @@ class ViewContainer extends Component {
                                 <br/>
                                 {this.state.closedAt ? this.state.closedAt : "N/A"}
                             </p>
-                            <p style={title}>
-                                <b>Retention Schedule:</b>
-                                <br/>
-                                {this.scheduleText()}
-                            </p>
                         </Col>
                         <Col md={10} mdOffset={2}>
                             <p style={title}>
                                 <b>Notes</b>
                                 <br/>
-                                {this.state.containerJson["notes"]}
+                                {this.state.containerJson["notes"] ? this.state.containerJson["notes"]:"N/A"}
                             </p>
                         </Col>
                     </Row>
@@ -313,6 +318,7 @@ class ViewContainer extends Component {
                                     <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
                             </ButtonToolbar>
+                            <br/>
                         </Col>
                     </Row>
                 </Grid>
