@@ -386,11 +386,13 @@ class UpdateRecord extends Component {
             .then(response => response.json())
             .then(data => {
                 if(data.length >0) {
-                    this.setState({classificationBack:[]});
-                    this.setState({classificationParentHistory:["(Select Record Type)"]})
-                    this.setState({classificationParent:"(Select Record Type)"});
-                    this.setState({classificationValidationState:null});
                     this.setState({classificationResponse: data});
+                    this.setState({classificationValidationState:null});
+                    this.setState({classification: null});
+                    this.setState({classificationBack:[]});
+                    this.setState({classificationParentHistory:["(Select Record Type)"]});
+                    this.setState({classificationParent:"(Select Record Type)"});
+                    this.setState({classificationAtLeaf:false});
                 }
             });
         document.getElementById("formClassification").value = "0";
