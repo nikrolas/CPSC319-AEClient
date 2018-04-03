@@ -278,17 +278,20 @@ class CreateRecord extends Component {
                 let concat_pattern_client  = concat_pattern.substring(0,concat_pattern.length-1);
                 this.setState({recordNumberPattern: concat_pattern_client},()=> {
                     this.setState({recordNumber:concat_pattern_client});
+                    this.setState({recordNumberValidationState:"success"})
                 });
             }
             else {
                 this.setState({recordNumberPattern: concat_pattern},()=> {
                     this.setState({recordNumber:concat_pattern});
+                    this.setState({recordNumberValidationState:"success"})
                 });
             }
         }
         else {
             this.setState({recordNumberPattern: finalPattern},()=> {
                 this.setState({recordNumber:finalPattern});
+                this.setState({recordNumberValidationState:"success"})
             });
         }
     }
