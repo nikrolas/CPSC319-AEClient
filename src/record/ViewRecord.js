@@ -289,7 +289,7 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Note</b>
                                 <br/>
-                                {this.state.recordJson["notes"] !== ""
+                                {this.state.recordJson["notes"] !== null
                                     ? this.state.recordJson["notes"]
                                     : "n/a"}
                             </p>
