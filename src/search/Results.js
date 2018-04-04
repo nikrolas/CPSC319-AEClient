@@ -25,7 +25,7 @@ class SelectTable extends Component {
             selection: [],
             selectAll: false,
             tray: [],
-            addbtntext: 'Add to Tray',
+            addbtnstate: '',
             selectvalue: 'none',
             record: true,
             container: true,
@@ -145,40 +145,64 @@ class SelectTable extends Component {
         let updated = false;
         this.state.selection.forEach((id) => {
             let selected = Object.assign({}, this.state.data[id]);
-            delete selected._id;
+            let idtype = selected["icon"] === "record" ? "id" : "containerId";
             let intray = tray.some((item) => {
-                return JSON.stringify(item) === JSON.stringify(selected);
+                return item[idtype] === selected[idtype];
             });
             if (!intray) {
+                //delete selected._id;
                 tray.push(selected);
                 updated = true;
             }
         });
         if (updated) {
-            this.setState({tray, addbtntext: 'Success'});
+            this.setState({tray, addbtnstate: 'success'});
             localStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
             setTimeout(() => {
-                this.setState({addbtntext: 'Add to Tray'});
-            }, 700);
+                this.setState({addbtnstate: ''});
+            }, 500);
         }
         else if (this.state.selection.length > 0) {
-            this.setState({addbtntext: 'Added'});
+            this.setState({addbtnstate: 'fail'});
             setTimeout(() => {
-                this.setState({addbtntext: 'Add to Tray'});
-            }, 700);
+                this.setState({addbtnstate: ''});
+            }, 500);
+        }
+    };
+    trayBtnText = () => {
+        let icon = {
+            marginRight: 5,
+            color: colors.white,
+            transform: 'scale(1.4, 1.4)',
+        };
+        switch (this.state.addbtnstate) {
+            case 'success':
+                return <span><i className="fa fa-check" style={icon}/>Success</span>;
+            case 'fail':
+                return <span><i className="fa fa-remove" style={icon}/>Added</span>;
+            default:
+                return "Add to Tray";
         }
     };
     addStyle = () => {
-        switch (this.state.addbtntext) {
-            default: {
-                return styles.addbtn;
-            }
-            case 'Success': {
-                return styles.addbtn2;
-            }
-            case 'Added': {
-                return styles.addbtn3;
-            }
+        let style = {
+            float: 'left',
+            width: '2.5cm',
+            backgroundColor: colors.lime,
+            borderColor: '#FFFFFF',
+            marginRight: '0.5cm',
+        };
+        switch (this.state.addbtnstate) {
+            default:
+                return style;
+            case 'success':
+                style["color"] = colors.white;
+                style.backgroundColor = colors.green;
+                return style;
+            case 'fail':
+                style["color"] = colors.white;
+                style.backgroundColor = colors.red;
+                return style;
         }
     };
 
@@ -237,7 +261,7 @@ class SelectTable extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, updateTray} = this;
-        const {data, columns, selectAll, selection, selectvalue, addbtntext, loading, page, pages, pageSize, alertMsg} = this.state;
+        const {data, columns, selectAll, selection, selectvalue, addbtnstate, loading, page, pages, pageSize, alertMsg} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -264,7 +288,7 @@ class SelectTable extends Component {
                     <button className='btn btn-s'
                             style={this.addStyle()}
                             disabled={!selection.length || !this.state.user || this.state.user.role === "General"}
-                            onClick={updateTray}>{addbtntext}</button>
+                            onClick={updateTray}>{addbtnstate ? this.trayBtnText() : "Add to Tray"}</button>
                     <ContextualActions {...this.props}
                                        selectedItemIndexes={selection}
                                        resultsData={data}
@@ -305,6 +329,16 @@ class SelectTable extends Component {
     }
 }
 
+const colors = {
+    blue: '#007aff',
+    gray: '#d8d8d8',
+    green: '#4cd964',
+    red: '#ff3b30',
+    white: '#ffffff',
+    lime: '#b5ff87',
+    cyan: '#8bffec',
+    palered: '#ff9c81'
+};
 let styles = {
         container: {
             padding: '5%'
@@ -317,25 +351,6 @@ let styles = {
             //border: '2px solid blue',
             alignItems: 'center',
             height: '1cm'
-        },
-        addbtn: {
-            float: 'left',
-            width: '2.5cm',
-            backgroundColor: '#b5ff87',
-            borderColor: '#FFFFFF',
-            marginRight: '0.5cm'
-        },
-        addbtn2: {
-            float: 'left',
-            width: '2.5cm',
-            backgroundColor: '#8bffec',
-            marginRight: '0.5cm'
-        },
-        addbtn3: {
-            float: 'left',
-            width: '2.5cm',
-            backgroundColor: '#ff9c81',
-            marginRight: '0.5cm'
         },
         filter: {
             //marginRight: '0.5cm',

@@ -91,14 +91,15 @@ class CreateVolume extends Component {
 
     handleCancel(event) {
         if (!this.state.timeout) {
-            this.setState({
+            this.props.history.goBack();
+            /*this.setState({
                 timeout: setTimeout(() => {
                     this.props.history.goBack();
                 }, 1000),
                 success: false,
                 alertMsg: "Cancelled. Redirecting..",
             });
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 0);*/
         }
 
         event.preventDefault();
@@ -244,12 +245,12 @@ let styles = {
         margin: "0 5% 5% 5%",
     },
     form: {
-        border: '1px solid gray',
+        // border: '1px solid gray',
+        // boxShadow: '-5px 5px 10px gray',
         margin: 'auto',
-        padding: '5%',
-        width: '70%',
+        padding: '2% 5% 5% 5%',
+        width: '75%',
         alignItems: 'center',
-        boxShadow: '-5px 5px 10px gray',
     },
     list: {
         fontSize: '25px',
@@ -272,17 +273,17 @@ let styles = {
         color: '#2f8bff',
     },
     notes: {
-        width: '75%',
+        width: '100%',
         overflowY: 'auto',
-        minWidth: '25%',
+        minWidth: '100%',
         maxWidth: '100%',
         minHeight: '1cm',
     },
     notes2: {
-        width: '75%',
+        width: '100%',
         height: '4cm',
         overflowY: 'auto',
-        minWidth: '25%',
+        minWidth: '100%',
         maxWidth: '100%',
         minHeight: '1cm',
     },

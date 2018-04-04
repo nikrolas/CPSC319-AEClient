@@ -55,6 +55,7 @@ class ViewRecord extends Component {
                     containerNumber: "n/a",
                     scheduleYear: "n/a"
                 },
+                traybtn: '',
                 onItemSelectCallback: props.onItemSelect,
                 onDataUpdateCallback: props.onDataUpdate
             };
@@ -180,7 +181,66 @@ class ViewRecord extends Component {
                 });
         }
         e.preventDefault();
-    }
+    };
+
+    addtoTray = () => {
+        if (this.state.traybtn !== '')
+            return;
+        let stored = localStorage.getItem("tray" + this.state.user.id);
+        let tray = stored ? JSON.parse(stored) : [];
+        let record = Object.assign({}, this.state.recordJson);
+        record["icon"] = "record";
+        let intray = tray.some((item) => {
+            return item["id"] === record["id"];
+        });
+        if (!intray) {
+            tray.push(record);
+            localStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
+            this.setState({traybtn: 'success'});
+        }
+        else
+            this.setState({traybtn: 'error'});
+    };
+    trayBtnText = () => {
+        switch (this.state.traybtn) {
+            case 'success':
+                return <i className="fa fa-check"/>;
+            case 'error':
+                return <i className="fa fa-remove"/>;
+            default:
+                return "Add to Tray";
+        }
+    };
+    trayBtnStyle = () => {
+        const colors = {
+            blue: '#007aff',
+            green: '#4cd964',
+            red: '#ff3b30',
+            white: '#ffffff'
+        };
+        let style = {
+            alignItems: 'center',
+            borderRadius: 35 / 2,
+            borderWidth: 1,
+            height: 35,
+            minWidth: 35,
+            justifyContent: 'center',
+            marginVertical: 10,
+            marginLeft: 5,
+            color: colors.white,
+            backgroundColor: colors.blue,
+        };
+        switch (this.state.traybtn) {
+            case 'success':
+                style["backgroundColor"] = colors.green;
+                return style;
+            case 'error':
+                style["backgroundColor"] = colors.red;
+                return style;
+            default:
+                return style;
+        }
+    };
 
     handleSubmit() {
         deleteRecordByIds([this.props.match.params.recordId], this.state.user.id)
@@ -491,6 +551,15 @@ class ViewRecord extends Component {
                                 >
                                     Add to Container
                                 </Button>
+                                <button
+                                    ref={ref => {
+                                        this.traybtn = ref
+                                    }}
+                                    disabled={this.state.readOnly}
+                                    onClick={this.addtoTray}
+                                    style={this.trayBtnStyle()}>
+                                    {this.state.traybtn ? this.trayBtnText() : "Add to Tray"}
+                                </button>
                             </ButtonToolbar>
                         </Col>
                     </ButtonToolbar>

@@ -22,6 +22,8 @@ class WorkTray extends Component {
             columns: [],
             selection: [],
             selectAll: false,
+            page: 0,
+            pageSize: 10,
             user: props.userData,
             onItemSelectCallback: props.onItemSelect,
             onDataUpdateCallback: props.onDataUpdate
@@ -31,12 +33,14 @@ class WorkTray extends Component {
     componentWillMount() {
         let stored = localStorage.getItem("tray" + this.state.user.id);
         if (stored && stored.length > 0) {
+            console.log(stored);
             stored = JSON.parse(stored);
             let ids = {records: [], containers: []};
             stored.forEach((item) => {
-                let type = item.icon + "s";
-                let id = item.icon === "record" ? "id" : "containerId";
-                ids[type].push(item[id]);
+                let type = item["icon"] + "s";
+                let id = item["icon"] === "record" ? "id" : "containerId";
+                if (ids[type] && item[id])
+                    ids[type].push(item[id]);
             });
             this.searchandupdate(ids);
         }
@@ -257,15 +261,17 @@ class WorkTray extends Component {
 
     toggleAll = () => {
         const selectAll = !this.state.selectAll;
-        const selection = [];
+        let selection = [];
         if (selectAll) {
             // we need to get at the internals of ReactTable
             const wrappedInstance = this.checkboxTable.getWrappedInstance();
             // the 'sortedData' property contains the currently accessible records based on the filter and sort
             const currentRecords = wrappedInstance.getResolvedState().sortedData;
             // we just push all the IDs onto the selection array
-            currentRecords.forEach((item) => {
-                selection.push(item._original._id);
+            let init = this.state.page * this.state.pageSize;
+            let final = init + this.state.pageSize - 1;
+            currentRecords.forEach((item, index) => {
+                if (index >= init && index <= final) selection.push(item._original._id);
             })
         }
         this.setState({selectAll, selection}, () => this.state.onItemSelectCallback(this.state.selection));
@@ -277,7 +283,7 @@ class WorkTray extends Component {
 
     render() {
         const {toggleSelection, toggleAll, isSelected, removeAll} = this;
-        const {data, columns, selectAll, selection, alertMsgs} = this.state;
+        const {data, columns, selectAll, selection, page, pageSize, alertMsgs} = this.state;
         const checkboxProps = {
             selectAll,
             isSelected,
@@ -325,7 +331,19 @@ class WorkTray extends Component {
                             ref={(r) => this.checkboxTable = r}
                             data={data}
                             columns={columns}
-                            defaultPageSize={10}
+                            page={page}
+                            defaultPageSize={pageSize}
+                            onPageChange={(page) => this.setState({
+                                page,
+                                selection: [],
+                                selectAll: false
+                            }, () => this.state.onItemSelectCallback(this.state.selection))}
+                            onPageSizeChange={(pageSize) => this.setState({
+                                pageSize,
+                                page: 0,
+                                selection: [],
+                                selectAll: false
+                            }, () => this.state.onItemSelectCallback(this.state.selection))}
                             className="-striped -highlight"
 
                             {...checkboxProps}

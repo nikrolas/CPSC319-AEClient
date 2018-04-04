@@ -47,6 +47,7 @@ class ViewContainer extends Component {
                     childRecordIds: [],
                     notes: ""
                 },
+                traybtn: ''
             };
         this.handleChange = this.handleChange.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
@@ -194,6 +195,65 @@ class ViewContainer extends Component {
             });
     }
 
+    addtoTray = () => {
+        if (this.state.traybtn !== '')
+            return;
+        let stored = localStorage.getItem("tray" + this.state.user.id);
+        let tray = stored ? JSON.parse(stored) : [];
+        let container = Object.assign({}, this.state.containerJson);
+        container["icon"] = "container";
+        let intray = tray.some((item) => {
+            return item["containerId"] === container["containerId"];
+        });
+        if (!intray) {
+            tray.push(container);
+            localStorage.setItem("tray" + this.state.user.id, JSON.stringify(tray));
+            this.setState({traybtn: 'success'});
+        }
+        else
+            this.setState({traybtn: 'error'});
+    };
+    trayBtnText = () => {
+        switch (this.state.traybtn) {
+            case 'success':
+                return <i className="fa fa-check"/>;
+            case 'error':
+                return <i className="fa fa-remove"/>;
+            default:
+                return "Add to Tray";
+        }
+    };
+    trayBtnStyle = () => {
+        const colors = {
+            blue: '#007aff',
+            green: '#4cd964',
+            red: '#ff3b30',
+            white: '#ffffff'
+        };
+        let style = {
+            alignItems: 'center',
+            borderRadius: 35 / 2,
+            borderWidth: 1,
+            height: 35,
+            minWidth: 35,
+            justifyContent: 'center',
+            marginVertical: 10,
+            marginLeft: 5,
+            color: colors.white,
+            backgroundColor: colors.blue,
+        };
+        switch (this.state.traybtn) {
+            case 'success':
+                style["backgroundColor"] = colors.green;
+                return style;
+            case 'error':
+                style["backgroundColor"] = colors.red;
+                return style;
+            default:
+                return style;
+        }
+    };
+
     render() {
         const updateContainerLink = "/updateContainer/" + this.props.match.params.containerId;
 
@@ -317,6 +377,15 @@ class ViewContainer extends Component {
                                     title="Deleting Container">
                                     <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
+                                <button
+                                    ref={ref => {
+                                        this.traybtn = ref
+                                    }}
+                                    disabled={this.state.readOnly}
+                                    onClick={this.addtoTray}
+                                    style={this.trayBtnStyle()}>
+                                    {this.state.traybtn ? this.trayBtnText() : "Add to Tray"}
+                                </button>
                             </ButtonToolbar>
                             <br/>
                         </Col>
