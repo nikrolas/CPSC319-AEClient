@@ -50,9 +50,9 @@ Cypress.Commands.add("createRecord", (recordType, location, recordNumber, title,
         transformedRecordNumber.replace("Z", "A");
         transformedRecordNumber.replace("N", "1");
         if (recordNumber == null) {
-            cy.get("#formRecordNumber").type(transformedRecordNumber);
+            cy.get("#formRecordNumber").clear().type(transformedRecordNumber);
         } else {
-            cy.get("input#formRecordNumber").type(recordNumber);
+            cy.get("input#formRecordNumber").clear().type(recordNumber);
         }
         cy.get("#formTitle").type(title);
 
