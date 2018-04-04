@@ -41,6 +41,7 @@ class ViewRecord extends Component {
                     consignmentCode: "n/a",
                     containerId: "n/a",
                     locationId: "n/a",
+                    classIds:[],
                     classifications: "n/a",
                     notes: "n/a",
                     id: "n/a",

@@ -105,7 +105,12 @@ class UpdateRecord extends Component {
                 this.setState({title: data.title});
                 this.setState({location: data.locationId});
                 this.setState({retentionSchedule: data.scheduleId});
-                this.setState({retentionScheduleName:data.schedule});
+                if(data.schedule === null) {
+                    this.setState({retentionScheduleName:""});
+                }
+                else {
+                    this.setState({retentionScheduleName:data.schedule});
+                }
                 this.setState({stateId: data.stateId});
                 this.setState({consignmentCode:data.consignmentCode});
                 this.setState({notes:data.notes});
@@ -149,7 +154,7 @@ class UpdateRecord extends Component {
             .then(response => response.json())
             .then(data => {
                 let splice_data = data;
-                if(this.state.retentionScheduleName !== null) {
+                if(this.state.retentionScheduleName !== "") {
                     splice_data.splice(3,1);
                 }
                 else {
