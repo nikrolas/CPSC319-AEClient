@@ -254,7 +254,6 @@ class ViewContainer extends Component {
     };
 
     render() {
-        const updateContainerLink = "/updateContainer/" + this.props.match.params.containerId;
 
         let title = {
             textAlign: "left",
@@ -368,9 +367,10 @@ class ViewContainer extends Component {
                     <Row>
                         <Col md={9} mdOffset={2}>
                             <ButtonToolbar style={btnStyle}>
-                                <Link to={updateContainerLink}>
-                                    <Button bsStyle="primary" disabled={this.state.readOnly}> Edit Container </Button>
-                                </Link>
+                                <Button bsStyle="primary" disabled={this.state.readOnly}
+                                        onClick={() => goTo(this.props, "/updateContainer/" + this.props.match.params.containerId)}>
+                                    Edit Container
+                                </Button>
                                 <Button bsStyle="warning"
                                         disabled={this.state.readOnly}
                                         onClick={() => this.bulkAction(destroyAction)}>
