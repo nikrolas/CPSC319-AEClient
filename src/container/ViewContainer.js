@@ -10,6 +10,7 @@ import {Link} from 'react-router-dom';
 import {destroyAction} from "../bulk/Action";
 import {containersResultsAccessors} from "../search/Results";
 import {goTo} from "../context/ContextualActions";
+import {MdMoveToInbox} from 'react-icons/lib/md';
 
 
 class ViewContainer extends Component {
@@ -78,7 +79,7 @@ class ViewContainer extends Component {
 
                     let recordIds = data.childRecordIds;
                     if (recordIds && recordIds.length > 0) {
-                        this.setRecords(recordIds)
+                        this.setRecords(recordIds);
 
                         getMostRecentClosedAt(this.props.match.params.containerId, this.state.user.id)
                             .then(response => {
@@ -121,7 +122,7 @@ class ViewContainer extends Component {
         } else {
             return "N/A";
         }
-    }
+    };
 
     setRecordsState = (records) => {
         let newState = {
@@ -189,7 +190,7 @@ class ViewContainer extends Component {
                 }
             })
             .catch(error => {
-                console.error(error)
+                console.error(error);
                 this.setState({alertMsg: "An unexpected error occurred when trying to delete this container. See the developers console for more details."});
                 window.scrollTo(0, 0);
             });
@@ -216,31 +217,28 @@ class ViewContainer extends Component {
     trayBtnText = () => {
         switch (this.state.traybtn) {
             case 'success':
-                return <i className="fa fa-check"/>;
+                return <span><i className="fa fa-check" style={{marginRight: '5px'}}/>Added to Tray</span>;
             case 'error':
-                return <i className="fa fa-remove"/>;
+                return <span><i className="fa fa-remove" style={{marginRight: '5px'}}/>Already in Tray</span>;
             default:
-                return "Add to Tray";
+                return <span><MdMoveToInbox style={{marginRight: '5px'}}/>Add to Tray</span>;
         }
     };
     trayBtnStyle = () => {
         const colors = {
-            blue: '#007aff',
-            green: '#4cd964',
-            red: '#ff3b30',
+            blue: '#00569c',
+            green: '#57b431',
+            red: '#C4354F',
             white: '#ffffff'
         };
         let style = {
             alignItems: 'center',
-            borderRadius: 35 / 2,
-            borderWidth: 1,
-            height: 35,
-            minWidth: 35,
             justifyContent: 'center',
             marginVertical: 10,
             marginLeft: 5,
             color: colors.white,
             backgroundColor: colors.blue,
+            borderColor: '#2e6da4'
         };
         switch (this.state.traybtn) {
             case 'success':
@@ -268,14 +266,21 @@ class ViewContainer extends Component {
             marginTop: "20px"
         };
 
+        let iconWithText = {
+            marginRight: '5px',
+            verticalAlign: 'middle',
+            transform: 'scale(1.3, 1.3)'
+        };
+
         let containerNumber = this.state.containerJson["containerNumber"];
         if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
             btnStyle = {
                 display: "flex",
                 justifyContent: "left",
                 marginTop: "20px"
+            }
         }
-        }
+
         return (
             <div>
                 {this.state.alertMsg && this.state.alertMsg.length !== 0
@@ -338,7 +343,7 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Notes</b>
                                 <br/>
-                                {this.state.containerJson["notes"] ? this.state.containerJson["notes"]:"N/A"}
+                                {this.state.containerJson["notes"] ? this.state.containerJson["notes"] : "N/A"}
                             </p>
                         </Col>
                     </Row>
@@ -377,15 +382,16 @@ class ViewContainer extends Component {
                                     title="Deleting Container">
                                     <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
                                 </Confirm>
-                                <button
+                                <Button
                                     ref={ref => {
                                         this.traybtn = ref
                                     }}
                                     disabled={this.state.readOnly}
                                     onClick={this.addtoTray}
                                     style={this.trayBtnStyle()}>
-                                    {this.state.traybtn ? this.trayBtnText() : "Add to Tray"}
-                                </button>
+                                    {this.state.traybtn ? this.trayBtnText() :
+                                        <span><MdMoveToInbox style={iconWithText}/>Add to Tray</span>}
+                                </Button>
                             </ButtonToolbar>
                             <br/>
                         </Col>

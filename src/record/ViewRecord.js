@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {getRecordById, deleteRecordByIds, updateRecord} from "../api/RecordsApi";
+import {MdCreateNewFolder, MdLibraryAdd, MdModeEdit, MdMoveToInbox} from 'react-icons/lib/md';
 import {
     Row,
     Col,
@@ -8,7 +9,9 @@ import {
     ButtonToolbar,
     Alert,
     FormGroup,
-    FormControl
+    Form,
+    FormControl,
+    InputGroup
 } from 'react-bootstrap'
 import {Link} from 'react-router-dom';
 import {Confirm} from 'react-confirm-bootstrap'
@@ -41,7 +44,7 @@ class ViewRecord extends Component {
                     consignmentCode: "n/a",
                     containerId: "n/a",
                     locationId: "n/a",
-                    classIds:[],
+                    classIds: [],
                     classifications: "n/a",
                     notes: "n/a",
                     id: "n/a",
@@ -126,7 +129,7 @@ class ViewRecord extends Component {
             let options = {
                 record: false,
                 container: true
-            }
+            };
             let encodedSearchString = encodeURIComponent(this.state.newContainerNumber.trim());
             searchByNumber(encodedSearchString, options, 1, 5, this.state.user.id)
                 .then(response => {
@@ -205,31 +208,28 @@ class ViewRecord extends Component {
     trayBtnText = () => {
         switch (this.state.traybtn) {
             case 'success':
-                return <i className="fa fa-check"/>;
+                return <span><i className="fa fa-check" style={{marginRight: '5px'}}/>Added to Tray</span>;
             case 'error':
-                return <i className="fa fa-remove"/>;
+                return <span><i className="fa fa-remove" style={{marginRight: '5px'}}/>Already in Tray</span>;
             default:
-                return "Add to Tray";
+                return <span><MdMoveToInbox style={{marginRight: '5px'}}/>Add to Tray</span>;
         }
     };
     trayBtnStyle = () => {
         const colors = {
-            blue: '#007aff',
-            green: '#4cd964',
-            red: '#ff3b30',
+            blue: '#00569c',
+            green: '#57b431',
+            red: '#C4354F',
             white: '#ffffff'
         };
         let style = {
             alignItems: 'center',
-            borderRadius: 35 / 2,
-            borderWidth: 1,
-            height: 35,
-            minWidth: 35,
             justifyContent: 'center',
             marginVertical: 10,
             marginLeft: 5,
             color: colors.white,
             backgroundColor: colors.blue,
+            borderColor: '#2e6da4'
         };
         switch (this.state.traybtn) {
             case 'success':
@@ -323,16 +323,19 @@ class ViewRecord extends Component {
         }
     };
 
-
     render() {
-
-        const updateRecordLink = "/updateRecord/" + this.props.match.params.recordId;
 
         let title = {
             textAlign: "left",
         };
         let btnStyle = {
             display: "none",
+        };
+
+        let iconWithText = {
+            marginRight: '5px',
+            verticalAlign: 'middle',
+            transform: 'scale(1.3, 1.3)'
         };
 
         let disabledLink = {
@@ -348,7 +351,7 @@ class ViewRecord extends Component {
             } else {
                 return disabledLink;
             }
-        }
+        };
 
         if (this.state.user.role === "Administrator" || this.state.user.role === "RMC") {
             btnStyle = {
@@ -379,11 +382,11 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Title</b>
                                 <br/>
-                                <div id="title">
-                                {this.state.recordJson["title"] !== ""
-                                    ? this.state.recordJson["title"]
-                                    : "n/a"}
-                                </div>
+                                <span id="title">
+                                    {this.state.recordJson["title"] !== ""
+                                        ? this.state.recordJson["title"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>State</b>
@@ -397,77 +400,77 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Location</b>
                                 <br/>
-                                <div id="location">
-                                {this.state.recordJson["location"] !== ""
-                                    ? this.state.recordJson["location"]
-                                    : "n/a"}
-                                </div>
+                                <span id="location">
+                                    {this.state.recordJson["location"] !== ""
+                                        ? this.state.recordJson["location"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Record Type</b>
                                 <br/>
-                                <div id="recordType">
-                                {this.state.recordJson["type"] !== ""
-                                    ? this.state.recordJson["type"]
-                                    : "n/a"}
-                                </div>
+                                <span id="recordType">
+                                    {this.state.recordJson["type"] !== ""
+                                        ? this.state.recordJson["type"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Classification</b>
                                 <br/>
-                                <div id="classification">
-                                {this.state.recordJson["classifications"] !== ""
-                                    ? this.state.recordJson["classifications"]
-                                    : "n/a"}
-                                </div>
+                                <span id="classification">
+                                    {this.state.recordJson["classifications"] !== ""
+                                        ? this.state.recordJson["classifications"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Consignment Code</b>
                                 <br/>
-                                <div id="consignmentCode">
-                                {this.state.recordJson["consignmentCode"] !== ""
-                                    ? this.state.recordJson["consignmentCode"]
-                                    : "n/a"}
-                                </div>
+                                <span id="consignmentCode">
+                                    {this.state.recordJson["consignmentCode"] !== ""
+                                        ? this.state.recordJson["consignmentCode"]
+                                        : "n/a"}
+                                </span>
                             </p>
                         </Col>
                         <Col md={5}>
                             <p style={title}>
                                 <b>Created At:</b>
                                 <br/>
-                                <div id="createdAt">
-                                {this.state.recordJson["createdAt"] !== ""
-                                    ? this.state.recordJson["createdAt"]
-                                    : "n/a"}
-                                </div>
+                                <span id="createdAt">
+                                    {this.state.recordJson["createdAt"] !== ""
+                                        ? this.state.recordJson["createdAt"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Updated At:</b>
                                 <br/>
-                                <div id="updatedAt">
-                                {this.state.recordJson["updatedAt"] !== ""
-                                    ? this.state.recordJson["updatedAt"]
-                                    : "n/a"}
-                                </div>
+                                <span id="updatedAt">
+                                    {this.state.recordJson["updatedAt"] !== ""
+                                        ? this.state.recordJson["updatedAt"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Closed At:</b>
                                 <br/>
-                                <div id="closedAt">
-                                {this.state.recordJson["closedAt"] !== ""
-                                    ? this.state.recordJson["closedAt"]
-                                    : "n/a"}
-                                </div>
+                                <span id="closedAt">
+                                    {this.state.recordJson["closedAt"] !== ""
+                                        ? this.state.recordJson["closedAt"]
+                                        : "n/a"}
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Retention Schedule:</b>
                                 <br/>
-                                <div id="retentionSchedule">
-                                {this.state.recordJson["schedule"] !== ""
-                                    ? this.state.recordJson["schedule"]
-                                    : "n/a"}
-                                ({this.state.recordJson["scheduleYear"]})
-                                </div>
+                                <span id="retentionSchedule">
+                                    {this.state.recordJson["schedule"] !== ""
+                                        ? this.state.recordJson["schedule"]
+                                        : "n/a"}
+                                    ({this.state.recordJson["scheduleYear"]})
+                                </span>
                             </p>
                             <p style={title}>
                                 <b>Container Number:</b>
@@ -481,89 +484,109 @@ class ViewRecord extends Component {
                             <p style={title}>
                                 <b>Note</b>
                                 <br/>
-                                <div id="note">
-                                {this.state.recordJson["notes"] !== null
-                                    ? this.state.recordJson["notes"]
-                                    : "n/a"}
-                                </div>
+                                <span id="note">
+                                    {this.state.recordJson["notes"] !== null
+                                        ? this.state.recordJson["notes"]
+                                        : "n/a"}
+                                </span>
                             </p>
                         </Col>
                     </Row>
                     <Row>
                         <Col md={10} mdOffset={2}>
                             <ButtonToolbar style={btnStyle}>
-                                <Link to={updateRecordLink}>
-                                    <Button id = "edit" bsStyle="primary" disabled={this.state.readOnly}> Edit Record </Button>
-                                </Link>
-                                <Link to={'/createVolume'}>
-                                    <Button bsStyle="primary" style={{marginLeft: '5px'}}
-                                            disabled={this.state.readOnly}> Create Volume </Button>
-                                </Link>
-                                <Confirm
-                                    onConfirm={this.handleRemoveFromContainer}
-                                    body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
-                                    confirmText="Remove"
-                                    title="Removing from container">
-                                    <Button bsStyle="warning"
-                                            disabled={!this.isInContainer() || this.state.readOnly}>Remove
-                                        From
-                                        Container</Button>
-                                </Confirm>
+                                <Button id="edit"
+                                        bsStyle="primary"
+                                        disabled={this.state.readOnly}
+                                        onClick={() => goTo(this.props, "/updateRecord/" + this.props.match.params.recordId)}
+                                >
+                                    <MdModeEdit style={iconWithText}/>
+                                    Edit Record
+                                </Button>
+                                <Button bsStyle="success"
+                                        disabled={this.state.readOnly}
+                                        onClick={() => {
+                                            goTo(this.props, "/createVolume")
+                                        }}>
+                                    <MdCreateNewFolder style={iconWithText}/>
+                                    Create Volume
+                                </Button>
                                 <Button bsStyle="warning"
                                         onClick={() => this.bulkAction(destroyAction)}
                                         disabled={this.state.readOnly}>
+                                    <i className="fa fa-flag" style={{marginRight: '5px'}}/>
                                     Destroy
                                 </Button>
-                                <Confirm
-                                    onConfirm={this.handleSubmit}
-                                    body="Are you sure you want to delete this?"
-                                    confirmText="Delete"
-                                    title="Deleting Record">
-                                    <Button bsStyle="danger" disabled={this.state.readOnly}>Delete</Button>
-                                </Confirm>
-                            </ButtonToolbar>
-                        </Col>
-                    </Row>
-                    <Row style={{marginTop: "10px"}}> <ButtonToolbar style={btnStyle}>
-                        <Col md={3} mdOffset={2}>
-
-                            <form onSubmit={e => {
-                                e.preventDefault();
-                            }}>
-                                <FormGroup
-                                    controlId="addToContainerInput"
-                                >
-                                    <FormControl
-                                        type="text"
-                                        name="newContainerNumber"
-                                        value={this.state.newContainerNumber}
-                                        placeholder="Enter Container Number"
-                                        onChange={this.handleChange}
-                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
-                                    />
-                                </FormGroup>
-                            </form>
-                        </Col>
-                        <Col>
-                            <ButtonToolbar style={btnStyle}>
-                                <Button bsStyle="primary"
-                                        disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
-                                        onClick={this.addToContainer}
-                                >
-                                    Add to Container
-                                </Button>
-                                <button
+                                <Button
                                     ref={ref => {
                                         this.traybtn = ref
                                     }}
                                     disabled={this.state.readOnly}
                                     onClick={this.addtoTray}
                                     style={this.trayBtnStyle()}>
-                                    {this.state.traybtn ? this.trayBtnText() : "Add to Tray"}
-                                </button>
+                                    {this.state.traybtn ? this.trayBtnText() :
+                                        <span><MdMoveToInbox style={iconWithText}/>Add to Tray</span>}
+                                </Button>
+                                <Confirm
+                                    onConfirm={this.handleSubmit}
+                                    body="Are you sure you want to delete this?"
+                                    confirmText="Delete"
+                                    title="Deleting Record">
+                                    <Button bsStyle="danger"
+                                            disabled={this.state.readOnly}>
+                                        <i className="fa fa-trash-o" style={{marginRight: '5px'}}/>
+                                        Delete
+                                    </Button>
+                                </Confirm>
                             </ButtonToolbar>
                         </Col>
-                    </ButtonToolbar>
+                    </Row>
+                    <Row style={{marginTop: "10px"}}>
+                        <Col md={10} mdOffset={2}>
+                            <Form inline style={{float: "left"}}>
+                                <InputGroup style={{marginRight: "5px"}}>
+                                    <FormGroup
+                                        controlId="addToContainerInput"
+                                    >
+                                        <FormControl
+                                            type="text"
+                                            name="newContainerNumber"
+                                            value={this.state.newContainerNumber}
+                                            placeholder="Enter Container Number"
+                                            onChange={this.handleChange}
+                                            disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
+                                        />
+                                    </FormGroup>
+                                    <InputGroup.Button>
+                                        <Button bsStyle="success"
+                                                disabled={this.state.recordJson.containerId !== 0 || this.state.readOnly}
+                                                onClick={this.addToContainer}>
+                                            <MdLibraryAdd style={iconWithText}/>
+                                            Add to Container
+                                        </Button>
+                                    </InputGroup.Button>
+                                </InputGroup>
+                                <Button bsStyle="primary"
+                                        disabled={this.state.readOnly}
+                                        onClick={() => goTo(this.props, "/createContainer")}>
+                                    <i className="fa fa-dropbox" style={iconWithText}/>
+                                    Contain
+                                </Button>
+                                <Confirm
+                                    style={{marginLeft: '5px'}}
+                                    onConfirm={this.handleRemoveFromContainer}
+                                    body={"Are you sure you want to remove " + this.state.recordJson["number"] + " from it's container?"}
+                                    confirmText="Remove"
+                                    title="Removing from container">
+                                    <Button
+                                        bsStyle="warning"
+                                        disabled={!this.isInContainer() || this.state.readOnly}>
+                                        <i className="fa fa-minus-square" style={{marginRight: '5px'}}/>
+                                        Remove From Container
+                                    </Button>
+                                </Confirm>
+                            </Form>
+                        </Col>
                     </Row>
                 </Grid>
                 <br/>

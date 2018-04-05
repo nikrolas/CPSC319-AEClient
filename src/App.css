@@ -33,3 +33,33 @@
     padding-top: 16px;
 }
 
+/*Bootstrap Overrides*/
+.btn-success {
+     background-color: #57b431;
+ }
+
+.btn-success:hover {
+    background-color: #2e7510;
+}
+
+.btn-primary {
+    background-color: #00569c;
+}
+
+.btn-primary:hover {
+    background-color: #003765;
+}
+
+.btn-warning {
+    background-color: #F8AA3E;
+}
+.btn-warning:hover {
+    background-color: #F28c00;
+}
+
+.btn-danger {
+     background-color: #C4354F;
+ }
+.btn-danger:hover {
+    background-color: #cc0000;
+}
