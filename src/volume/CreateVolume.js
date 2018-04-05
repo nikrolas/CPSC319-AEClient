@@ -35,7 +35,7 @@ class CreateVolume extends Component {
                             alertMsg: "Nothing selected. Redirecting..",
                             timeout: setTimeout(() => {
                                 this.props.history.goBack();
-                            }, 2000)
+                            }, 1000)
                         }
                     );
                     window.scrollTo(0, 0);
@@ -106,8 +106,10 @@ class CreateVolume extends Component {
     }
 
     handleSubmit(event) {
-        let {volumes, copy} = this.state;
+        if (this.state.timeout)
+            return;
 
+        let {volumes, copy} = this.state;
         let latest = volumes[volumes.length - 1];
         let id = null;
         if (latest) {
@@ -128,16 +130,17 @@ class CreateVolume extends Component {
                 window.scrollTo(0, 0)
             }
             else {
-                if (!this.state.timeout) {
+                this.props.history.push("/viewRecord/" + data.id);
+                /*if (!this.state.timeout) {
                     this.setState({
                         timeout: setTimeout(() => {
                             this.props.history.push("/viewRecord/" + data.id);
-                        }, 2000),
+                        }, 500),
                         success: true,
-                        alertMsg: "Success",
+                        alertMsg: "Success. Redirecting..",
                     });
                     window.scrollTo(0, 0);
-                }
+                }*/
             }
         })
         .catch(error => {
@@ -149,9 +152,11 @@ class CreateVolume extends Component {
     }
 
     handleClick(event, index) {
-            let routePath = "/viewRecord/" + this.state.volumes[index].id;
-            this.props.history.push(routePath);
-            event.preventDefault();
+        if (this.state.timeout)
+            return;
+        let routePath = "/viewRecord/" + this.state.volumes[index].id;
+        this.props.history.push(routePath);
+        event.preventDefault();
     };
 
     displayVolumes = () => {
