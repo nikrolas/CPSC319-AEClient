@@ -241,6 +241,15 @@ class SelectTable extends Component {
         });
     };
 
+    getDecodedSearchString = () => {
+        let decodedString = "";
+        let searchString = this.props.match.params.searchString;
+        if (searchString) {
+            decodedString = decodeURIComponent(searchString);
+        }
+        return decodedString;
+    };
+
     sortThisColumn = (id, desc) => {
         let data = [...this.state.data];
         data.sort((a, b) => this.defaultSortMethod(a[id], b[id]));
@@ -288,7 +297,7 @@ class SelectTable extends Component {
                     : null
                 }
                 <div style={{marginBottom: '1cm'}}>
-                    <Search searchValue={this.props.match.params.searchString}/>
+                    <Search searchValue={this.getDecodedSearchString()}/>
                 </div>
                 <div style={styles.btncontainer}>
                     <button className='btn btn-s'
@@ -302,11 +311,11 @@ class SelectTable extends Component {
                     <div style={styles.filter}>
                         <h4 style={{float: 'left'}}>Filter:</h4>
                         <select
-                        id="filterSelect"
+                            id="filterSelect"
                             style={styles.sel}
-                                className="form-control"
-                                onChange={this.handleSelectChange}
-                                value={selectvalue}>
+                            className="form-control"
+                            onChange={this.handleSelectChange}
+                            value={selectvalue}>
                             <option value='none' selected>None</option>
                             <option value='records'>Records</option>
                             <option value='containers'>Containers</option>
@@ -346,30 +355,30 @@ const colors = {
     palered: '#ff9c81'
 };
 let styles = {
-        container: {
-            padding: '5%'
-        },
+    container: {
+        padding: '5%'
+    },
     tablecontainer: {
-            //border: '5px solid gray'
-            marginTop: '5px',
-        },
-        btncontainer: {
-            //border: '2px solid blue',
-            alignItems: 'center',
-            height: '1cm'
-        },
-        filter: {
-            //marginRight: '0.5cm',
-            float: 'right',
-            height: '100%',
-        },
-        sel: {
-            marginLeft: '5px',
-            marginTop: '3px',
-            float: 'left',
-            height: '85%',
-            width: 'auto',
-        },
-    };
+        //border: '5px solid gray'
+        marginTop: '5px',
+    },
+    btncontainer: {
+        //border: '2px solid blue',
+        alignItems: 'center',
+        height: '1cm'
+    },
+    filter: {
+        //marginRight: '0.5cm',
+        float: 'right',
+        height: '100%',
+    },
+    sel: {
+        marginLeft: '5px',
+        marginTop: '3px',
+        float: 'left',
+        height: '85%',
+        width: 'auto',
+    },
+};
 
 export default SelectTable;
