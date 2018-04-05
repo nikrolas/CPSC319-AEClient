@@ -1,8 +1,7 @@
 describe('search', function () {
-    let serviceRoot = "/";
-
     beforeEach(function () {
-        cy.visit(serviceRoot);
+        cy.visit("/");
+        cy.switchUser(500);
     });
 
     it('should search with enter input', function () {
