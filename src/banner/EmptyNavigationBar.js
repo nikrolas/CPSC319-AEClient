@@ -7,7 +7,7 @@ import {Navbar, Nav, NavItem} from "react-bootstrap";
 class EmptyNavigationBar extends Component {
     render() {
         return (
-            <Navbar inverse fluid>
+            <Navbar fluid>
                 <Nav>
                     <NavItem className="logo-container" componentClass={Link} href="/" to="/">
                         <img src={banner_logo} className="App-logo" alt="logo"/>

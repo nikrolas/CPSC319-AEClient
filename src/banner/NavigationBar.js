@@ -70,7 +70,7 @@ class NavigationBar extends Component {
         }
 
         return (
-            <Navbar inverse fluid>
+            <Navbar fluid>
                 <Nav>
                     <NavItem className="logo-container" componentClass={Link} href="/" to="/">
                         <img src={banner_logo} className="App-logo" alt="logo"/>

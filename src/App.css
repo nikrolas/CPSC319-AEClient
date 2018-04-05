@@ -35,8 +35,8 @@
 
 /*Bootstrap Overrides*/
 .btn-success {
-     background-color: #57b431;
- }
+    background-color: #57b431;
+}
 
 .btn-success:hover {
     background-color: #2e7510;
@@ -53,13 +53,31 @@
 .btn-warning {
     background-color: #F8AA3E;
 }
+
 .btn-warning:hover {
     background-color: #F28c00;
 }
 
 .btn-danger {
-     background-color: #C4354F;
- }
+    background-color: #C4354F;
+}
+
 .btn-danger:hover {
     background-color: #cc0000;
+}
+
+.navbar {
+    background-color: #57b431;
+    border: none;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #fff;
+    font-size: large;
+}
+
+.navbar-default .nav.navbar-nav.navbar-right> li > a {
+    color: #fff;
+    font-size: medium;
+    font-weight: normal;
 }

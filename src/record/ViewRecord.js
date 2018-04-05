@@ -543,7 +543,7 @@ class ViewRecord extends Component {
                         </Col>
                     </Row>
                     <Row style={{marginTop: "10px"}}>
-                        <Col md={10} mdOffset={2}>
+                        <Col md={10} mdOffset={2} style={btnStyle}>
                             <Form inline style={{float: "left"}}>
                                 <InputGroup style={{marginRight: "5px"}}>
                                     <FormGroup
