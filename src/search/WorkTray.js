@@ -33,7 +33,6 @@ class WorkTray extends Component {
     componentWillMount() {
         let stored = localStorage.getItem("tray" + this.state.user.id);
         if (stored && stored.length > 0) {
-            console.log(stored);
             stored = JSON.parse(stored);
             let ids = {records: [], containers: []};
             stored.forEach((item) => {
