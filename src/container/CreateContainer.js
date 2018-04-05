@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, FormGroup, ControlLabel, FormControl, Alert, HelpBlock} from 'react-bootstrap'
+import {Button, FormGroup, ControlLabel, FormControl, Alert, HelpBlock, Row, Grid} from 'react-bootstrap'
 import {createContainer} from "../api/ContainersApi";
 import ReactTable from "react-table";
 import AlertDismissable from "../AlertDismissable";
@@ -254,78 +254,90 @@ class CreateContainer extends Component {
                     ? <Alert bsStyle="success"><h4>{this.state.alertMsg}</h4></Alert>
                     : null
                 }
-                <h1>New Container</h1>
-                <b>Due for destruction</b>
-                <div>{destructionDate}</div>
-                <form onSubmit={this.handleSubmit} style={styles.formStyle}>
-                    <FormGroup
-                        controlId="formTitle"
-                        validationState={this.state.titleValidationState}
-                    >
-                        <ControlLabel>Title {requiredLabel}</ControlLabel>
-                        <FormControl
-                            name="title"
-                            type="text"
-                            value={this.state.title}
-                            placeholder="Enter container title"
-                            onChange={this.handleChange}
-                        />
-                        {this.state.titleValidationState === "error"
-                            ? <HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
-                            : null
-                        }
-                    </FormGroup>
-                    <FormGroup
-                        controlId="formLocation"
-                        onChange={this.handleChange}
-                        validationState={this.state.locationValidationState}
-                    >
-                        <ControlLabel>Location {requiredLabel}</ControlLabel>
-                        <FormControl
-                            name="locationId"
-                            componentClass="select"
-                            value={this.state.locationId}
-                        >
-                            {listLocationJson}
-                        </FormControl>
-                        {this.state.locationValidationState === "error"
-                            ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
-                            : null
-                        }
-                    </FormGroup>
-                    <FormGroup
-                        controlId="formNotes"
-                        validationState={this.state.notesValidationState}
-                    >
-                        <ControlLabel>Notes</ControlLabel>
-                        <FormControl name="notes"
-                                     componentClass="textarea"
-                                     placeholder="Enter text"
-                                     value={this.state.notes}
-                                     onChange={this.handleChange}/>
-                        {this.state.notesValidationState === "error"
-                            ? <HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
-                            : null
-                        }
-                    </FormGroup>
-                    <Button bsStyle="danger" style={{marginRight: '10px'}} onClick={() => {
-                        this.props.history.goBack()
-                    }}>Cancel</Button>
-                    <Button bsStyle="primary" type="submit" disabled={!this.state.success}>Submit</Button>
-                </form>
-                <div style={styles.container}>
-                    <strong>Records to contain:</strong>
-                    <div style={styles.recordsTable}>
-                        <ReactTable
-                            data={data}
-                            columns={columns}
-                            className="-striped -highlight"
-                            showPagination={true}
-                            minRows={5}
-                            defaultPageSize={5}
-                        />
-                    </div>
-                </div>
+                <Grid>
+                    <Row>
+                        <h1>New Container</h1>
+                    </Row>
+                    <Row>
+                        <b>Due for destruction</b>
+                    </Row>
+                    <Row>
+                        <div>{destructionDate}</div>
+                    </Row>
+                    <Row>
+                        <form onSubmit={this.handleSubmit} style={styles.formStyle}>
+                            <FormGroup
+                                controlId="formTitle"
+                                validationState={this.state.titleValidationState}
+                            >
+                                <ControlLabel>Title {requiredLabel}</ControlLabel>
+                                <FormControl
+                                    name="title"
+                                    type="text"
+                                    value={this.state.title}
+                                    placeholder="Enter container title"
+                                    onChange={this.handleChange}
+                                />
+                                {this.state.titleValidationState === "error"
+                                    ? <HelpBlock>{this.state.titleValidationMsg}</HelpBlock>
+                                    : null
+                                }
+                            </FormGroup>
+                            <FormGroup
+                                controlId="formLocation"
+                                onChange={this.handleChange}
+                                validationState={this.state.locationValidationState}
+                            >
+                                <ControlLabel>Location {requiredLabel}</ControlLabel>
+                                <FormControl
+                                    name="locationId"
+                                    componentClass="select"
+                                    value={this.state.locationId}
+                                >
+                                    {listLocationJson}
+                                </FormControl>
+                                {this.state.locationValidationState === "error"
+                                    ? <HelpBlock>{this.state.locationValidationMsg}</HelpBlock>
+                                    : null
+                                }
+                            </FormGroup>
+                            <FormGroup
+                                controlId="formNotes"
+                                validationState={this.state.notesValidationState}
+                            >
+                                <ControlLabel>Notes</ControlLabel>
+                                <FormControl name="notes"
+                                             componentClass="textarea"
+                                             placeholder="Enter text"
+                                             value={this.state.notes}
+                                             onChange={this.handleChange}/>
+                                {this.state.notesValidationState === "error"
+                                    ? <HelpBlock>{this.state.notesValidationMsg}</HelpBlock>
+                                    : null
+                                }
+                            </FormGroup>
+                            <Button bsStyle="danger" style={{marginRight: '10px'}} onClick={() => {
+                                this.props.history.goBack()
+                            }}>Cancel</Button>
+                            <Button bsStyle="primary" type="submit" disabled={!this.state.success}>Submit</Button>
+                        </form>
+                    </Row>
+                    <Row>
+                        <div style={styles.container}>
+                            <strong>Records to contain:</strong>
+                            <div style={styles.recordsTable}>
+                                <ReactTable
+                                    data={data}
+                                    columns={columns}
+                                    className="-striped -highlight"
+                                    showPagination={true}
+                                    minRows={5}
+                                    defaultPageSize={5}
+                                />
+                            </div>
+                        </div>
+                    </Row>
+                </Grid>
             </div>
         )
     }
