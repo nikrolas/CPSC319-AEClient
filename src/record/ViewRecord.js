@@ -22,6 +22,7 @@ import {destroyAction} from "../bulk/Action";
 import {goTo} from "../context/ContextualActions";
 import {addRecordsToContainer} from "../api/ContainersApi";
 import {searchByNumber} from "../api/SearchApi";
+import {isARecordItem} from "../utilities/Items";
 
 
 class ViewRecord extends Component {
@@ -195,7 +196,7 @@ class ViewRecord extends Component {
         let record = Object.assign({}, this.state.recordJson);
         record["icon"] = "record";
         let intray = tray.some((item) => {
-            return item["id"] === record["id"];
+            return isARecordItem(item) && item["id"] === record["id"];
         });
         if (!intray) {
             tray.push(record);

@@ -11,6 +11,7 @@ import {destroyAction} from "../bulk/Action";
 import {containersResultsAccessors} from "../search/Results";
 import {goTo} from "../context/ContextualActions";
 import {MdMoveToInbox} from 'react-icons/lib/md';
+import {isAContainerItem} from "../utilities/Items";
 
 
 class ViewContainer extends Component {
@@ -204,7 +205,7 @@ class ViewContainer extends Component {
         let container = Object.assign({}, this.state.containerJson);
         container["icon"] = "container";
         let intray = tray.some((item) => {
-            return item["containerId"] === container["containerId"];
+            return isAContainerItem(item) && item["containerId"] === container["containerId"];
         });
         if (!intray) {
             tray.push(container);

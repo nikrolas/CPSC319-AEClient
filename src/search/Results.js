@@ -8,6 +8,7 @@ import {getColumns, setData} from "../utilities/ReactTable";
 import ContextualActions from '../context/ContextualActions';
 import {searchByNumber} from "../api/SearchApi";
 import {Alert} from 'react-bootstrap';
+import {isAContainerItem, isARecordItem} from "../utilities/Items";
 
 const CheckboxTable = checkboxHOC(ReactTable);
 
@@ -145,9 +146,14 @@ class SelectTable extends Component {
         let updated = false;
         this.state.selection.forEach((id) => {
             let selected = Object.assign({}, this.state.data[id]);
-            let idtype = selected["icon"] === "record" ? "id" : "containerId";
             let intray = tray.some((item) => {
-                return item[idtype] === selected[idtype];
+                if (isARecordItem(item) && !isAContainerItem(item)) {
+                    return item["id"] === selected["id"];
+                } else if (isAContainerItem(item)) {
+                    return item["containerId"] === selected["containerId"];
+                } else {
+                    return false;
+                }
             });
             if (!intray) {
                 //delete selected._id;
