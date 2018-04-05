@@ -6,7 +6,6 @@ import {getRecordsByIds} from "../api/RecordsApi";
 import ReactTable from "react-table";
 import {getColumns, setData} from "../utilities/ReactTable";
 import {getDateString, getDateTimeString, transformDates} from "../utilities/DateTime";
-import {Link} from 'react-router-dom';
 import {destroyAction} from "../bulk/Action";
 import {containersResultsAccessors} from "../search/Results";
 import {goTo} from "../context/ContextualActions";
