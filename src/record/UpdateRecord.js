@@ -111,6 +111,23 @@ class UpdateRecord extends Component {
                 else {
                     this.setState({retentionScheduleName:data.schedule});
                 }
+                getRecordStates()
+                    .then(response => response.json())
+                    .then(data => {
+                        let splice_data = data;
+                        if(this.state.retentionScheduleName !== "") {
+                            splice_data.splice(3,1);
+                        }
+                        else {
+                            splice_data.splice(1,1);
+                            splice_data.splice(4,1);
+                        }
+                        this.setState({recordStateResponse: splice_data});
+                    })
+                    .catch(err => {
+                        console.error("Error loading record: " + err.message);
+                        this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
+                    });
                 this.setState({stateId: data.stateId});
                 this.setState({consignmentCode:data.consignmentCode});
                 this.setState({notes:data.notes});
@@ -145,23 +162,6 @@ class UpdateRecord extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({retentionScheduleResponse: data});
-            })
-            .catch(err => {
-                console.error("Error loading record: " + err.message);
-                this.setState({alertMsg: "The application was unable to connect to the server. Please try again later."})
-            });
-        getRecordStates()
-            .then(response => response.json())
-            .then(data => {
-                let splice_data = data;
-                if(this.state.retentionScheduleName !== "") {
-                    splice_data.splice(3,1);
-                }
-                else {
-                    splice_data.splice(1,1);
-                    splice_data.splice(4,1);
-                }
-                this.setState({recordStateResponse: splice_data});
             })
             .catch(err => {
                 console.error("Error loading record: " + err.message);
