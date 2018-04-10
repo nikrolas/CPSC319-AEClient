@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getRecordById, deleteRecordByIds, updateRecord} from "../api/RecordsApi";
+import {getRecordById, deleteRecordByIds, updateRecord, getDestructionDate} from "../api/RecordsApi";
 import {MdCreateNewFolder, MdLibraryAdd, MdModeEdit, MdMoveToInbox} from 'react-icons/lib/md';
 import {
     Row,
@@ -37,6 +37,7 @@ class ViewRecord extends Component {
                 readOnly: false,
                 newContainerNumber: "",
                 newContainerId: 0,
+                destructionDate: "",
                 recordJson: {
                     title: "n/a",
                     number: "n/a",
@@ -118,6 +119,27 @@ class ViewRecord extends Component {
             }
         });
         context.setState({"recordJson": data}, callback);
+        this.getDestructionDate([data.id]);
+    };
+
+    getDestructionDate = (recordIds) => {
+        if (recordIds && recordIds.length > 0) {
+            getDestructionDate(recordIds, this.state.user.id)
+                .then(response => {
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.error) {
+                        console.error(result.error);
+                    } else if (!isNaN(result) && result !== null) {
+                        let destructionDate = getDateTimeString(new Date(result));
+                        this.setState({destructionDate});
+                    }
+                })
+                .catch(error => {
+                    console.error("Error retrieving destruction date: " + error);
+                })
+        }
     };
 
     handleChange(e) {
@@ -365,6 +387,16 @@ class ViewRecord extends Component {
             containerPath = "/viewContainer/" + this.state.recordJson.containerId;
         }
 
+        let yearSuffix = null;
+
+        if (!isNaN(this.state.recordJson["scheduleYear"]) && this.state.recordJson["scheduleYear"] !== null) {
+            if (this.state.recordJson["scheduleYear"] === 1) {
+                yearSuffix = "year";
+            } else if (this.state.recordJson["scheduleYear"] >= 0) {
+                yearSuffix = "years";
+            }
+        }
+
         return (
             <div>
                 {this.state.alertMsg && this.state.alertMsg.length !== 0
@@ -464,13 +496,23 @@ class ViewRecord extends Component {
                                 </span>
                             </p>
                             <p style={title}>
+                                <b>Destruction Date:</b>
+                                <br/>
+                                <span id="destructionDate">
+                                    {this.state.destructionDate !== ""
+                                        ? this.state.destructionDate
+                                        : "n/a"}
+                                </span>
+                            </p>
+                            <p style={title}>
                                 <b>Retention Schedule:</b>
                                 <br/>
                                 <span id="retentionSchedule">
                                     {this.state.recordJson["schedule"] !== ""
                                         ? this.state.recordJson["schedule"]
                                         : "n/a"}
-                                    ({this.state.recordJson["scheduleYear"]})
+                                    {yearSuffix ?
+                                        " (" + this.state.recordJson["scheduleYear"] + " " + yearSuffix + ")" : null}
                                 </span>
                             </p>
                             <p style={title}>

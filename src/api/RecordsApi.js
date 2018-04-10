@@ -103,3 +103,16 @@ export function destroyRecords(recordIds, userId) {
         })
     });
 }
+
+export function getDestructionDate(recordIds, userId) {
+    return fetch(serviceRoot + '/destructiondate?userId=' + userId, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            recordIds: recordIds
+        })
+    });
+}

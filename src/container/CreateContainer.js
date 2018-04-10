@@ -5,6 +5,8 @@ import ReactTable from "react-table";
 import AlertDismissable from "../AlertDismissable";
 import {isARecordItem} from "../utilities/Items";
 import {setData} from "../utilities/ReactTable";
+import {getDateTimeString} from "../utilities/DateTime";
+import {getDestructionDate} from "../api/RecordsApi";
 
 class CreateContainer extends Component {
 
@@ -20,7 +22,7 @@ class CreateContainer extends Component {
                 title: "",
                 locationId: null,
                 locations: [],
-                destructionDate: this.getDestructionDate(),
+                destructionDate: "",
                 notes: "",
                 selectedRecords: selectedItems.selectedRecords,
                 selectedContainers: selectedItems.selectedContainers,
@@ -64,7 +66,7 @@ class CreateContainer extends Component {
                 if (record.scheduleId !== firstRecordSchedule) {
                     differentSchedules = true;
                 }
-            })
+            });
 
             if (recordsAlreadyContained.length > 0) {
                 let recordNumbers = recordsAlreadyContained.map(r => r.containerNumber);
@@ -78,6 +80,7 @@ class CreateContainer extends Component {
                     success: false
                 });
             } else {
+                this.estimateDestructionDate();
                 this.setState({success: true});
             }
         }
@@ -102,14 +105,43 @@ class CreateContainer extends Component {
         return {selectedRecords, selectedContainers};
     };
 
-    getDestructionDate = () => {
-        //TODO: get destruction date of selected records
-        return "September 12, 2010 6:52PM";
+    estimateDestructionDate = () => {
+        if (this.state.selectedContainers && this.state.selectedContainers.length > 0) {
+            getDestructionDate(this.state.selectedContainers[0].childRecordIds);
+        } else if (this.state.selectedRecords && this.state.selectedRecords.length > 0) {
+            let scheduleYear = this.state.selectedRecords[0].scheduleYear;
+
+            if (!isNaN(scheduleYear) && scheduleYear !== null) {
+                let currentDate = new Date();
+                let currentYear = currentDate.getFullYear();
+                let currentMonth = currentDate.getMonth();
+                let currentDay = currentDate.getDate();
+                let destructionDate = new Date(currentYear + scheduleYear, currentMonth, currentDay);
+
+                let destructionDateTimeString = getDateTimeString(destructionDate);
+                this.setState({destructionDate: destructionDateTimeString});
+            }
+        }
     };
 
-    //TODO - Validationstate is working but will have to likely create many for different validations
-    getValidationState() {
-
+    getDestructionDate = (recordIds) => {
+        if (recordIds && recordIds.length > 0) {
+            getDestructionDate(recordIds, this.state.user.id)
+                .then(response => {
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.error) {
+                        console.error(result.error);
+                    } else if (!isNaN(result) && result !== null) {
+                        let destructionDate = getDateTimeString(new Date(result));
+                        this.setState({destructionDate});
+                    }
+                })
+                .catch(error => {
+                    console.error("Error retrieving destruction date: " + error);
+                })
+        }
     };
 
     handleChange(e) {
@@ -225,7 +257,7 @@ class CreateContainer extends Component {
 
     render() {
         let listLocationJson = null;
-        const destructionDate = <div>{this.state.destructionDate}</div>;
+        const destructionDate = <div>{this.state.destructionDate ? this.state.destructionDate : "n/a"}</div>;
         const requiredLabel = <span style={{color: 'red'}}>(Required)</span>;
         const {columns, data} = this.state;
 

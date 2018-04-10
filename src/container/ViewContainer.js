@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Row, Col, Grid, Button, ButtonToolbar, Alert} from 'react-bootstrap'
 import {Confirm} from 'react-confirm-bootstrap'
 import {deleteContainers, getContainerById, getMostRecentClosedAt} from "../api/ContainersApi";
-import {getRecordsByIds} from "../api/RecordsApi";
+import {getDestructionDate, getRecordsByIds} from "../api/RecordsApi";
 import ReactTable from "react-table";
 import {getColumns, setData} from "../utilities/ReactTable";
 import {getDateString, getDateTimeString, transformDates} from "../utilities/DateTime";
@@ -26,6 +26,7 @@ class ViewContainer extends Component {
                 success: false,
                 readOnly: false,
                 closedAt: null,
+                destructionDate: null,
                 data: [],
                 columns: columns,
                 records: [],
@@ -80,6 +81,7 @@ class ViewContainer extends Component {
                     let recordIds = data.childRecordIds;
                     if (recordIds && recordIds.length > 0) {
                         this.setRecords(recordIds);
+                        this.getDestructionDate(recordIds);
 
                         getMostRecentClosedAt(this.props.match.params.containerId, this.state.user.id)
                             .then(response => {
@@ -112,15 +114,42 @@ class ViewContainer extends Component {
         goTo(this.props, "/confirmAction");
     };
 
+    getDestructionDate = (recordIds) => {
+        if (recordIds && recordIds.length > 0) {
+            getDestructionDate(recordIds, this.state.user.id)
+                .then(response => {
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.error) {
+                        console.error(result.error);
+                    } else if (!isNaN(result) && result !== null) {
+                        let destructionDate = getDateTimeString(new Date(result));
+                        this.setState({destructionDate});
+                    }
+                })
+                .catch(error => {
+                    console.error("Error retrieving destruction date: " + error);
+                })
+        }
+    };
+
     scheduleText = () => {
         if (this.state.containerJson && this.state.containerJson.scheduleName) {
             let yearStr = "";
+            let yearSuffix = "";
             if (this.state.containerJson.scheduleYear !== null) {
-                yearStr = " (" + this.state.containerJson.scheduleYear + ")";
+                if (this.state.containerJson["scheduleYear"] === 1) {
+                    yearSuffix = "year";
+                } else if (this.state.containerJson["scheduleYear"] >= 0) {
+                    yearSuffix = "years";
+                }
+                yearStr = " (" + this.state.containerJson.scheduleYear + " " + yearSuffix + ")";
             }
             return this.state.containerJson.scheduleName + yearStr;
-        } else {
-            return "N/A";
+        }
+        else {
+            return "n/a";
         }
     };
 
@@ -280,6 +309,15 @@ class ViewContainer extends Component {
             }
         }
 
+        let destructionDateElement = null;
+        if (this.state.destructionDate) {
+            destructionDateElement = <p style={title}>
+                <b>Destruction Date:</b>
+                <br/>
+                {this.state.destructionDate}
+            </p>;
+        }
+
         return (
             <div>
                 {this.state.alertMsg && this.state.alertMsg.length !== 0
@@ -303,12 +341,12 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Location</b>
                                 <br/>
-                                {this.state.containerJson.locationName ? this.state.containerJson.locationName : "N/A"}
+                                {this.state.containerJson.locationName ? this.state.containerJson.locationName : "n/a"}
                             </p>
                             <p style={title}>
                                 <b>State</b>
                                 <br/>
-                                {this.state.containerJson.state ? this.state.containerJson.state : "N/A"}
+                                {this.state.containerJson.state ? this.state.containerJson.state : "n/a"}
                             </p>
                             <p style={title}>
                                 <b>Consignment Code</b>
@@ -335,14 +373,15 @@ class ViewContainer extends Component {
                             <p style={title}>
                                 <b>Closed At:</b>
                                 <br/>
-                                {this.state.closedAt ? this.state.closedAt : "N/A"}
+                                {this.state.closedAt ? this.state.closedAt : "n/a"}
                             </p>
+                            {destructionDateElement}
                         </Col>
                         <Col md={10} mdOffset={2}>
                             <p style={title}>
                                 <b>Notes</b>
                                 <br/>
-                                {this.state.containerJson["notes"] ? this.state.containerJson["notes"] : "N/A"}
+                                {this.state.containerJson["notes"] ? this.state.containerJson["notes"] : "n/a"}
                             </p>
                         </Col>
                     </Row>
